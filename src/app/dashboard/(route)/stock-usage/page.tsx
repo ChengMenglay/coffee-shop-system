@@ -1,8 +1,8 @@
 import React from "react";
-import IngredientClient from "./components/client";
 import { prisma } from "@/lib/prisma";
 import { IngredientStockColumn } from "./components/columns";
 import { format } from "date-fns";
+import IngredientStockClient from "./components/client";
 async function IngredientStock() {
   const ingredientStocks = await prisma.ingredientStock.findMany({
     include: { ingredient: true },
@@ -21,7 +21,7 @@ async function IngredientStock() {
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 px-6 py-8">
-        <IngredientClient data={formattedIngredientStock} />
+        <IngredientStockClient data={formattedIngredientStock} />
       </div>
     </div>
   );

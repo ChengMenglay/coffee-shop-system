@@ -53,7 +53,7 @@ export async function PATCH(
       where: { id: ingredientId },
       data: {
         stock:
-          Number(ingredient.stock) +
+          Number(ingredient?.stock) +
           Number(ingredientStockData?.quantity) -
           quantity,
       },
@@ -79,6 +79,19 @@ export async function DELETE(
       return new NextResponse("Ingredient  stock Id is required", {
         status: 400,
       });
+    const ingredientStockData = await prisma.ingredientStock.findUnique({
+      where: { id: stockUsageId },
+    });
+    const ingredient = await prisma.ingredient.findUnique({
+      where: { id: ingredientStockData?.ingredientId },
+    });
+    await prisma.ingredient.update({
+      where: { id: ingredientStockData?.ingredientId },
+      data: {
+        stock:
+          Number(ingredient?.stock) + Number(ingredientStockData?.quantity),
+      },
+    });
     const ingredientStock = await prisma.ingredientStock.delete({
       where: { id: stockUsageId },
     });

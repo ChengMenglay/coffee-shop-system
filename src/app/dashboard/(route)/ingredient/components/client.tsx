@@ -24,6 +24,7 @@ function IngredientClient({ data }: IngredientColumnProps) {
         <Header
           title="Ingredient"
           subtitle="Manage ingredient for your store."
+          total={data.length}
         />
         <div className="flex items-center gap-2">
           <Button variant={"outline"} onClick={() => setFilterdData(data)}>
@@ -37,7 +38,7 @@ function IngredientClient({ data }: IngredientColumnProps) {
           </Button>
         </div>
       </div>
-      <Separator />
+      <Separator className="my-6" />
       <DataTable searchKey="name" columns={columns} data={filterdData} />
     </>
   );

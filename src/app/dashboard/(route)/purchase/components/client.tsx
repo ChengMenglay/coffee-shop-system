@@ -6,7 +6,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { getColumns, IngredientStockColumn } from "./columns";
 import { CalendarIcon, RefreshCcw } from "lucide-react";
 import {
   Select,
@@ -24,32 +23,31 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { columns, PurchaseColumn } from "./columns";
+import { Ingredient } from "@/generated/prisma";
 
-type IngredientStockColumnProps = {
-  data: IngredientStockColumn[];
+type PurchaseColumnProps = {
+  data: PurchaseColumn[];
+  ingredients: Ingredient[];
 };
-function IngredientStockClient({ data }: IngredientStockColumnProps) {
+function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
   const router = useRouter();
-  const [filterdData, setFilterdData] = useState<IngredientStockColumn[]>(data);
-  const [status, setStatus] = useState("");
+  const [filterdData, setFilterdData] = useState<PurchaseColumn[]>(data);
+  const [ingredient, setIngredient] = useState("");
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
-  const { data: session } = useSession();
-  const userRole = session?.user.role ?? "";
-  const columns = getColumns(userRole);
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 space-x-2">
         <Header
-          title="Ingredient Stock"
-          subtitle="Manage ingredient stock for your store."
+          title="Purchases"
+          subtitle="Manage purchase stock for your store."
           total={data.length}
         />
         <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
           <Button
             variant={"outline"}
             onClick={() => {
-              setStatus("");
+              setIngredient("");
               setDateRange(undefined);
               setFilterdData(data);
             }}
@@ -72,7 +70,7 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
                     {format(dateRange.to, "dd/MM/yyyy")}
                   </>
                 ) : (
-                  <span className="truncate">Filter by Date Range</span>
+                  <span className=" truncate">Filter by Date Range</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -110,11 +108,11 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
             </PopoverContent>
           </Popover>
           <Select
-            value={status}
+            value={ingredient}
             onValueChange={(value) => {
-              setStatus(value);
+              setIngredient(value);
               setFilterdData(
-                value ? data.filter((item) => item.status === value) : data
+                value ? data.filter((item) => item.ingredient === value) : data
               );
             }}
           >
@@ -123,13 +121,16 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="Use">Use</SelectItem>
-                <SelectItem value="Issue">Issue</SelectItem>
+                {ingredients.map((item) => (
+                  <SelectItem key={item.id} value={item.name}>
+                    {item.name}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button onClick={() => router.push("/dashboard/stock-usage/action")}>
-            Stock Action
+          <Button onClick={() => router.push("/dashboard/purchase/action")}>
+            Purchase
           </Button>
         </div>
       </div>
@@ -139,4 +140,4 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
   );
 }
 
-export default IngredientStockClient;
+export default PurchaseClient;

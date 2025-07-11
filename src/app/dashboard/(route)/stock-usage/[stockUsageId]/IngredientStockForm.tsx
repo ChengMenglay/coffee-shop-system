@@ -31,6 +31,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Ingredient, IngredientStock } from "@/generated/prisma";
 import { Textarea } from "@/components/ui/textarea";
+import { ChevronLeft } from "lucide-react";
 
 type IngredientFormProps = {
   initialData: IngredientStock | null;
@@ -99,7 +100,16 @@ function IngredientStockForm({
   return (
     <>
       <div className="flex overflow-y-auto items-center justify-between">
-        <Header title={title} subtitle={subtitle} />
+                <div className="flex space-x-6">
+          <Button
+            onClick={() => router.back()}
+            variant={"outline"}
+            size={"icon"}
+          >
+            <ChevronLeft />
+          </Button>
+          <Header title={title} subtitle={subtitle} />
+        </div>
       </div>
       <Separator />
       <Form {...form}>
