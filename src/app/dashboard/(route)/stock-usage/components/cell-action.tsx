@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import React, { useState } from "react";
-import { IngredientColumn } from "./columns";
+import { IngredientStockColumn } from "./columns";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -25,21 +25,20 @@ import {
 import axios from "axios";
 
 type CellActionProps = {
-  data: IngredientColumn;
+  data: IngredientStockColumn;
 };
 export default function CellAction({ data }: CellActionProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Ingredient id copied");
+    toast.success("Ingredient stock id copied");
   };
   const onDelete = async () => {
     try {
-
-      await axios.delete(`/api/ingredient/${data.id}`);
-      toast.success("Ingredient deleted");
-      router.push(`/dashboard/ingredient`);
+      await axios.delete(`/api/ingredientStock/${data.id}`);
+      toast.success("Ingredient stock deleted");
+      router.push(`/dashboard/stock-usage`);
       setIsOpen(false);
       router.refresh();
     } catch (error) {
@@ -87,7 +86,7 @@ export default function CellAction({ data }: CellActionProps) {
             Copy Id
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/ingredient/${data.id}`)}
+            onClick={() => router.push(`/dashboard/stock-usage/${data.id}`)}
           >
             <Edit className="w-4 h-4" />
             Update

@@ -8,6 +8,7 @@ export type IngredientColumn = {
   stock: number;
   unit: string;
   lowStockThreshold: number;
+  createdAt:string;
 };
 
 export const columns: ColumnDef<IngredientColumn>[] = [
@@ -21,6 +22,7 @@ export const columns: ColumnDef<IngredientColumn>[] = [
     header: "Unit",
   },
   { accessorKey: "lowStockThreshold", header: "Low Stock" },
+  { accessorKey: "createdAt", header: "Create At" },
   {
     accessorKey: "Action",
     cell: ({ row }) => <CellAction data={row.original} />,

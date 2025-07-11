@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET({ params }: { params: { ingredientId: string } }) {
+export async function GET(
+  _req: Request,
+  { params }: { params: { ingredientId: string } }
+) {
   try {
     if (!params.ingredientId)
       return new NextResponse("Ingredient Id is required", { status: 400 });
@@ -42,12 +45,16 @@ export async function PATCH(
   }
 }
 
-export async function DELETE({ params }: { params: { ingredientId: string } }) {
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { ingredientId: string } }
+) {
   try {
-    if (!params.ingredientId)
+    const { ingredientId } = params;
+    if (!ingredientId)
       return new NextResponse("Ingredient Id is required", { status: 400 });
     const ingredient = await prisma.ingredient.delete({
-      where: { id: params.ingredientId },
+      where: { id: ingredientId },
     });
     return NextResponse.json(ingredient);
   } catch (error) {

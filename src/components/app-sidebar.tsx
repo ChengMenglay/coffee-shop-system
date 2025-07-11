@@ -1,4 +1,4 @@
-import { Home, UserCircle } from "lucide-react";
+import { ClipboardList, Home, PackageOpen, UserCircle } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,6 +25,8 @@ const items = [
     url: "/dashboard/ingredient",
     icon: UtensilsCrossed,
   },
+  { title: "Stock Usage", url: "/dashboard/stock-usage", icon: PackageOpen },
+  { title: "Purchases", url: "/dashboard/purchase", icon: ClipboardList },
   {
     title: "Account",
     url: "/dashboard/account",

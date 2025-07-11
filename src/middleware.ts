@@ -14,6 +14,12 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isLoggIn = !!token;
   const isAuthRoute = authenticationPath.includes(pathname);
+  if (pathname === "/" && token?.role === "Admin") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+  if (pathname === "/" && !isLoggIn) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
   if (isLoggIn && isAuthRoute) {
     return NextResponse.redirect(new URL("/", req.url));
   }

@@ -97,7 +97,9 @@ model IngredientStock{
   id String @id @default(cuid())
   ingredientId String
   ingredient Ingredient @relation(fields:[ingredientId], references: [id])
+  quantity Int
   status String @default("Use")
+  note String?
   createdAt DateTime @default(now())
 }
 
