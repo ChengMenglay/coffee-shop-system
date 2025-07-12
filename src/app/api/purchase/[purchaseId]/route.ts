@@ -25,7 +25,7 @@ export async function PATCH(
 ) {
   try {
     const body = await req.json();
-    const { ingredientId, quantity, price, supplier } = body;
+    const { ingredientId, quantity, price, supplierId } = body;
     if (!params.purchaseId)
       return NextResponse.json("Purchase id is required", { status: 400 });
     if (!ingredientId)
@@ -34,7 +34,7 @@ export async function PATCH(
       return NextResponse.json("quantity is required", { status: 400 });
     if (!price) return NextResponse.json("Price is required", { status: 400 });
 
-    if (!supplier)
+    if (!supplierId)
       return NextResponse.json("Supplier is required", { status: 400 });
     const ingredient = await prisma.ingredient.findUnique({
       where: { id: ingredientId },
@@ -51,7 +51,7 @@ export async function PATCH(
     });
     const purchase = await prisma.purchase.update({
       where: { id: params.purchaseId },
-      data: { ingredientId, quantity, price, supplier },
+      data: { ingredientId, quantity, price, supplierId },
     });
     return NextResponse.json(purchase);
   } catch (error) {

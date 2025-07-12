@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import z from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
 import {
   Select,
@@ -30,25 +30,34 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ingredient, Purchase } from "@/generated/prisma";
+import { Ingredient, Purchase, Supplier } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
+type SupplierWithIngredients = Supplier & {
+  suppliedIngredients: Ingredient[];
+};
 
 type PurchaseColumnPRops = {
   initialData: Purchase | null;
   ingredients: Ingredient[];
+  suppliers: SupplierWithIngredients[];
 };
 const purchaseSchema = z.object({
   ingredientId: z.string().min(1),
   price: z.coerce.number(),
   quantity: z.coerce.number(),
-  supplier: z.string().min(1),
+  supplierId: z.string().min(1),
 });
 type PurchaseSchema = z.infer<typeof purchaseSchema>;
-function PurchaseForm({ initialData, ingredients }: PurchaseColumnPRops) {
+function PurchaseForm({
+  initialData,
+  ingredients,
+  suppliers,
+}: PurchaseColumnPRops) {
   const title = initialData ? "Update Purchase" : "Create Purchase";
   const subtitle = initialData ? "Edit an Purchase" : "Add a new Purchase";
   const toastMessage = initialData ? "Purchase updated." : "Purchase created";
   const router = useRouter();
+  const [selectIngredientId, setSelectIngredientId] = useState("");
   const form = useForm<PurchaseSchema>({
     resolver: zodResolver(purchaseSchema),
     defaultValues: initialData
@@ -57,7 +66,7 @@ function PurchaseForm({ initialData, ingredients }: PurchaseColumnPRops) {
           ingredientId: "",
           price: 0,
           quantity: 0,
-          supplier: "",
+          supplierId: "",
         },
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +88,19 @@ function PurchaseForm({ initialData, ingredients }: PurchaseColumnPRops) {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.ingredientId) {
+        setSelectIngredientId(value.ingredientId);
+      }
+      return () => subscription.unsubscribe();
+    });
+  }, [form]);
+  const supplierFiltered = suppliers.filter((supplier) =>
+    supplier.suppliedIngredients.some(
+      (ingredient) => ingredient.id === selectIngredientId
+    )
+  );
   return (
     <>
       <div className="flex overflow-y-auto items-center justify-between">
@@ -114,9 +136,17 @@ function PurchaseForm({ initialData, ingredients }: PurchaseColumnPRops) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {ingredients.map((item) => (
-                            <SelectItem value={item.id}>{item.name}</SelectItem>
-                          ))}
+                          {ingredients.length > 0 ? (
+                            ingredients.map((item) => (
+                              <SelectItem key={item.id} value={item.id}>
+                                {item.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div className="p-2 text-muted-foreground text-sm">
+                              No ingredients available
+                            </div>
+                          )}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -153,12 +183,46 @@ function PurchaseForm({ initialData, ingredients }: PurchaseColumnPRops) {
             />
             <FormField
               control={form.control}
-              name="supplier"
+              name="supplierId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Supplier</FormLabel>
                   <FormControl>
-                    <Input disabled={isLoading} {...field} />
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={"Select a supplier"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {supplierFiltered.length > 0 ? (
+                            supplierFiltered.map((item) => (
+                              <SelectItem key={item.id} value={item.id}>
+                                {item.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <>
+                              <div className="p-2 text-muted-foreground text-sm">
+                                No suppliers available
+                              </div>
+                              <Button
+                                onClick={() =>
+                                  router.push("/dashboard/supplier/new")
+                                }
+                                variant={"outline"}
+                                className="p-2 text-sm w-full"
+                              >
+                                Create new supplier
+                              </Button>
+                            </>
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

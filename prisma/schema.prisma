@@ -83,13 +83,16 @@ model OrderItem{
   note String?
 }
 
+
+
 model Ingredient{
   id String @id @default(cuid())
-  name String
-  stock Int @default(0)
+  name String  
+  stock Int
   unit String
   lowStockThreshold Int 
   createdAt DateTime @default(now())
+  suppliers   Supplier[] @relation("SupplierIngredients")
   ingredientStocks IngredientStock[]
   Purchases Purchase[]
 }
@@ -108,8 +111,19 @@ model Purchase{
   id String @id @default(cuid())
   ingredientId String
   ingredient Ingredient @relation(fields:[ingredientId], references: [id])
+  supplierId String
+  supplier Supplier @relation(fields: [supplierId], references: [id])
   quantity Int
   price Decimal
-  supplier String
+  createdAt DateTime @default(now())
+}
+
+model Supplier{
+  id String @id @default(cuid())
+  name String
+  contact String
+  isActive Boolean @default(true)
+  purchases Purchase[]
+ suppliedIngredients Ingredient[] @relation("SupplierIngredients")
   createdAt DateTime @default(now())
 }

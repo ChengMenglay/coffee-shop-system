@@ -1,4 +1,10 @@
-import { ClipboardList, Home, PackageOpen, UserCircle } from "lucide-react";
+import {
+  ClipboardList,
+  Home,
+  PackageOpen,
+  UserCircle,
+  UserCog,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -27,6 +33,7 @@ const items = [
   },
   { title: "Stock Usage", url: "/dashboard/stock-usage", icon: PackageOpen },
   { title: "Purchases", url: "/dashboard/purchase", icon: ClipboardList },
+  { title: "Supplier", url: "/dashboard/supplier", icon: UserCog },
   {
     title: "Account",
     url: "/dashboard/account",

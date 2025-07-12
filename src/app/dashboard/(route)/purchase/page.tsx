@@ -6,7 +6,7 @@ import { formatterUSD } from "@/lib/utils";
 import PurchaseClient from "./components/client";
 async function IngredientStock() {
   const purchases = await prisma.purchase.findMany({
-    include: { ingredient: true },
+    include: { ingredient: true ,supplier:true},
     orderBy: { createdAt: "desc" },
   });
   const ingredients = await prisma.ingredient.findMany({
@@ -17,7 +17,7 @@ async function IngredientStock() {
     ingredient: item.ingredient.name,
     price: formatterUSD.format(Number(item.price)),
     quantity: item.quantity,
-    supplier: item.supplier,
+    supplier: item.supplier.name,
     createdAt: format(item.createdAt, "dd MMMM yyyy"),
   }));
   return (
