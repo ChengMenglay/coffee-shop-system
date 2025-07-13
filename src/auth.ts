@@ -9,7 +9,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
-        token.role = user.role;
+        token.role = typeof user.role === "object" ? user.role.name : user.role;
+        token.permissions = user.permissions ? user.permissions : [];
       }
       return token;
     },
@@ -17,6 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token) {
         session.user.id = token.sub as string;
         session.user.role = token.role as string;
+        session.user.permissions = token.permissions;
       }
       return session;
     },

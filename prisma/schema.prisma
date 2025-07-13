@@ -23,6 +23,12 @@ model User {
   role Role @relation(fields:[roleId], references: [id])
   createdAt DateTime @default(now())
   orders Order[]
+  IngredientStocks IngredientStock[]
+  purchases Purchase[]
+  pendingPurchases PendingPurchase[]
+  approvedPendingPurchases PendingPurchase[] @relation("ApprovedBy")
+  approvedPendingStockUsages PendingStockUsage[] @relation("ApprovedStockUsage")
+  pendingStockUsages PendingStockUsage[]
 }
 
 model Role{
@@ -35,7 +41,7 @@ model Role{
 model Permission{
   id String @id @default(cuid())
   name String
-  path String
+  key String
   roles Role[] @relation("RolePermissions")
 }
 
@@ -95,29 +101,69 @@ model Ingredient{
   suppliers   Supplier[] @relation("SupplierIngredients")
   ingredientStocks IngredientStock[]
   Purchases Purchase[]
+  pendingPurchases PendingPurchase[]
+  pendingStockUsages PendingStockUsage[]
 }
 
 model IngredientStock{
   id String @id @default(cuid())
   ingredientId String
   ingredient Ingredient @relation(fields:[ingredientId], references: [id])
+  userId String
+  user User @relation(fields:[userId], references: [id])
   quantity Int
   status String @default("Use")
   note String?
   createdAt DateTime @default(now())
 }
 
+model PendingStockUsage {
+  id             String   @id @default(cuid())
+  ingredientId   String
+  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
+  userId         String
+  user           User @relation(fields: [userId], references: [id])
+  quantity       Int
+  note           String?
+  approvalStatus String   @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvedById   String?
+  approvedBy     User?    @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
+  rejectionReason String?
+  approvedAt     DateTime?
+  createdAt      DateTime @default(now())
+}
+
+
 model Purchase{
   id String @id @default(cuid())
   ingredientId String
   ingredient Ingredient @relation(fields:[ingredientId], references: [id])
+  userId String
+  user User @relation(fields:[userId], references: [id])
   supplierId String
   supplier Supplier @relation(fields: [supplierId], references: [id])
   quantity Int
   price Decimal
   createdAt DateTime @default(now())
 }
-
+model PendingPurchase{
+    id           String   @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  supplierId   String
+  supplier     Supplier @relation(fields: [supplierId], references: [id])
+  userId       String
+  user         User @relation(fields: [userId], references: [id])
+  quantity     Int
+  price        Decimal
+  note         String?
+  approvalStatus String @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvedById String? // Optional, in case you want to track
+  approvedBy   User?   @relation("ApprovedBy", fields: [approvedById], references: [id])
+  rejectionReason String?
+  approvedAt DateTime?
+  createdAt    DateTime @default(now())
+}
 model Supplier{
   id String @id @default(cuid())
   name String
@@ -126,4 +172,5 @@ model Supplier{
   purchases Purchase[]
  suppliedIngredients Ingredient[] @relation("SupplierIngredients")
   createdAt DateTime @default(now())
+  pendingPurchases PendingPurchase[]
 }

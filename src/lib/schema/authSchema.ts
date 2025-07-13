@@ -17,6 +17,7 @@ export const registerSchema = z.object({
     .min(1, "Password is required")
     .min(8, "Password must be more than 8 characters"),
   roleId: z.string(),
+  phone: z.string().optional(),
 });
 
-export type RegisterSchema = z.infer<typeof registerSchema>
+export type RegisterSchema = z.infer<typeof registerSchema>;

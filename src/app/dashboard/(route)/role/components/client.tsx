@@ -6,15 +6,15 @@ import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { columns, SupplierColumn } from "./columns";
+import { columns, RoleColumn } from "./columns";
 import { RefreshCcw } from "lucide-react";
 
-type SupplierColumnProps = {
-  data: SupplierColumn[];
+type RoleColumnProps = {
+  data: RoleColumn[];
 };
-function SupplierClient({ data }: SupplierColumnProps) {
+function RoleClient({ data }: RoleColumnProps) {
   const router = useRouter();
-  const [filterdData, setFilterdData] = useState<SupplierColumn[]>(data);
+  const [filterdData, setFilterdData] = useState<RoleColumn[]>(data);
   useEffect(() => {
     setFilterdData(data);
   }, [data]);
@@ -22,23 +22,23 @@ function SupplierClient({ data }: SupplierColumnProps) {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
         <Header
-          title="Supplier"
-          subtitle="Manage supplier for your store."
+          title="Roles"
+          subtitle="Manage roles for your store."
           total={data.length}
         />
         <div className="flex items-center gap-2">
           <Button variant={"outline"} onClick={() => setFilterdData(data)}>
             <RefreshCcw />
           </Button>
-          <Button onClick={() => router.push("/dashboard/supplier/new")}>
+          <Button onClick={() => router.push("/dashboard/role/new")}>
             New
           </Button>
         </div>
       </div>
       <Separator className="my-6" />
-      <DataTable searchKey="contact" columns={columns} data={filterdData} />
+      <DataTable columns={columns} data={filterdData} />
     </>
   );
 }
 
-export default SupplierClient;
+export default RoleClient;

@@ -18,6 +18,7 @@ export default {
               id: user.id,
               name: user.name,
               role: user.role.name,
+              permissions: user.role.permissions.map((p) => p.key),
             };
           }
           return null;

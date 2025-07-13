@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CalendarIcon, RefreshCcw } from "lucide-react";
 import {
   Select,
@@ -35,6 +35,9 @@ function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
   const [filterdData, setFilterdData] = useState<PurchaseColumn[]>(data);
   const [ingredient, setIngredient] = useState("");
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
+  useEffect(() => {
+    setFilterdData(data);
+  }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 space-x-2">

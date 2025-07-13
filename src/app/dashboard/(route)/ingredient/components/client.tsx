@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { columns, IngredientColumn } from "./columns";
 import { RefreshCcw } from "lucide-react";
 
@@ -18,6 +18,9 @@ function IngredientClient({ data }: IngredientColumnProps) {
   const handleLowStock = () => {
     setFilterdData(data.filter((item) => item.stock <= item.lowStockThreshold));
   };
+    useEffect(() => {
+      setFilterdData(data);
+    }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">

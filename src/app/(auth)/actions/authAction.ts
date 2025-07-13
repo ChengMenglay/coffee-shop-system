@@ -1,6 +1,6 @@
 "use server";
 import { ActionResult } from "@/app";
-import { signIn, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
   LoginSchema,
@@ -42,13 +42,13 @@ export async function RegisterUser(
   try {
     const validated = registerSchema.safeParse(data);
     if (validated.success) {
-      const { name, password, roleId } = validated.data;
+      const { name, password, roleId, phone } = validated.data;
       const hashedPassword = await bcrypt.hash(password, 10);
       const existingUser = await prisma.user.findFirst({ where: { name } });
       if (existingUser)
         return { status: "error", error: "User already exists" };
       const result = await prisma.user.create({
-        data: { name, password: hashedPassword, roleId },
+        data: { name, password: hashedPassword, roleId, phone },
       });
       if (result) {
         return { status: "success", data: "User register Success!" };
@@ -65,8 +65,15 @@ export const getUserByName = async (name: string) => {
   const user = await prisma.user.findFirst({
     where: { name },
     include: {
-      role: true,
+      role: { include: { permissions: true } },
     },
   });
   return user;
+};
+
+export const getUserId = async () => {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return null;
+  return userId;
 };

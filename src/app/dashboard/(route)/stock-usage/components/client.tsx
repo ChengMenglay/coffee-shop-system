@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getColumns, IngredientStockColumn } from "./columns";
 import { CalendarIcon, RefreshCcw } from "lucide-react";
 import {
@@ -37,6 +37,9 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
   const { data: session } = useSession();
   const userRole = session?.user.role ?? "";
   const columns = getColumns(userRole);
+    useEffect(() => {
+      setFilterdData(data);
+    }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">

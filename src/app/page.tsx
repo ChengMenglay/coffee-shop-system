@@ -6,11 +6,7 @@ async function Home() {
   if (session) {
     console.log(session);
   }
-  return (
-    <div>
-     
-    </div>
-  );
+  return <div>Home</div>;
 }
 
 export default Home;

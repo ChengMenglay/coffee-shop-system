@@ -15,6 +15,7 @@ async function PurchasePage({ params }: { params: { purchaseId: string } }) {
     orderBy: { createdAt: "desc" },
   });
   const suppliers: SupplierWithIngredients[] = await prisma.supplier.findMany({
+    where: { isActive: true },
     include: { suppliedIngredients: true },
     orderBy: { createdAt: "desc" },
   });

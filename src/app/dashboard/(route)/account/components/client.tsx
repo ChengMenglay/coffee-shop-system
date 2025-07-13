@@ -6,39 +6,39 @@ import { DataTable } from "@/components/ui/data-table";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { columns, SupplierColumn } from "./columns";
+import { columns, AccountColumn } from "./columns";
 import { RefreshCcw } from "lucide-react";
 
-type SupplierColumnProps = {
-  data: SupplierColumn[];
+type AccountColumnProps = {
+  data: AccountColumn[];
 };
-function SupplierClient({ data }: SupplierColumnProps) {
+function AccountClient({ data }: AccountColumnProps) {
   const router = useRouter();
-  const [filterdData, setFilterdData] = useState<SupplierColumn[]>(data);
-  useEffect(() => {
-    setFilterdData(data);
-  }, [data]);
+  const [filterdData, setFilterdData] = useState<AccountColumn[]>(data);
+    useEffect(() => {
+      setFilterdData(data);
+    }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
         <Header
-          title="Supplier"
-          subtitle="Manage supplier for your store."
+          title="Account"
+          subtitle="Manage account for your store."
           total={data.length}
         />
         <div className="flex items-center gap-2">
           <Button variant={"outline"} onClick={() => setFilterdData(data)}>
             <RefreshCcw />
           </Button>
-          <Button onClick={() => router.push("/dashboard/supplier/new")}>
+          <Button onClick={() => router.push("/dashboard/account/new")}>
             New
           </Button>
         </div>
       </div>
       <Separator className="my-6" />
-      <DataTable searchKey="contact" columns={columns} data={filterdData} />
+      <DataTable searchKey="name" columns={columns} data={filterdData} />
     </>
   );
 }
 
-export default SupplierClient;
+export default AccountClient;
