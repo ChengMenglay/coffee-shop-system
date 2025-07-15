@@ -9,7 +9,8 @@ export async function PATCH(
   try {
     const body = await req.json();
     const { name, phone, roleId, password } = body;
-    if (!params.accountId)
+    const { accountId } = await params;
+    if (!accountId)
       return new NextResponse("Account Id is required", { status: 400 });
     if (!name) return NextResponse.json("Name is required", { status: 400 });
     if (!phone) return NextResponse.json("Phone is required", { status: 400 });
@@ -26,7 +27,7 @@ if (password && password.length >= 6) {
   updateData.password = hashed;
 }
 const user = await prisma.user.update({
-  where: { id: params.accountId },
+  where: { id:accountId },
   data: updateData,
 });
     return NextResponse.json(user);
@@ -41,7 +42,7 @@ export async function DELETE(
   { params }: { params: { accountId: string } }
 ) {
   try {
-    const { accountId } = params;
+    const { accountId } = await params;
 
     if (!accountId) {
       return new NextResponse("Account Id is required", { status: 400 });

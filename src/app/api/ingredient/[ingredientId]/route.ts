@@ -6,10 +6,11 @@ export async function GET(
   { params }: { params: { ingredientId: string } }
 ) {
   try {
-    if (!params.ingredientId)
+    const { ingredientId } = await params;
+    if (!ingredientId)
       return new NextResponse("Ingredient Id is required", { status: 400 });
     const ingredient = await prisma.ingredient.findUnique({
-      where: { id: params.ingredientId },
+      where: { id: ingredientId },
     });
     return NextResponse.json(ingredient);
   } catch (error) {
@@ -25,7 +26,8 @@ export async function PATCH(
   try {
     const body = await req.json();
     const { name, stock, unit, lowStockThreshold } = body;
-    if (!params.ingredientId)
+    const { ingredientId } = await params;
+    if (!ingredientId)
       return new NextResponse("Ingredient Id is required", { status: 400 });
     if (!name) return NextResponse.json("Name is required", { status: 400 });
     if (!stock) return NextResponse.json("Stock is required", { status: 400 });
@@ -35,7 +37,7 @@ export async function PATCH(
         status: 400,
       });
     const ingredient = await prisma.ingredient.update({
-      where: { id: params.ingredientId },
+      where: { id:ingredientId },
       data: { name, stock, unit, lowStockThreshold },
     });
     return NextResponse.json(ingredient);
@@ -50,7 +52,7 @@ export async function DELETE(
   { params }: { params: { ingredientId: string } }
 ) {
   try {
-    const { ingredientId } = params;
+    const { ingredientId } = await params;
     if (!ingredientId)
       return new NextResponse("Ingredient Id is required", { status: 400 });
     const ingredient = await prisma.ingredient.delete({

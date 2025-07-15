@@ -2,6 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import SupplierForm from "./SupplierForm";
 import { Ingredient, Supplier } from "@/generated/prisma";
+import { checkPermission } from "@/lib/check-permission";
 
 async function SupplierPage({ params }: { params: { supplierId: string } }) {
   const supplier = (await prisma.supplier.findUnique({
@@ -17,7 +18,10 @@ async function SupplierPage({ params }: { params: { supplierId: string } }) {
         suppliedIngredients: supplier.suppliedIngredients.map((i) => i),
       }
     : null;
-
+if(supplier === null) {
+    await checkPermission(["create:supplier"]);
+  } else {
+    await checkPermission(["edit:supplier"]);
   return (
     <div className="flex-col h-full">
       <div className="space-y-4 px-6 py-8">

@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { IngredientStockColumn } from "./components/columns";
 import { format } from "date-fns";
 import IngredientStockClient from "./components/client";
+import { checkPermission } from "@/lib/check-permission";
 async function IngredientStock() {
+  await checkPermission(["view:stock"]);
   const ingredientStocks = await prisma.ingredientStock.findMany({
-    include: { ingredient: true },
+    include: { ingredient: true, user: { include: { role: true } } },
     orderBy: { createdAt: "desc" },
   });
   const formattedIngredientStock: IngredientStockColumn[] =
@@ -16,6 +18,7 @@ async function IngredientStock() {
       unit: item.ingredient.unit,
       status: item.status,
       note: item.note ? item.note : "",
+      name: item.user.name + " (" + item.user.role.name + ")",
       createdAt: format(item.createdAt, "dd MMMM yyyy"),
     }));
   return (

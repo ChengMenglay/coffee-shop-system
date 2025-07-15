@@ -7,10 +7,11 @@ export async function GET(
   { params }: { params: { supplierId: string } }
 ) {
   try {
-    if (!params.supplierId)
+    const { supplierId } = await params;
+    if (!supplierId)
       return new NextResponse("Supplier Id is required", { status: 400 });
     const supplier = await prisma.supplier.findUnique({
-      where: { id: params.supplierId },
+      where: { id: supplierId },
     });
     return NextResponse.json(supplier);
   } catch (error) {
@@ -24,8 +25,9 @@ export async function PATCH(
   { params }: { params: { supplierId: string } }
 ) {
   try {
+    const { supplierId } = await params;
     const body = await req.json();
-    if (!params.supplierId)
+    if (!supplierId)
       return new NextResponse("Supplier Id is required", { status: 400 });
     const { name, contact, isActive, suppliedIngredients } = body;
     if (!name) return NextResponse.json("Name is required", { status: 400 });
@@ -37,7 +39,7 @@ export async function PATCH(
       });
     }
     const supplier = await prisma.supplier.update({
-      where: { id: params.supplierId },
+      where: { id: supplierId },
       data: {
         name,
         contact,

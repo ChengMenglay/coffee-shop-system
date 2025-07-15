@@ -2,7 +2,9 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { SupplierColumn } from "./components/columns";
 import SupplierClient from "./components/client";
+import { checkPermission } from "@/lib/check-permission";
 async function SupplierPage() {
+  await checkPermission(["view:supplier"]);
   const suppliers = await prisma.supplier.findMany({
     include: { suppliedIngredients: true },
     orderBy: { createdAt: "desc" },

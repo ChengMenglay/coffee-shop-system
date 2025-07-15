@@ -2,8 +2,10 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { RoleColumn } from "./components/columns";
 import RoleClient from "./components/client";
+import { checkPermission } from "@/lib/check-permission";
 
 async function RolePage() {
+  await checkPermission(["view:role"]);
   const roles = await prisma.role.findMany({ include: { permissions: true } });
   const formattedRoles: RoleColumn[] = roles.map((item) => ({
     id: item.id,

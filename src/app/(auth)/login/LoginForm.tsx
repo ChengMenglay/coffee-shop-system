@@ -27,7 +27,7 @@ function LoginForm() {
       const result = await SignInUser(data);
       if (result.status === "success") {
         toast.success(result.data);
-        router.push("/dashboard");
+        router.push("/");
         router.refresh();
       } else {
         toast.error(result.error as string);

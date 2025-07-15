@@ -6,12 +6,13 @@ export async function GET(
   { params }: { params: { stockUsageId: string } }
 ) {
   try {
-    if (!params.stockUsageId)
+    const { stockUsageId } = await params;
+    if (!stockUsageId)
       return new NextResponse("Ingredient stock Id is required", {
         status: 400,
       });
     const ingredientStock = await prisma.ingredientStock.findUnique({
-      where: { id: params.stockUsageId },
+      where: { id: stockUsageId },
     });
     return NextResponse.json(ingredientStock);
   } catch (error) {
@@ -26,8 +27,9 @@ export async function PATCH(
 ) {
   try {
     const body = await req.json();
-    const { ingredientId, quantity, status, note } = body;
-    if (!params.stockUsageId)
+    const { ingredientId, quantity, status, note, userId } = body;
+    const { stockUsageId } = await params;
+    if (!stockUsageId)
       return new NextResponse("Ingredient stock Id is required", {
         status: 400,
       });
@@ -35,6 +37,8 @@ export async function PATCH(
       return NextResponse.json("ingredient id is required", { status: 400 });
     if (!quantity)
       return NextResponse.json("quantity is required", { status: 400 });
+    if (!userId)
+      return NextResponse.json("User id is required", { status: 400 });
     if (!status)
       return NextResponse.json("status is required", { status: 400 });
     const quantityNum = parseInt(quantity);
@@ -44,7 +48,7 @@ export async function PATCH(
       });
     }
     const ingredientStockData = await prisma.ingredientStock.findUnique({
-      where: { id: params.stockUsageId },
+      where: { id: stockUsageId },
     });
     const ingredient = await prisma.ingredient.findUnique({
       where: { id: ingredientId },
@@ -59,8 +63,8 @@ export async function PATCH(
       },
     });
     const ingredientStock = await prisma.ingredientStock.update({
-      where: { id: params.stockUsageId },
-      data: { ingredientId, quantity, status, note },
+      where: { id:stockUsageId },
+      data: { ingredientId, quantity, status, note, userId },
     });
     return NextResponse.json(ingredientStock);
   } catch (error) {
@@ -74,7 +78,7 @@ export async function DELETE(
   { params }: { params: { stockUsageId: string } }
 ) {
   try {
-    const { stockUsageId } = params;
+    const { stockUsageId } = await params;
     if (!stockUsageId)
       return new NextResponse("Ingredient  stock Id is required", {
         status: 400,

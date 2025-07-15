@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { AccountColumn } from "./components/columns";
 import AccountClient from "./components/client";
 import { format } from "date-fns";
+import { checkPermission } from "@/lib/check-permission";
 
 async function AccountPage() {
+  await checkPermission(["view:account"]);
   const accounts = await prisma.user.findMany({
     select: {
       id: true,

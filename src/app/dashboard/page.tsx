@@ -1,6 +1,8 @@
+import { checkPermission } from "@/lib/check-permission";
 import React from "react";
 
-function DashboardPage() {
+async function DashboardPage() {
+  await checkPermission(["view:dashboard"]);
   return <div className="px-4 py-8">DashboardPage</div>;
 }
 

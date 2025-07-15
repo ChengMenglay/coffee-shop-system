@@ -3,7 +3,9 @@ import IngredientClient from "./components/client";
 import { prisma } from "@/lib/prisma";
 import { IngredientColumn } from "./components/columns";
 import { format } from "date-fns";
+import { checkPermission } from "@/lib/check-permission";
 async function IngredientPage() {
+  await checkPermission(["view:ingredient"]);
   const ingredients = await prisma.ingredient.findMany({
     orderBy: { createdAt: "desc" },
   });

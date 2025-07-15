@@ -5,8 +5,8 @@ export async function PATCH(request:Request, { params }: { params: { roleId: str
   try {
     const body = await request.json();
     const { name, permissions } = body;
-
-    if (!params.roleId) {
+const { roleId } = await params;
+    if (!roleId) {
       return new NextResponse("Role Id is required", { status: 400 });
     }
     if (!name) {
@@ -17,7 +17,7 @@ export async function PATCH(request:Request, { params }: { params: { roleId: str
     }
 
     const role = await prisma.role.update({
-      where: { id: params.roleId },
+      where: { id: roleId },
       data: {
         name,
         permissions: {
@@ -35,7 +35,7 @@ export async function PATCH(request:Request, { params }: { params: { roleId: str
 
 export async function DELETE(_req: Request, { params }: { params: { roleId: string } }) {
   try {
-    const { roleId } = params;
+    const { roleId } = await params;
 
     if (!roleId) {
       return new NextResponse("Role Id is required", { status: 400 });

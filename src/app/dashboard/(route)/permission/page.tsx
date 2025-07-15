@@ -2,9 +2,11 @@ import React from "react";
 import IngredientClient from "./components/client";
 import { prisma } from "@/lib/prisma";
 import { PermissionColumn } from "./components/columns";
+import { checkPermission } from "@/lib/check-permission";
 
 export const dynamic = "force-dynamic";
 async function PermissionPage() {
+  await checkPermission(["view:permission"]);
   const permissions = await prisma.permission.findMany();
   const formattedPermission: PermissionColumn[] = permissions.map((item) => ({
     id: item.id,

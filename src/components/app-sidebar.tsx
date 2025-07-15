@@ -1,6 +1,7 @@
 import {
   ClipboardList,
   Home,
+  Inbox,
   PackageOpen,
   Puzzle,
   ShieldCheck,
@@ -70,6 +71,12 @@ const items = [
     url: "/dashboard/permission",
     icon: Puzzle,
     requiredPermission: "view:permission",
+  },
+  {
+    title: "Approval",
+    url: "/dashboard/approval",
+    icon: Inbox,
+    requiredPermission: "view:approval",
   },
 ];
 

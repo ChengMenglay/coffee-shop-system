@@ -4,7 +4,9 @@ import { format } from "date-fns";
 import { PurchaseColumn } from "./components/columns";
 import { formatterUSD } from "@/lib/utils";
 import PurchaseClient from "./components/client";
+import { checkPermission } from "@/lib/check-permission";
 async function IngredientStock() {
+  await checkPermission(["view:purchases"]);
   const purchases = await prisma.purchase.findMany({
     include: { ingredient: true ,supplier:true},
     orderBy: { createdAt: "desc" },

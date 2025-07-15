@@ -36,6 +36,7 @@ import { ChevronLeft } from "lucide-react";
 type IngredientFormProps = {
   initialData: IngredientStock | null;
   ingredients: Ingredient[];
+  userId: string;
 };
 const ingredientStockSchema = z.object({
   ingredientId: z.string().min(1, "Ingrediet is required"),
@@ -47,6 +48,7 @@ type IngredientStockSchema = z.infer<typeof ingredientStockSchema>;
 function IngredientStockForm({
   initialData,
   ingredients,
+  userId,
 }: IngredientFormProps) {
   const title = initialData
     ? "Update Ingredient Stock"
@@ -85,6 +87,7 @@ function IngredientStockForm({
           quantity: data.quantity,
           status: data.status,
           note: data.note,
+          userId,
         });
       }
       toast.success(toastMessage);
@@ -100,7 +103,7 @@ function IngredientStockForm({
   return (
     <>
       <div className="flex overflow-y-auto items-center justify-between">
-                <div className="flex space-x-6">
+        <div className="flex space-x-6">
           <Button
             onClick={() => router.back()}
             variant={"outline"}
@@ -178,7 +181,7 @@ function IngredientStockForm({
                         <SelectGroup>
                           <SelectLabel>Status</SelectLabel>
                           <SelectItem value="Use">Use</SelectItem>
-                          <SelectItem value="Issue">Issue</SelectItem>
+                          <SelectItem value="Expired">Expired</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>

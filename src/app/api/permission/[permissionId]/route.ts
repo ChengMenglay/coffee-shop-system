@@ -6,7 +6,8 @@ export async function GET(
   { params }: { params: { permissionId: string } }
 ) {
   try {
-    if (!params.permissionId)
+    const { permissionId } = await params;
+    if (!permissionId)
       return new NextResponse("Permission Id is required", { status: 400 });
     const permission = await prisma.permission.findUnique({
       where: { id: params.permissionId },
@@ -23,14 +24,15 @@ export async function PATCH(
   { params }: { params: { permissionId: string } }
 ) {
   try {
+    const { permissionId } = await params;
     const body = await req.json();
     const { name, key } = body;
-    if (!params.permissionId)
+    if (!permissionId)
       return new NextResponse("Permission Id is required", { status: 400 });
     if (!name) return NextResponse.json("Name is required", { status: 400 });
     if (!key) return NextResponse.json("Key is required", { status: 400 });
     const permission = await prisma.permission.update({
-      where: { id: params.permissionId },
+      where: { id: permissionId },
       data: { name, key },
     });
     return NextResponse.json(permission);
@@ -45,7 +47,7 @@ export async function DELETE(
   { params }: { params: { permissionId: string } }
 ) {
   try {
-    const { permissionId } = params;
+    const { permissionId } = await params;
     if (!permissionId)
       return new NextResponse("Permission Id is required", { status: 400 });
     const permission = await prisma.permission.delete({

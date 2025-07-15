@@ -6,11 +6,12 @@ export async function GET(
   { params }: { params: { purchaseId: string } }
 ) {
   try {
-    if (!params.purchaseId) {
+    const { purchaseId } = await params;
+    if (!purchaseId) {
       return NextResponse.json("Purchase id is required", { status: 400 });
     }
     const purchase = await prisma.purchase.findUnique({
-      where: { id: params.purchaseId },
+      where: { id: purchaseId },
     });
     return NextResponse.json(purchase);
   } catch (error) {
@@ -24,9 +25,10 @@ export async function PATCH(
   { params }: { params: { purchaseId: string } }
 ) {
   try {
+    const { purchaseId } = await params;
     const body = await req.json();
     const { ingredientId, quantity, price, supplierId } = body;
-    if (!params.purchaseId)
+    if (!purchaseId)
       return NextResponse.json("Purchase id is required", { status: 400 });
     if (!ingredientId)
       return NextResponse.json("ingredient id is required", { status: 400 });
@@ -40,7 +42,7 @@ export async function PATCH(
       where: { id: ingredientId },
     });
     const purchaseData = await prisma.purchase.findUnique({
-      where: { id: params.purchaseId },
+      where: { id: purchaseId },
     });
     await prisma.ingredient.update({
       where: { id: ingredientId },
@@ -65,10 +67,11 @@ export async function DELETE(
   { params }: { params: { purchaseId: string } }
 ) {
   try {
-    if (!params.purchaseId)
+    const { purchaseId } = await params;
+    if (!purchaseId)
       return NextResponse.json("Purchase id is required", { status: 400 });
     const purchaseData = await prisma.purchase.findUnique({
-      where: { id: params.purchaseId },
+      where: { id: purchaseId },
     });
     const ingredient = await prisma.ingredient.findUnique({
       where: { id: purchaseData?.ingredientId },
@@ -80,7 +83,7 @@ export async function DELETE(
       },
     });
     const purchase = await prisma.purchase.delete({
-      where: { id: params.purchaseId },
+      where: { id: purchaseId },
     });
     return NextResponse.json(purchase);
   } catch (error) {
