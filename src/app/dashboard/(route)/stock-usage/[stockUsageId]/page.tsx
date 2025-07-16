@@ -13,6 +13,7 @@ async function IngredientStockPage({
   const ingredientStock = await prisma.ingredientStock.findUnique({
     where: { id: stockUsageId },
   });
+  
   const ingredients = await prisma.ingredient.findMany({
     orderBy: { createdAt: "desc" },
   });

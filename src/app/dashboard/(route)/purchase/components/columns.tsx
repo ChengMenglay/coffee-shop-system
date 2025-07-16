@@ -6,7 +6,7 @@ export type PurchaseColumn = {
   id: string;
   ingredient: string;
   price: string;
-  quantity: number;
+  quantity: string;
   supplier: string;
   createdAt: string;
 };

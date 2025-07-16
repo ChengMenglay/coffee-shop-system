@@ -7,18 +7,21 @@ import PurchaseClient from "./components/client";
 import { checkPermission } from "@/lib/check-permission";
 async function IngredientStock() {
   await checkPermission(["view:purchases"]);
-  const purchases = await prisma.purchase.findMany({
-    include: { ingredient: true ,supplier:true},
-    orderBy: { createdAt: "desc" },
-  });
-  const ingredients = await prisma.ingredient.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [purchases, ingredients] = await Promise.all([
+    prisma.purchase.findMany({
+      include: { ingredient: true, supplier: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.ingredient.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+
   const formattedPurchases: PurchaseColumn[] = purchases.map((item) => ({
     id: item.id,
-    ingredient: item.ingredient.name,
+    ingredient: item.ingredient.name + ` (${item.ingredient.unit})`,
     price: formatterUSD.format(Number(item.price)),
-    quantity: item.quantity,
+    quantity: ` ${item.quantity} ${item.ingredient.unit}`,
     supplier: item.supplier.name,
     createdAt: format(item.createdAt, "dd MMMM yyyy"),
   }));

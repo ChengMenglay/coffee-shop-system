@@ -23,7 +23,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -32,6 +31,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Ingredient, Purchase, Supplier } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 type SupplierWithIngredients = Supplier & {
   suppliedIngredients: Ingredient[];
 };
@@ -40,22 +40,25 @@ type PurchaseColumnPRops = {
   initialData: Purchase | null;
   ingredients: Ingredient[];
   suppliers: SupplierWithIngredients[];
+  userId: string | null;
 };
 const purchaseSchema = z.object({
   ingredientId: z.string().min(1),
   price: z.coerce.number(),
   quantity: z.coerce.number(),
   supplierId: z.string().min(1),
+  note: z.string().optional(),
 });
 type PurchaseSchema = z.infer<typeof purchaseSchema>;
 function PurchaseForm({
   initialData,
   ingredients,
   suppliers,
+  userId,
 }: PurchaseColumnPRops) {
-  const title = initialData ? "Update Purchase" : "Create Purchase";
+  const title = initialData ? "Update Purchase" : "Request Purchase";
   const subtitle = initialData ? "Edit an Purchase" : "Add a new Purchase";
-  const toastMessage = initialData ? "Purchase updated." : "Purchase created";
+  const toastMessage = initialData ? "Purchase updated." : "Request has been sent.";
   const router = useRouter();
   const [selectIngredientId, setSelectIngredientId] = useState("");
   const form = useForm<PurchaseSchema>({
@@ -67,6 +70,7 @@ function PurchaseForm({
           price: 0,
           quantity: 0,
           supplierId: "",
+          note: "",
         },
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +80,14 @@ function PurchaseForm({
       if (initialData) {
         await axios.patch(`/api/purchase/${initialData.id}`, data);
       } else {
-        await axios.post("/api/purchase", data);
+        await axios.post("/api/purchase-request", {
+          ingredientId: data.ingredientId,
+          supplierId: data.supplierId,
+          userId,
+          quantity: data.quantity,
+          note: data.note,
+          price: data.price,
+        });
       }
       toast.success(toastMessage);
       router.push("/dashboard/purchase");
@@ -139,7 +150,7 @@ function PurchaseForm({
                           {ingredients.length > 0 ? (
                             ingredients.map((item) => (
                               <SelectItem key={item.id} value={item.id}>
-                                {item.name}
+                                {item.name + ` (${item.unit})`}
                               </SelectItem>
                             ))
                           ) : (
@@ -228,16 +239,34 @@ function PurchaseForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="note"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Note</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={isLoading}
+                      placeholder=""
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <Button disabled={isLoading} type="submit">
             {isLoading && <CgSpinnerTwoAlt className=" animate-spin" />}
             {isLoading
               ? initialData
                 ? "Save Change..."
-                : "Creating..."
+                : "Sending..."
               : initialData
               ? "Save Change"
-              : "Create"}
+              : "Send Request"}
           </Button>
         </form>
       </Form>

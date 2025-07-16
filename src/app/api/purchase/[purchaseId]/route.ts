@@ -52,7 +52,7 @@ export async function PATCH(
       },
     });
     const purchase = await prisma.purchase.update({
-      where: { id: params.purchaseId },
+      where: { id: purchaseId },
       data: { ingredientId, quantity, price, supplierId },
     });
     return NextResponse.json(purchase);

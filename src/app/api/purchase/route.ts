@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { ingredientId, quantity, price, supplierId } = body;
+    const { ingredientId, quantity, price, supplierId, userId } = body;
+    if (!userId)
+      return NextResponse.json("User id is required", { status: 400 });
     if (!ingredientId)
       return NextResponse.json("ingredient id is required", { status: 400 });
     if (!quantity)
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
       data: { stock: ingredient?.stock + quantity },
     });
     const purchase = await prisma.purchase.create({
-      data: { ingredientId, quantity, price, supplierId },
+      data: { ingredientId, quantity, price, supplierId, userId },
     });
     return NextResponse.json(purchase);
   } catch (error) {

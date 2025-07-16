@@ -29,6 +29,7 @@ model User {
   approvedPendingPurchases PendingPurchase[] @relation("ApprovedBy")
   approvedPendingStockUsages PendingStockUsage[] @relation("ApprovedStockUsage")
   pendingStockUsages PendingStockUsage[]
+  notification Notification[]
 }
 
 model Role{
@@ -125,6 +126,7 @@ model PendingStockUsage {
   user           User @relation(fields: [userId], references: [id])
   quantity       Int
   note           String?
+  status        String   @default("Use")
   approvalStatus String   @default("Pending") // "Pending" | "Approved" | "Rejected"
   approvedById   String?
   approvedBy     User?    @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
@@ -174,3 +176,14 @@ model Supplier{
   createdAt DateTime @default(now())
   pendingPurchases PendingPurchase[]
 }
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // "purchase" | "stock"
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+

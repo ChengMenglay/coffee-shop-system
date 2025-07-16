@@ -52,13 +52,13 @@ function IngredientStockForm({
 }: IngredientFormProps) {
   const title = initialData
     ? "Update Ingredient Stock"
-    : "Create Ingredient Stock";
+    : "Request Ingredient Stock";
   const subtitle = initialData
     ? "Edit an ingredient stock"
-    : "Add a new ingredient stock";
+    : "Add a new ingredient Stock";
   const toastMessage = initialData
     ? "Ingredient stock updated."
-    : "Ingredient stock created";
+    : "Request has been sent.";
   const router = useRouter();
   const form = useForm<IngredientStockSchema>({
     resolver: zodResolver(ingredientStockSchema),
@@ -82,7 +82,7 @@ function IngredientStockForm({
       if (initialData) {
         await axios.patch(`/api/ingredientStock/${initialData.id}`, data);
       } else {
-        await axios.post("/api/ingredientStock", {
+        await axios.post("/api/stock-usage-request", {
           ingredientId: data.ingredientId,
           quantity: data.quantity,
           status: data.status,
@@ -154,7 +154,7 @@ function IngredientStockForm({
               name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stock</FormLabel>
+                  <FormLabel>Quantity</FormLabel>
                   <FormControl>
                     <Input disabled={isLoading} type="number" {...field} />
                   </FormControl>
@@ -208,30 +208,16 @@ function IngredientStockForm({
                 </FormItem>
               )}
             />
-
-            {/* <FormField
-              control={form.control}
-              name="lowStockThreshold"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Low Stock Threshold</FormLabel>
-                  <FormControl>
-                    <Input disabled={isLoading} type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
           </div>
           <Button disabled={isLoading} type="submit">
             {isLoading && <CgSpinnerTwoAlt className=" animate-spin" />}
             {isLoading
               ? initialData
                 ? "Save Change..."
-                : "Creating..."
+                : "Sending..."
               : initialData
               ? "Save Change"
-              : "Create"}
+              : "Request"}
           </Button>
         </form>
       </Form>

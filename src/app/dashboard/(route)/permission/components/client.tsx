@@ -15,9 +15,9 @@ type PermissionColumnProps = {
 function PermissionClient({ data }: PermissionColumnProps) {
   const router = useRouter();
   const [filterdData, setFilterdData] = useState<PermissionColumn[]>(data);
-    useEffect(() => {
-      setFilterdData(data);
-    }, [data]);
+  useEffect(() => {
+    setFilterdData(data);
+  }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
@@ -36,7 +36,7 @@ function PermissionClient({ data }: PermissionColumnProps) {
         </div>
       </div>
       <Separator className="my-6" />
-      <DataTable searchKey="key" columns={columns} data={filterdData} />
+      <DataTable searchKey="name" columns={columns} data={filterdData} />
     </>
   );
 }
