@@ -8,8 +8,9 @@ async function permissionPage({
 }: {
   params: { roleId: string };
 }) {
+  const{roleId}= await params
   const role = await prisma.role.findUnique({
-    where: { id: params.roleId },
+    where: { id:roleId },
     include: { permissions: true },
   });
   const permissions= await prisma.permission.findMany();

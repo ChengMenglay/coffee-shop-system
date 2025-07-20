@@ -26,8 +26,14 @@ import axios from "axios";
 
 type CellActionProps = {
   data: PermissionColumn;
+  canEdit: boolean;
+  canDelete: boolean;
 };
-export default function CellAction({ data }: CellActionProps) {
+export default function CellAction({
+  data,
+  canEdit,
+  canDelete,
+}: CellActionProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const onCopy = (id: string) => {
@@ -85,16 +91,20 @@ export default function CellAction({ data }: CellActionProps) {
             <Copy className="w-4 h-4" />
             Copy Id
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/permission/${data.id}`)}
-          >
-            <Edit className="w-4 h-4" />
-            Update
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsOpen(true)}>
-            <Trash className="w-4 h-4" />
-            Delete
-          </DropdownMenuItem>
+          {canEdit && (
+            <DropdownMenuItem
+              onClick={() => router.push(`/dashboard/permission/${data.id}`)}
+            >
+              <Edit className="w-4 h-4" />
+              Update
+            </DropdownMenuItem>
+          )}
+          {canDelete && (
+            <DropdownMenuItem onClick={() => setIsOpen(true)}>
+              <Trash className="w-4 h-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

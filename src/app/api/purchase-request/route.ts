@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       !quantity ||
       !price
     ) {
-      return new Response("Missing required fields", { status: 400 });
+      return NextResponse.json("Missing required fields", { status: 400 });
     }
     const newPurchaseRequest = await prisma.pendingPurchase.create({
       data: {
@@ -27,6 +27,6 @@ export async function POST(request: Request) {
     return NextResponse.json(newPurchaseRequest);
   } catch (error) {
     console.error("[PURCHASE_REQUEST POST]", error);
-    return new Response("Internal Server Error", { status: 500 });
+    return NextResponse.json("Internal Server Error", { status: 500 });
   }
 }

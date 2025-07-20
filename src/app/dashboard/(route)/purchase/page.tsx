@@ -9,7 +9,7 @@ async function IngredientStock() {
   await checkPermission(["view:purchases"]);
   const [purchases, ingredients] = await Promise.all([
     prisma.purchase.findMany({
-      include: { ingredient: true, supplier: true },
+      include: { ingredient: true, supplier: true, user: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.ingredient.findMany({
@@ -19,10 +19,11 @@ async function IngredientStock() {
 
   const formattedPurchases: PurchaseColumn[] = purchases.map((item) => ({
     id: item.id,
-    ingredient: item.ingredient.name + ` (${item.ingredient.unit})`,
+    ingredient: item.ingredient.name,
     price: formatterUSD.format(Number(item.price)),
-    quantity: ` ${item.quantity} ${item.ingredient.unit}`,
+    quantity: item.quantity + ` ${item.ingredient.unit}`,
     supplier: item.supplier.name,
+    purchasedBy: item.user.name,
     createdAt: format(item.createdAt, "dd MMMM yyyy"),
   }));
   return (

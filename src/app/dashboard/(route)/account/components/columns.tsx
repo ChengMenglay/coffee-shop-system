@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type AccountColumn = {
   id: string;
@@ -20,6 +21,15 @@ export const columns: ColumnDef<AccountColumn>[] = [
   { accessorKey: "createdAt", header: "Created At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => {
+      const { canPerformAction } = usePermissions();
+      return (
+        <CellAction
+          canEdit={canPerformAction(["edit:account"])}
+          canDelete={canPerformAction(["delete:account"])}
+          data={row.original}
+        />
+      );
+    },
   },
 ];

@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type IngredientColumn = {
   id: string;
@@ -8,7 +9,7 @@ export type IngredientColumn = {
   stock: number;
   unit: string;
   lowStockThreshold: number;
-  createdAt:string;
+  createdAt: string;
 };
 
 export const columns: ColumnDef<IngredientColumn>[] = [
@@ -25,6 +26,15 @@ export const columns: ColumnDef<IngredientColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => {
+      const { canPerformAction } = usePermissions();
+      return (
+        <CellAction
+          canEdit={canPerformAction(["edit:ingredient"])}
+          canDelete={canPerformAction(["delete:ingredient"])}
+          data={row.original}
+        />
+      );
+    },
   },
 ];

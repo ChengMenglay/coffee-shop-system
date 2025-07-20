@@ -45,7 +45,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [rejectionNote, setRejectionNote] = useState("");
   const [loading, setLoading] = useState<string>("");
-
+  const [selectedIngredient, setSelectedIngredient] = useState("");
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
@@ -59,7 +59,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
     }
   };
 
-  const approveHandler = async (id: string) => {
+  const approveHandler = async (id: string, ingredient: string) => {
     setLoading(id);
     try {
       const response = await axios.patch(`/api/stock-usage-request/${id}`, {
@@ -68,6 +68,12 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
         approvedAt: new Date(),
       });
       if (response.status === 200) {
+        await axios.post("/api/notification", {
+          title: "Stock Usage Request Approved",
+          userId: response.data.userId,
+          message: `Your stock usage request for ${ingredient} has been approved.`,
+          type: "success",
+        });
         toast.success("Stock usage request approved successfully");
         router.refresh();
       }
@@ -94,6 +100,12 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
         approvedAt: new Date(),
       });
       if (response.status === 200) {
+        await axios.post("/api/notification", {
+          title: "Stock Usage Request Rejected",
+          userId: response.data.userId,
+          message: `Your stock usage request for ${selectedIngredient} has been rejected. Reason: ${response.data.rejectionReason}`,
+          type: "warning",
+        });
         toast.success("Stock Usage request rejected successfully");
         setOpenAlert(false);
         setRejectionNote("");
@@ -108,8 +120,9 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
     }
   };
 
-  const handleRejectClick = (id: string) => {
+  const handleRejectClick = (id: string, ingredient: string) => {
     setSelectedItem(id);
+    setSelectedIngredient(ingredient);
     setOpenAlert(true);
   };
 
@@ -215,7 +228,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRejectClick(item.id)}
+                    onClick={() => handleRejectClick(item.id, item.ingredient)}
                     disabled={loading === item.id}
                     className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
                   >
@@ -224,7 +237,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() => approveHandler(item.id)}
+                    onClick={() => approveHandler(item.id, item.ingredient)}
                     disabled={loading === item.id}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                   >

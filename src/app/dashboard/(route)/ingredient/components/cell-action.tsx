@@ -26,8 +26,14 @@ import axios from "axios";
 
 type CellActionProps = {
   data: IngredientColumn;
+  canEdit: boolean;
+  canDelete: boolean;
 };
-export default function CellAction({ data }: CellActionProps) {
+export default function CellAction({
+  data,
+  canEdit,
+  canDelete,
+}: CellActionProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const onCopy = (id: string) => {
@@ -36,7 +42,6 @@ export default function CellAction({ data }: CellActionProps) {
   };
   const onDelete = async () => {
     try {
-
       await axios.delete(`/api/ingredient/${data.id}`);
       toast.success("Ingredient deleted");
       router.push(`/dashboard/ingredient`);
@@ -86,16 +91,20 @@ export default function CellAction({ data }: CellActionProps) {
             <Copy className="w-4 h-4" />
             Copy Id
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/ingredient/${data.id}`)}
-          >
-            <Edit className="w-4 h-4" />
-            Update
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsOpen(true)}>
-            <Trash className="w-4 h-4" />
-            Delete
-          </DropdownMenuItem>
+          {canEdit && (
+            <DropdownMenuItem
+              onClick={() => router.push(`/dashboard/ingredient/${data.id}`)}
+            >
+              <Edit className="w-4 h-4" />
+              Update
+            </DropdownMenuItem>
+          )}
+          {canDelete && (
+            <DropdownMenuItem onClick={() => setIsOpen(true)}>
+              <Trash className="w-4 h-4" />
+              Delete
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

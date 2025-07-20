@@ -80,7 +80,13 @@ function IngredientStockForm({
       }
       setIsLoading(true);
       if (initialData) {
-        await axios.patch(`/api/ingredientStock/${initialData.id}`, data);
+        await axios.patch(`/api/ingredientStock/${initialData.id}`, {
+          ingredientId: data.ingredientId,
+          quantity: data.quantity,
+          status: data.status,
+          note: data.note,
+          userId,
+        });
       } else {
         await axios.post("/api/stock-usage-request", {
           ingredientId: data.ingredientId,
@@ -88,6 +94,19 @@ function IngredientStockForm({
           status: data.status,
           note: data.note,
           userId,
+        });
+        const ingredient = await axios
+          .get(`/api/ingredient/${data.ingredientId}`)
+          .then((res) => res.data);
+        await axios.post("/api/notification", {
+          title: "Stock Usage Request Sent",
+          userId,
+          message: `Your stock usage request for ${
+            data.quantity + " " + ingredient.unit
+          } of ${
+            ingredient.name
+          } has been sent. Please wait for someone approve.`,
+          type: "info",
         });
       }
       toast.success(toastMessage);

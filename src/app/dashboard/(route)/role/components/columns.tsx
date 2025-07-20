@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
 import { Badge } from "@/components/ui/badge";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type RoleColumn = {
   id: string;
@@ -37,8 +38,17 @@ export const columns: ColumnDef<RoleColumn>[] = [
       );
     },
   },
-  {
+{
     accessorKey: "Action",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => {
+      const { canPerformAction } = usePermissions();
+      return (
+        <CellAction
+          canEdit={canPerformAction(["edit:role"])}
+          canDelete={canPerformAction(["delete:role"])}
+          data={row.original}
+        />
+      );
+    },
   },
 ];

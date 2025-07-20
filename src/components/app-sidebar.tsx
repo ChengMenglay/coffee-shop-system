@@ -1,10 +1,10 @@
 import {
   Archive,
-  ChevronDown,
   ChevronRight,
   ClipboardList,
   Home,
   Inbox,
+  Package,
   PackageOpen,
   Puzzle,
   Settings,
@@ -16,9 +16,9 @@ import {
   Building2,
   Bell,
   CreditCard,
-  LogOut,
+  ReceiptText,
+  Tags,
 } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -32,19 +32,24 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
 import Link from "next/link";
 import { auth } from "@/auth";
 import Singout from "./Singout";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
-import { useState } from "react";
+import NotificationBell from "./NotificaitonBell"; // fix spelling if needed
+import { Notification } from "types";
+import { formatDistanceStrict } from "date-fns";
+import { getUserId } from "@/app/(auth)/actions/authAction";
 
-const menuGroups = async (counts: { purchase: number; stock: number }) => [
+const menuGroups = (counts: { purchase: number; stock: number }) => [
   {
     title: "Main",
     items: [
@@ -53,6 +58,29 @@ const menuGroups = async (counts: { purchase: number; stock: number }) => [
         url: "/dashboard",
         icon: Home,
         requiredPermission: "view:dashboard",
+      },
+    ],
+  },
+  {
+    title: "Sale",
+    items: [
+      {
+        title: "Order",
+        url: "/dashboard/order",
+        icon: ReceiptText,
+        requiredPermission: "view:order",
+      },
+      {
+        title: "Products",
+        url: "/dashboard/product",
+        icon: Package,
+        requiredPermission: "view:product",
+      },
+      {
+        title: "Category",
+        url: "/dashboard/category",
+        icon: Tags,
+        requiredPermission: "view:category",
       },
     ],
   },
@@ -164,25 +192,48 @@ const settingsItems = [
 export async function AppSidebar() {
   const session = await auth();
   const users = session?.user;
-
-  const [purchaseCount, stockCount] = await Promise.all([
+  const userId = await getUserId();
+  const [purchaseCount, stockCount, notifications] = await Promise.all([
     prisma.pendingPurchase.count({ where: { approvalStatus: "Pending" } }),
     prisma.pendingStockUsage.count({ where: { approvalStatus: "Pending" } }),
+    prisma.notification.findMany({
+      where: { userId: userId as string },
+      include: { user: { include: { role: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
-  const groups = await menuGroups({
+  const groups = menuGroups({
     purchase: purchaseCount,
     stock: stockCount,
   });
+
+  // Optional: format notifications if needed for NotificaitonBell
+  const formattedNotifications: Notification[] = notifications.map((item) => ({
+    id: item.id,
+    name: item.user.name,
+    role: item.user.role.name,
+    title: item.title,
+    message: item.message,
+    type: item.type,
+    read: item.read,
+    createdAt: formatDistanceStrict(new Date(item.createdAt), new Date(), {
+      addSuffix: true,
+    }),
+  }));
 
   return (
     <Sidebar className="py-2">
       <SidebarContent>
         <SidebarGroup className="gap-y-4">
-          <SidebarGroupLabel>
+          <SidebarGroupLabel className="flex items-center justify-between">
             <Link href="/" className="font-bold text-black text-2xl">
               Coffee Shop
             </Link>
+            <NotificationBell
+              userId={userId as string}
+              mockNotifications={formattedNotifications}
+            />
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-2 space-y-1">
@@ -269,8 +320,7 @@ export async function AppSidebar() {
                 </Collapsible>
               </SidebarMenuItem>
 
-              {/* Divider */}
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-gray-200 my-2" />
 
               {/* Sign Out */}
               <SidebarMenuItem>

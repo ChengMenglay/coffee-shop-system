@@ -13,8 +13,9 @@ async function IngredientStockPage({
   const ingredientStock = await prisma.ingredientStock.findUnique({
     where: { id: stockUsageId },
   });
-  
+
   const ingredients = await prisma.ingredient.findMany({
+    where: { stock: { gt: 0 } },
     orderBy: { createdAt: "desc" },
   });
   if (ingredientStock === null) {

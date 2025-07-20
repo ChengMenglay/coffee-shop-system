@@ -25,6 +25,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { columns, PurchaseColumn } from "./columns";
 import { Ingredient } from "@/generated/prisma";
+import { unparse } from "papaparse";
 
 type PurchaseColumnProps = {
   data: PurchaseColumn[];
@@ -38,21 +39,45 @@ function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
   useEffect(() => {
     setFilterdData(data);
   }, [data]);
+  const exportToCSV = () => {
+    if (!filterdData.length) return;
+
+    const csvData = filterdData.map((item, idx) => ({
+      ID: item.id,
+      Ingredient: item.ingredient,
+      Quantity: item.quantity,
+      Supplier: item.supplier,
+      PurchasedBy: item.purchasedBy,
+      Date: new Date(item.createdAt).toLocaleDateString(),
+    }));
+
+    const csv = unparse(csvData);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "purchases.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 space-x-2">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
         <Header
           title="Purchases"
           subtitle="Manage purchase stock for your store."
           total={data.length}
         />
-        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 my-2 w-full sm:w-auto overflow-x-auto">
           <Button
             variant={"outline"}
+            size={"icon"}
             onClick={() => {
+              setFilterdData(data);
               setIngredient("");
               setDateRange(undefined);
-              setFilterdData(data);
             }}
           >
             <RefreshCcw />
@@ -120,7 +145,7 @@ function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
             }}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={"Select a status"} />
+              <SelectValue placeholder={"Select an ingredient"} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -132,6 +157,9 @@ function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
               </SelectGroup>
             </SelectContent>
           </Select>
+          <Button variant="outline" onClick={exportToCSV}>
+            Export CSV
+          </Button>
           <Button onClick={() => router.push("/dashboard/purchase/action")}>
             Purchase
           </Button>

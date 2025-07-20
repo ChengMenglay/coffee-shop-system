@@ -15,9 +15,9 @@ type AccountColumnProps = {
 function AccountClient({ data }: AccountColumnProps) {
   const router = useRouter();
   const [filterdData, setFilterdData] = useState<AccountColumn[]>(data);
-    useEffect(() => {
-      setFilterdData(data);
-    }, [data]);
+  useEffect(() => {
+    setFilterdData(data);
+  }, [data]);
   return (
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">

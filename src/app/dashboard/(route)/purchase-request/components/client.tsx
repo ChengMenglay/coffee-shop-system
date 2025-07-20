@@ -47,6 +47,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [rejectionNote, setRejectionNote] = useState("");
   const [loading, setLoading] = useState<string>("");
+  const [selectedIngredient, setSeletedIngredient] = useState("");
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -61,7 +62,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
     }
   };
 
-  const approveHandler = async (id: string) => {
+  const approveHandler = async (id: string, ingredient: string) => {
     setLoading(id);
     try {
       const response = await axios.patch(`/api/purchase-request/${id}`, {
@@ -70,6 +71,12 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
         approvedAt: new Date(),
       });
       if (response.status === 200) {
+        await axios.post("/api/notification", {
+          title: "Purchase Request Approved",
+          userId: response.data.userId,
+          message: `Your purchase request for ${ingredient} has been approved.`,
+          type: "success",
+        });
         toast.success("Purchase request approved successfully");
         router.refresh();
       }
@@ -96,6 +103,12 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
         approvedAt: new Date(),
       });
       if (response.status === 200) {
+        await axios.post("/api/notification", {
+          title: "Purchase Request Rejected",
+          userId: response.data.userId,
+          message: `Your purchase request for ${selectedIngredient} has been rejected. Reason: ${response.data.rejectionReason}`,
+          type: "warning",
+        });
         toast.success("Purchase request rejected successfully");
         setOpenAlert(false);
         setRejectionNote("");
@@ -110,9 +123,10 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
     }
   };
 
-  const handleRejectClick = (id: string) => {
+  const handleRejectClick = (id: string, ingredient: string) => {
     setSelectedItem(id);
     setOpenAlert(true);
+    setSeletedIngredient(ingredient);
   };
 
   return (
@@ -228,7 +242,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleRejectClick(item.id)}
+                    onClick={() => handleRejectClick(item.id, item.ingredient)}
                     disabled={loading === item.id}
                     className="flex-1 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
                   >
@@ -237,7 +251,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
                   </Button>
                   <Button
                     size="sm"
-                    onClick={() => approveHandler(item.id)}
+                    onClick={() => approveHandler(item.id, item.ingredient)}
                     disabled={loading === item.id}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                   >

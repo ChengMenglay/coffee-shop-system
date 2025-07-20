@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/hooks/usePermission";
 export type IngredientStockColumn = {
   id: string;
   ingredient: string;
@@ -45,13 +46,20 @@ export function getColumns(
     { accessorKey: "note", header: "Note" },
     { accessorKey: "name", header: "Create By" },
     { accessorKey: "createdAt", header: "Create At" },
-  ];
-  if (userRole === "Admin") {
-    baseColumns.push({
+    {
       accessorKey: "Action",
-      cell: ({ row }) => <CellAction data={row.original} />,
-    });
-  }
+      cell: ({ row }) => {
+        const { canPerformAction } = usePermissions();
+        return (
+          <CellAction
+            canEdit={canPerformAction(["edit:stock"])}
+            canDelete={canPerformAction(["delete:stock"])}
+            data={row.original}
+          />
+        );
+      },
+    },
+  ];
 
   return baseColumns;
 }

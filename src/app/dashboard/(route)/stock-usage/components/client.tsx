@@ -37,24 +37,25 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
   const { data: session } = useSession();
   const userRole = session?.user.role ?? "";
   const columns = getColumns(userRole);
-    useEffect(() => {
-      setFilterdData(data);
-    }, [data]);
+  useEffect(() => {
+    setFilterdData(data);
+  }, [data]);
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
         <Header
           title="Ingredient Stock"
           subtitle="Manage ingredient stock for your store."
           total={data.length}
         />
-        <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 my-2 w-full sm:w-auto overflow-x-auto">
           <Button
             variant={"outline"}
+            size={"icon"}
             onClick={() => {
+              setFilterdData(data);
               setStatus("");
               setDateRange(undefined);
-              setFilterdData(data);
             }}
           >
             <RefreshCcw />
@@ -64,19 +65,21 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
               <Button
                 variant={"outline"}
                 className={cn(
-                  " justify-start text-left font-normal",
+                  "justify-start text-left font-normal truncate w-full sm:w-auto min-w-0",
                   !dateRange && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 w-4 h-4" />
-                {dateRange?.from && dateRange?.to ? (
-                  <>
-                    {format(dateRange.from, "dd/MM/yyyy")} -{" "}
-                    {format(dateRange.to, "dd/MM/yyyy")}
-                  </>
-                ) : (
-                  <span className="truncate">Filter by Date Range</span>
-                )}
+                <CalendarIcon className="mr-2 w-4 h-4 flex-shrink-0" />
+                <span className="truncate">
+                  {dateRange?.from && dateRange?.to ? (
+                    <>
+                      {format(dateRange.from, "dd/MM/yyyy")} -{" "}
+                      {format(dateRange.to, "dd/MM/yyyy")}
+                    </>
+                  ) : (
+                    "Filter by Date Range"
+                  )}
+                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-auto p-1">
@@ -116,22 +119,30 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
             value={status}
             onValueChange={(value) => {
               setStatus(value);
-              setFilterdData(
-                value ? data.filter((item) => item.status === value) : data
-              );
+              if (value === "All") {
+                setFilterdData(data);
+              } else {
+                setFilterdData(
+                  value ? data.filter((item) => item.status === value) : data
+                );
+              }
             }}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder={"Select a status"} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
+                <SelectItem value="All">All</SelectItem>
                 <SelectItem value="Use">Use</SelectItem>
-                <SelectItem value="Issue">Issue</SelectItem>
+                <SelectItem value="Expired">Expired</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button onClick={() => router.push("/dashboard/stock-usage/action")}>
+          <Button
+            onClick={() => router.push("/dashboard/stock-usage/action")}
+            className="w-full sm:w-auto whitespace-nowrap"
+          >
             Stock Action
           </Button>
         </div>

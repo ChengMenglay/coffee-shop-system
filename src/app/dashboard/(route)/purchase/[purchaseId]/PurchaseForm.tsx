@@ -29,9 +29,10 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ingredient, Purchase, Supplier } from "@/generated/prisma";
+import { Ingredient, Supplier } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Purchase } from "types";
 type SupplierWithIngredients = Supplier & {
   suppliedIngredients: Ingredient[];
 };
@@ -58,13 +59,21 @@ function PurchaseForm({
 }: PurchaseColumnPRops) {
   const title = initialData ? "Update Purchase" : "Request Purchase";
   const subtitle = initialData ? "Edit an Purchase" : "Add a new Purchase";
-  const toastMessage = initialData ? "Purchase updated." : "Request has been sent.";
+  const toastMessage = initialData
+    ? "Purchase updated."
+    : "Request has been sent.";
   const router = useRouter();
   const [selectIngredientId, setSelectIngredientId] = useState("");
   const form = useForm<PurchaseSchema>({
     resolver: zodResolver(purchaseSchema),
     defaultValues: initialData
-      ? { ...initialData, price: Number(initialData.price) }
+      ? {
+          ...initialData,
+          price: typeof initialData.price === "object" && "toNumber" in initialData.price
+            ? (initialData.price as any).toNumber()
+            : Number(initialData.price),
+          quantity: Number((initialData as any)?.quantity),
+        }
       : {
           ingredientId: "",
           price: 0,
@@ -78,7 +87,14 @@ function PurchaseForm({
     try {
       setIsLoading(true);
       if (initialData) {
-        await axios.patch(`/api/purchase/${initialData.id}`, data);
+        await axios.patch(`/api/purchase/${initialData.id}`, {
+          ingredientId: data.ingredientId,
+          supplierId: data.supplierId,
+          userId,
+          quantity: data.quantity,
+          note: data.note,
+          price: Number(data.price),
+        });
       } else {
         await axios.post("/api/purchase-request", {
           ingredientId: data.ingredientId,
@@ -86,7 +102,20 @@ function PurchaseForm({
           userId,
           quantity: data.quantity,
           note: data.note,
-          price: data.price,
+          price: Number(data.price),
+        });
+        const ingredient = await axios
+          .get(`/api/ingredient/${data.ingredientId}`)
+          .then((res) => res.data);
+        await axios.post("/api/notification", {
+          title: "Purchase Request Sent",
+          userId,
+          message: `Your purchase request for ${
+            data.quantity + " " + ingredient.unit
+          } of ${
+            ingredient.name
+          } has been sent. Please wait for someone approve.`,
+          type: "info",
         });
       }
       toast.success(toastMessage);

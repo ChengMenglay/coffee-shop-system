@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
 import { Badge } from "@/components/ui/badge";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type SupplierColumn = {
   id: string;
@@ -55,8 +56,17 @@ export const columns: ColumnDef<SupplierColumn>[] = [
       );
     },
   },
-  {
-    accessorKey: "Action",
-    cell: ({ row }) => <CellAction data={row.original} />,
-  },
+    {
+      accessorKey: "Action",
+      cell: ({ row }) => {
+        const { canPerformAction } = usePermissions();
+        return (
+          <CellAction
+            canEdit={canPerformAction(["edit:stock"])}
+            canDelete={canPerformAction(["delete:stock"])}
+            data={row.original}
+          />
+        );
+      },
+    },
 ];

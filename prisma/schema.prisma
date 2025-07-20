@@ -179,9 +179,10 @@ model Supplier{
 
 model Notification {
   id        String   @id @default(cuid())
+  title     String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  type      String   // "purchase" | "stock"
+  type      String
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())

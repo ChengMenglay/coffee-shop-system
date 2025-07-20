@@ -1,7 +1,14 @@
-"use client";
 import { useSession } from "next-auth/react";
 
-export function usePermissio(permissionKey: string) {
-  const { data: session } = useSession();
-  return session?.user.permissions.includes(permissionKey) ?? false;
-}
+export const usePermissions = () => {
+  const { data: session, status } = useSession();
+  const canPerformAction = (requiredPermission: string[]) => {
+    const permissions = session?.user?.permissions || [];
+    const hasPermission = requiredPermission.some((p) =>
+      permissions.includes(p)
+    );
+    return hasPermission;
+  };
+
+  return { canPerformAction };
+};

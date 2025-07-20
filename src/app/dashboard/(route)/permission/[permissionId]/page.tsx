@@ -8,8 +8,9 @@ async function permissionPage({
 }: {
   params: { permissionId: string };
 }) {
+  const {permissionId}= await params
   const permission = await prisma.permission.findUnique({
-    where: { id: params.permissionId },
+    where: { id: permissionId },
   });
   if (permission === null) {
     await checkPermission(["create:permission"]);

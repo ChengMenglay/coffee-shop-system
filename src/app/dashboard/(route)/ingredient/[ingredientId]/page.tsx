@@ -8,18 +8,19 @@ async function IngredientPage({
 }: {
   params: { ingredientId: string };
 }) {
+  const { ingredientId } = await params;
   const ingredient = await prisma.ingredient.findUnique({
-    where: { id: params.ingredientId },
+    where: { id: ingredientId },
   });
-  if(ingredient===null){
+  if (ingredient === null) {
     await checkPermission(["create:ingredient"]);
-  }else{
+  } else {
     await checkPermission(["edit:ingredient"]);
   }
   return (
     <div className="flex-col h-full">
       <div className="space-y-4 px-6 py-8">
-        <IngredientForm initialData={ingredient}/>
+        <IngredientForm initialData={ingredient} />
       </div>
     </div>
   );

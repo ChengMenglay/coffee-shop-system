@@ -1,6 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type PermissionColumn = {
   id: string;
@@ -16,6 +17,15 @@ export const columns: ColumnDef<PermissionColumn>[] = [
   { accessorKey: "key", header: "Key" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => {
+      const { canPerformAction } = usePermissions();
+      return (
+        <CellAction
+          canEdit={canPerformAction(["edit:permission"])}
+          canDelete={canPerformAction(["delete:permission"])}
+          data={row.original}
+        />
+      );
+    },
   },
 ];

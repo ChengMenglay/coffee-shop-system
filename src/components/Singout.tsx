@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { LogoutUser } from "@/app/(auth)/actions/authAction";
-import { LogOut, Trash } from "lucide-react";
+import { LogOut, LogOutIcon, Trash } from "lucide-react";
 import { SidebarMenuButton } from "./ui/sidebar";
 import {
   AlertDialog,
@@ -14,8 +14,6 @@ import {
   AlertDialogTitle,
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
-import { toast } from "sonner";
-import { CgSpinnerTwo } from "react-icons/cg";
 
 function Singout() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,8 +48,8 @@ function Singout() {
                 variant={"ghost"}
                 onClick={async () => await LogoutUser()}
               >
-                <Trash className="w-4 h-4" />
-                Delete
+                <LogOutIcon className="w-4 h-4" />
+                Logout
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
