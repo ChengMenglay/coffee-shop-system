@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { StockUsageColumn } from "./type";
 import { Badge } from "@/components/ui/badge";
+import NoResult from "@/components/NoResult";
 
 type StockUsageColumnProps = {
   data: StockUsageColumn[];
@@ -138,18 +139,11 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
       <Separator className="my-6" />
 
       {data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="bg-gray-100 rounded-full p-6 mb-4">
-            <SearchX className="w-12 h-12 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No Stock Usage Requests Found
-          </h3>
-          <p className="text-gray-500 max-w-md">
-            There are currently no stock usage requests to review. New requests
-            will appear here when submitted.
-          </p>
-        </div>
+        <NoResult
+          title="No Stock Usage Requests Found"
+          description="There are currently no stock usage requests to review. New requests
+            will appear here when submitted."
+        />
       ) : (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
           {data.map((item) => (

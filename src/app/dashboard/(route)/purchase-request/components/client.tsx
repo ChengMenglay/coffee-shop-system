@@ -35,6 +35,7 @@ import {
   Building2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import NoResult from "@/components/NoResult";
 
 type PurchaseColumnProps = {
   data: PurchaseColumn[];
@@ -141,18 +142,11 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
       <Separator className="my-6" />
 
       {data.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="bg-gray-100 rounded-full p-6 mb-4">
-            <SearchX className="w-12 h-12 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No Purchase Requests Found
-          </h3>
-          <p className="text-gray-500 max-w-md">
-            There are currently no purchase requests to review. New requests
-            will appear here when submitted.
-          </p>
-        </div>
+        <NoResult
+          title="No Purchase Requests Found"
+          description="There are currently no purchase requests to review. New requests
+            will appear here when submitted."
+        />
       ) : (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
           {data.map((item) => (

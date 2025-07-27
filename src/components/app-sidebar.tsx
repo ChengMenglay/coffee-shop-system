@@ -18,6 +18,7 @@ import {
   CreditCard,
   ReceiptText,
   Tags,
+  StretchHorizontal,
 } from "lucide-react";
 import {
   Sidebar,
@@ -81,6 +82,12 @@ const menuGroups = (counts: { purchase: number; stock: number }) => [
         url: "/dashboard/category",
         icon: Tags,
         requiredPermission: "view:category",
+      },
+      {
+        title: "Size",
+        url: "/dashboard/size",
+        icon: StretchHorizontal,
+        requiredPermission: "view:size",
       },
     ],
   },

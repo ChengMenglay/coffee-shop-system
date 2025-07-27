@@ -5,7 +5,7 @@ import { PurchaseColumn } from "./components/columns";
 import { formatterUSD } from "@/lib/utils";
 import PurchaseClient from "./components/client";
 import { checkPermission } from "@/lib/check-permission";
-async function IngredientStock() {
+async function PurchasePage() {
   await checkPermission(["view:purchases"]);
   const [purchases, ingredients] = await Promise.all([
     prisma.purchase.findMany({
@@ -35,4 +35,4 @@ async function IngredientStock() {
   );
 }
 
-export default IngredientStock;
+export default PurchasePage;

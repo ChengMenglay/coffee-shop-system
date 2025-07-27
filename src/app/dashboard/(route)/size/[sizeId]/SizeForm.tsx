@@ -23,68 +23,57 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IngredientColumn } from "../components/columns";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ingredient } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
+import { Product, Size } from "types";
 
-type IngredientFormProps = {
-  initialData: Ingredient | null;
+type SizeFormProps = {
+  initialData: Size | null;
+  products: Product[] | null;
 };
-const ingredientSchema = z.object({
-  name: z.string().min(1, "Ingrediet is required"),
-  stock: z.coerce.number(),
-  unit: z.string().min(1, "Unit is required"),
-  lowStockThreshold: z.coerce.number(),
+const sizeSchema = z.object({
+  sizeName: z.string().min(1, "Size is required"),
+  priceModifier: z.coerce.number(),
+  productId: z.string().min(1, "Product id is required"),
 });
-type IngredientSchema = z.infer<typeof ingredientSchema>;
-function IngredientForm({ initialData }: IngredientFormProps) {
-  const title = initialData ? "Update Ingredient" : "Create Ingredient";
-  const subtitle = initialData ? "Edit an ingredient" : "Add a new ingredient";
-  const toastMessage = initialData
-    ? "Ingredient updated."
-    : "Ingredient created";
+type SizeSchema = z.infer<typeof sizeSchema>;
+function SizeForm({ initialData, products }: SizeFormProps) {
+  const title = initialData ? "Update Size" : "Create Size";
+  const subtitle = initialData ? "Edit an size" : "Add a new size";
+  const toastMessage = initialData ? "Size updated." : "Size created";
   const router = useRouter();
-  const form = useForm<IngredientSchema>({
-    resolver: zodResolver(ingredientSchema),
+  const form = useForm<SizeSchema>({
+    resolver: zodResolver(sizeSchema),
     defaultValues: initialData
       ? { ...initialData }
       : {
-          name: "",
-          stock: 0,
-          unit: "",
-          lowStockThreshold: 0,
+          sizeName: "",
+          priceModifier: 0,
+          productId: "",
         },
   });
   const [isLoading, setIsLoading] = useState(false);
-  const onSubmitted = async (data: IngredientSchema) => {
+  const onSubmitted = async (data: SizeSchema) => {
     try {
-      if (data.stock <= 0) {
-        toast.warning("Stock must be greater than 0");
-        return;
-      }
-      if (data.lowStockThreshold <= 0) {
-        toast.warning("Low Stock must be greater than 0");
-        return;
-      }
       setIsLoading(true);
       if (initialData) {
-        await axios.patch(`/api/ingredient/${initialData.id}`, data);
+        await axios.patch(`/api/size/${initialData.id}`, data);
       } else {
-        await axios.post("/api/ingredient", data);
+        await axios.post("/api/size", data);
       }
       toast.success(toastMessage);
-      router.push("/dashboard/ingredient");
+      router.push("/dashboard/size");
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      toast.error("Something went wrong!");
+      toast.error(
+        error?.response?.data || "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -109,40 +98,10 @@ function IngredientForm({ initialData }: IngredientFormProps) {
           <div className="grid grid-cols-3 gap-4">
             <FormField
               control={form.control}
-              name="name"
+              name="sizeName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ingredient</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder="Ingredient name..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="stock"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stock</FormLabel>
-                  <FormControl>
-                    <Input disabled={isLoading} type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="unit"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Unit</FormLabel>
+                  <FormLabel>Size</FormLabel>
                   <FormControl>
                     <Select
                       value={field.value}
@@ -150,17 +109,13 @@ function IngredientForm({ initialData }: IngredientFormProps) {
                       disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder={"Select a unit"} />
+                        <SelectValue placeholder={"Select a size"} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectLabel>Unit</SelectLabel>
-                          <SelectItem value="ml">ML</SelectItem>
-                          <SelectItem value="g">G</SelectItem>
-                          <SelectItem value="kg">KG</SelectItem>
-                          <SelectItem value="bottle">Bottles</SelectItem>
-                          <SelectItem value="pack">Pack</SelectItem>
-                          <SelectItem value="l">Liters (L)</SelectItem>
+                          <SelectItem value="small">Small</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="large">Large</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -171,10 +126,40 @@ function IngredientForm({ initialData }: IngredientFormProps) {
             />
             <FormField
               control={form.control}
-              name="lowStockThreshold"
+              name="productId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Low Stock Threshold</FormLabel>
+                  <FormLabel>Product</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={"Select a size"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {products?.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="priceModifier"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price Modifier</FormLabel>
                   <FormControl>
                     <Input disabled={isLoading} type="number" {...field} />
                   </FormControl>
@@ -199,4 +184,4 @@ function IngredientForm({ initialData }: IngredientFormProps) {
   );
 }
 
-export default IngredientForm;
+export default SizeForm;

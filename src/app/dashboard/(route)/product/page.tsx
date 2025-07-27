@@ -18,6 +18,7 @@ async function CategoryPage() {
     category: item.category.name,
     price: formatterUSD.format(Number(item.price)),
     status: item.status,
+    discount: item.discount ? `${item.discount}%` : "",
     createdAt: format(item.createdAt, "dd MMMM yyyy"),
   }));
   return (

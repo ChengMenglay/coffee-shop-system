@@ -3,7 +3,6 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,11 +29,12 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Category, Product } from "@/generated/prisma";
+import { Category } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import ImageUpload from "@/components/ImageUpload";
+import { Product } from "types";
 
 type ProductFormProps = {
   initialData: Product | null;
@@ -45,6 +45,7 @@ const productSchema = z.object({
   image: z.string().min(1, "Image is required"),
   categoryId: z.string().min(1, "Category is required"),
   description: z.string().min(1, "Description is required"),
+  discount: z.coerce.number().optional(),
   price: z.coerce.number(),
   status: z.boolean(),
 });
@@ -57,12 +58,17 @@ function ProductForm({ initialData, categories }: ProductFormProps) {
   const form = useForm<ProductSchema>({
     resolver: zodResolver(productSchema),
     defaultValues: initialData
-      ? { ...initialData, price: Number(initialData.price) }
+      ? {
+          ...initialData,
+          price: Number(initialData.price),
+          discount: Number(initialData?.discount),
+        }
       : {
           name: "",
           image: "",
           categoryId: "",
           description: "",
+          discount: 0,
           price: 0,
           status: true,
         },
@@ -136,12 +142,29 @@ function ProductForm({ initialData, categories }: ProductFormProps) {
             />
             <FormField
               control={form.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount %</FormLabel>
+                  <FormControl>
+                    <Input disabled={isLoading} type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      disabled={isLoading}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger>
                         <SelectValue
                           className="text-foreground"
@@ -217,7 +240,7 @@ function ProductForm({ initialData, categories }: ProductFormProps) {
                 <FormControl>
                   <ImageUpload
                     value={field.value ? field.value : ""}
-                    onChange={(url:string) => field.onChange(url)}
+                    onChange={(url: string) => field.onChange(url)}
                     onDelete={() => field.onChange("")}
                   />
                 </FormControl>

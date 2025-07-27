@@ -12,6 +12,7 @@ export type ProductColumn = {
   image: string;
   category: string;
   status: boolean;
+  discount:string;
   createdAt: string;
 };
 
@@ -24,7 +25,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
         alt={row.original.name}
         width={100}
         height={100}
-        src={row.original.image}
+        src={`/uploads/${row.original.image}`}
         className="rounded-md"
       />
     ),
@@ -41,6 +42,10 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "price",
     header: "Price",
   },
+    {
+    accessorKey: "discount",
+    header: "Discount",
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -56,7 +61,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
       );
     },
   },
-    {
+  {
     accessorKey: "createdAt",
     header: "Create At",
   },
