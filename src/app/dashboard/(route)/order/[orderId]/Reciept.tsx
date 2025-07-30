@@ -5,6 +5,7 @@ import { useReactToPrint } from "react-to-print";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { ArrowLeft } from "lucide-react";
 
 interface OrderInvoiceProps {
   orderItems: OrderItem[];
@@ -33,7 +34,14 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
   const finalTotal = order.total;
 
   return (
-    <div className="max-w-sm mx-auto bg-white">
+    <div className="max-w-sm mx-auto bg-white relative">
+      <div className="absolute top-2 left-2">
+        {" "}
+        <Button size={"icon"} variant={"outline"} onClick={() => router.back()}>
+          <ArrowLeft />
+        </Button>
+      </div>
+
       {/* Receipt Content */}
       <div
         ref={contentRef}

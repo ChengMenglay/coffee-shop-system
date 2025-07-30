@@ -78,6 +78,7 @@ function IngredientStockForm({
         toast.warning("Stock must be greater than 0");
         return;
       }
+
       setIsLoading(true);
       if (initialData) {
         await axios.patch(`/api/ingredientStock/${initialData.id}`, {
@@ -88,6 +89,16 @@ function IngredientStockForm({
           userId,
         });
       } else {
+        const ingredient = await axios
+          .get(`/api/ingredient/${data.ingredientId}`)
+          .then((res) => res.data);
+
+        if (data.quantity > ingredient.stock) {
+          toast.info(
+            `Request quanity must be less than current stock (${ingredient.stock})`
+          );
+          return;
+        }
         await axios.post("/api/stock-usage-request", {
           ingredientId: data.ingredientId,
           quantity: data.quantity,
@@ -95,9 +106,7 @@ function IngredientStockForm({
           note: data.note,
           userId,
         });
-        const ingredient = await axios
-          .get(`/api/ingredient/${data.ingredientId}`)
-          .then((res) => res.data);
+
         await axios.post("/api/notification", {
           title: "Stock Usage Request Sent",
           userId,

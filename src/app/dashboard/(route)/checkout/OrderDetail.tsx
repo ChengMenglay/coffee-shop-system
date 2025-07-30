@@ -120,7 +120,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
         userId: session?.user?.id as string,
         paymentMethod: selectedPayment,
         paymentStatus: isFullyPaid ? true : false,
-        orderStatus: isFullyPaid && "Pending",
+        orderStatus: "Completed",
         discount: discountAmount > 0 ? discountAmount : 0,
         total: Number(total.toFixed(2)),
       };
@@ -129,10 +129,6 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
         try {
           await Promise.all(
             items.map((item) => {
-              const discount = Math.min(
-                100,
-                Math.max(0, Number(item.discount) || 0)
-              );
               return axios.post("/api/order_item", {
                 orderId: order.data.id,
                 productId: item.id,
@@ -145,7 +141,6 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
             })
           );
           toast.success("Payment processed and order created!");
-
           router.push(`order/${order.data.id}`);
           removeAll();
         } catch {

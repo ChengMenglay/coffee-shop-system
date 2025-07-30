@@ -38,7 +38,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h1 className="md:text-xs text-sm font-semibold dark:text-black truncate">
           {product?.name}
         </h1>
-        {product?.discount ? (
+        {product?.discount && product?.discount ? (
           <div className="flex items-center space-x-1">
             <p className="text-red-500 md:text-md text-sm font-bold">
               {formatterUSD.format(Number(calculateItemAfterDiscount(product)))}
@@ -52,7 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {formatterUSD.format(Number(product?.price))}
           </p>
         )}
-        {product?.discount && (
+        {typeof product?.discount === "number" && product.discount > 0 && (
           <Badge
             className="absolute top-0 right-1 rounded-full text-xs font-semibold p-2"
             variant={"destructive"}

@@ -50,7 +50,11 @@ import { Notification } from "types";
 import { formatDistanceStrict } from "date-fns";
 import { getUserId } from "@/app/(auth)/actions/authAction";
 
-const menuGroups = (counts: { purchase: number; stock: number }) => [
+const menuGroups = (counts: {
+  purchase: number;
+  stock: number;
+  order_management: number;
+}) => [
   {
     title: "Main",
     items: [
@@ -88,6 +92,13 @@ const menuGroups = (counts: { purchase: number; stock: number }) => [
         url: "/dashboard/size",
         icon: StretchHorizontal,
         requiredPermission: "view:size",
+      },
+      {
+        title: "Order Management",
+        url: "/dashboard/order_management",
+        icon: Bell,
+        requiredPermission: "view:order_management",
+        count: counts.order_management,
       },
     ],
   },
@@ -183,12 +194,6 @@ const settingsItems = [
     requiredPermission: "view:profile",
   },
   {
-    title: "Notifications",
-    url: "/dashboard/notifications",
-    icon: Bell,
-    requiredPermission: "view:notifications",
-  },
-  {
     title: "Billing",
     url: "/dashboard/billing",
     icon: CreditCard,
@@ -200,7 +205,13 @@ export async function AppSidebar() {
   const session = await auth();
   const users = session?.user;
   const userId = await getUserId();
-  const [purchaseCount, stockCount, notifications] = await Promise.all([
+  const [
+    purchaseCount,
+    stockCount,
+    notifications,
+    orderPendingCount,
+    orderDraftCount,
+  ] = await Promise.all([
     prisma.pendingPurchase.count({ where: { approvalStatus: "Pending" } }),
     prisma.pendingStockUsage.count({ where: { approvalStatus: "Pending" } }),
     prisma.notification.findMany({
@@ -208,11 +219,14 @@ export async function AppSidebar() {
       include: { user: { include: { role: true } } },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.order.count({ where: { orderStatus: "Pending" } }),
+    prisma.order.count({ where: { orderStatus: "Draft" } }),
   ]);
-
+  const totalOrder = orderPendingCount + orderDraftCount;
   const groups = menuGroups({
     purchase: purchaseCount,
     stock: stockCount,
+    order_management: totalOrder,
   });
 
   // Optional: format notifications if needed for NotificaitonBell
