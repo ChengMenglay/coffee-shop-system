@@ -69,10 +69,6 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
             <p>Time:</p>
             <p>{currentTime}</p>
           </div>
-          <div className="flex justify-between">
-            <p>Status:</p>
-            <p className="uppercase">{order.orderStatus}</p>
-          </div>
         </div>
 
         {/* Customer Info */}
@@ -81,14 +77,12 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
             <p>Customer:</p>
             <p>{order.user.name}</p>
           </div>
-          <div className="flex justify-between">
-            <p>Phone:</p>
-            <p>{order.user.phone}</p>
-          </div>
-          <div className="flex justify-between">
-            <p>Role:</p>
-            <p>{order.user.role.name}</p>
-          </div>
+          {order.user.phone && (
+            <div className="flex justify-between">
+              <p>Phone:</p>
+              <p>{order.user.phone}</p>
+            </div>
+          )}
           <div className="flex justify-between">
             <p>Payment:</p>
             <p>{order.paymentStatus ? "PAID" : "UNPAID"}</p>
@@ -111,7 +105,7 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
             </div>
           </div>
 
-          {orderItems.map((item, index) => {
+          {orderItems.map((item) => {
             const itemTotal = item.price * item.quantity;
             const basePrice = item.productId.price;
             const sizePrice = item.size.fullPrice;

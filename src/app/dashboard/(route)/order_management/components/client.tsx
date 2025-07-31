@@ -198,58 +198,58 @@ function OrderManagementClient({
       </div>
       <Separator className="my-4" />
       {selectedTab === "completed" ? (
-  completedData.length > 0 ? (
-    <DataTable data={completedData} columns={columns} />
-  ) : (
-    <NoResult
-      title="No completed orders"
-      description="There are no completed orders yet. Orders will appear here once they are completed."
-    />
-  )
-) : selectedTab === "cancelled" ? (
-  cancelledData.length > 0 ? (
-    <DataTable data={cancelledData} columns={columns} />
-  ) : (
-    <NoResult
-      title="No cancelled orders"
-      description="There are no cancelled orders. Orders will appear here when they are cancelled."
-    />
-  )
-) : selectedTab === "draft" ? (
-  <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-    {draftData.length > 0 ? (
-      draftData.map((draft) => (
-        <NewOrder
-          key={draft.id}
-          data={draft}
-          countItem={draft.orderItems.length}
-        />
-      ))
-    ) : (
-      <NoResult
-        title="No draft orders"
-        description="There are no draft orders. Items will appear here when saved as drafts."
-      />
-    )}
-  </div>
-) : selectedTab === "new_order" ? (
-  <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-    {pendingData.length > 0 ? (
-      pendingData.map((order) => (
-        <NewOrder
-          key={order.id}
-          data={order}
-          countItem={order.orderItems.length}
-        />
-      ))
-    ) : (
-      <NoResult
-        title="No pending orders"
-        description="There are no pending orders. New orders will appear here when submitted."
-      />
-    )}
-  </div>
-) : null}
+        completedData.length > 0 ? (
+          <DataTable data={completedData} columns={columns} />
+        ) : (
+          <NoResult
+            title="No completed orders"
+            description="There are no completed orders yet. Orders will appear here once they are completed."
+          />
+        )
+      ) : selectedTab === "cancelled" ? (
+        cancelledData.length > 0 ? (
+          <DataTable data={cancelledData} columns={columns} />
+        ) : (
+          <NoResult
+            title="No cancelled orders"
+            description="There are no cancelled orders. Orders will appear here when they are cancelled."
+          />
+        )
+      ) : selectedTab === "draft" ? (
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+          {draftData.length > 0 ? (
+            draftData.map((draft) => (
+              <NewOrder
+                key={draft.id}
+                data={draft}
+                countItem={draft.orderItems.length}
+              />
+            ))
+          ) : (
+            <NoResult
+              title="No draft orders"
+              description="There are no draft orders. Items will appear here when saved as drafts."
+            />
+          )}
+        </div>
+      ) : selectedTab === "new_order" ? (
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+          {pendingData.length > 0 ? (
+            pendingData.map((order) => (
+              <NewOrder
+                key={order.id}
+                data={order}
+                countItem={order.orderItems.length}
+              />
+            ))
+          ) : (
+            <NoResult
+              title="No pending orders"
+              description="There are no pending orders. New orders will appear here when submitted."
+            />
+          )}
+        </div>
+      ) : null}
     </>
   );
 }

@@ -49,6 +49,7 @@ import NotificationBell from "./NotificaitonBell"; // fix spelling if needed
 import { Notification } from "types";
 import { formatDistanceStrict } from "date-fns";
 import { getUserId } from "@/app/(auth)/actions/authAction";
+import AutoRefresh from "./AutoRefresh";
 
 const menuGroups = (counts: {
   purchase: number;
@@ -245,6 +246,7 @@ export async function AppSidebar() {
 
   return (
     <Sidebar className="py-2">
+      <AutoRefresh interval={20000} />
       <SidebarContent>
         <SidebarGroup className="gap-y-4">
           <SidebarGroupLabel className="flex items-center justify-between">

@@ -143,7 +143,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
             })
           );
           toast.success("Payment processed and order created!");
-          window.location.href = `/dashboard/order/${order.data.id}`;
+          router.push(`/dashboard/order/${order.data.id}`);
           removeAll();
         } catch {
           toast.error("Failed to create order items");
@@ -185,6 +185,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
           );
           toast.success("Payment processed and order created!");
           window.location.href = "/dashboard/order";
+          // router.push("/dashboard/order")
           removeAll();
         } catch {
           toast.error("Failed to create order items");

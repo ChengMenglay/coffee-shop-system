@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { LogoutUser } from "@/app/(auth)/actions/authAction";
-import { LogOut, LogOutIcon, Trash } from "lucide-react";
+import { LogOut, LogOutIcon } from "lucide-react";
 import { SidebarMenuButton } from "./ui/sidebar";
 import {
   AlertDialog,

@@ -64,6 +64,7 @@ async function OrderManagementPage() {
       total: formatterUSD.format(Number(order.total)),
       createdAt: format(order.createdAt, "dd MMMM yyyy"),
     }));
+
     const formattedPendingOrder: PendingOrder[] = orders.map((order) => ({
       id: order.id,
       userId: order.userId,
