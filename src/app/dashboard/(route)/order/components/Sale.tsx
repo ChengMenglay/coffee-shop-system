@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Plus, SortDescIcon } from "lucide-react";
 import CartStore from "./CartStore";
-import useCart from "@/hooks/use-cart";
 import { useRouter } from "next/navigation";
 import {
   HoverCard,
@@ -37,8 +36,7 @@ export default function Sale({ products, categories, sizes }: SaleProps) {
   );
 
   const [searchProducts, setSearchProducts] = useState("");
-  const { addItem } = useCart();
-  const router = useRouter();
+   const router = useRouter();
   const onSort = (id: string | null) => {
     setSelectedCategoryId(id);
     ProductFilter(searchProducts, id);

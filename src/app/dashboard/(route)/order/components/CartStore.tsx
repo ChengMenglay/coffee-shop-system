@@ -264,7 +264,7 @@ export default function CartStore({ sizes }: CardStoreProps) {
                         className="object-contain rounded"
                         sizes="(max-width: 768px) 100vw, 50vw"
                       />
-                      {item.discount && (
+                      {typeof item?.discount === "number" && item.discount > 0 && (
                         <Badge
                           className="absolute -top-2 -right-2 p-1  text-xs rounded-full"
                           variant={"destructive"}

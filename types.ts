@@ -28,11 +28,17 @@ export type Purchase = {
   price: number;
 };
 
+export type Category={
+  id:string;
+  name:string;
+}
+
 export type Product = {
   id: string;
   categoryId: string;
+  category:Category
   name: string;
-  price: number;
+  price: number ;
   discount: number | null;
   description: string;
   status: boolean;

@@ -61,198 +61,169 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
   };
 
   return (
-    <Card className="group relative p-0 shadow-lg hover:shadow-2xl transition-all duration-500 border-0 bg-white overflow-hidden max-h-[700px] flex flex-col rounded-2xl backdrop-blur-sm">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 opacity-60" />
-
-      {/* Header Section */}
-      <div className="relative p-4 sm:p-6 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 text-white">
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="relative flex flex-col sm:flex-row justify-between items-start gap-4">
-          <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
-            <div className="rounded-2xl w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/30 shadow-lg">
-              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
+    <Card className="group relative overflow-hidden bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 max-w-sm">
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-slate-900 to-gray-800 p-3 text-white">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+              <ShoppingBag className="w-4 h-4" />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3 mb-2">
-                <h1 className="font-bold text-lg sm:text-xl truncate">
-                  Order #{data.displayId}
-                </h1>
-                <div className="flex items-center gap-1 text-xs sm:text-sm text-emerald-100">
-                  <Calendar className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate">{data.createdAt}</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                {data.orderStatus === "Pending" ? (
-                  <Badge className="bg-amber-400 text-amber-900 border-0 font-semibold px-3 py-1 shadow-sm">
-                    {data.orderStatus}
-                  </Badge>
-                ) : (
-                  <Badge className="bg-red-400 text-white border-0 font-semibold px-3 py-1 shadow-sm">
-                    {data.orderStatus}
-                  </Badge>
-                )}
-                <div className="flex items-center space-x-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
-                  {data.paymentStatus ? (
-                    <>
-                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-200" />
-                      <span className="text-xs sm:text-sm font-medium">
-                        Paid
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-200" />
-                      <span className="text-xs sm:text-sm font-medium">
-                        Unpaid
-                      </span>
-                    </>
-                  )}
-                </div>
+            <div>
+              <h1 className="font-bold text-sm">#{data.displayId}</h1>
+              <div className="flex items-center gap-1 text-xs text-gray-300">
+                <Calendar className="w-3 h-3" />
+                {data.createdAt}
               </div>
             </div>
           </div>
-
-          <div className="text-left sm:text-right flex-shrink-0">
-            <h1 className="text-xl sm:text-2xl font-bold mb-1 drop-shadow-sm">
+          <div className="text-right">
+            <div className="text-lg font-bold">
               {formatterUSD.format(data.total)}
-            </h1>
-            <div className="flex items-center justify-start sm:justify-end space-x-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
+            </div>
+            <div className="flex items-center gap-1 text-xs">
               {data.paymentMethod === "Cash" ? (
-                <>
-                  <Banknote className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-200" />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {data.paymentMethod}
-                  </span>
-                </>
+                <Banknote className="w-3 h-3" />
               ) : data.paymentMethod === "ABA" ? (
+                <Landmark className="w-3 h-3" />
+              ) : (
+                <CreditCard className="w-3 h-3" />
+              )}
+              {data.paymentMethod}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <Badge
+              className={`text-xs px-2 py-0.5 ${
+                data.orderStatus === "Pending"
+                  ? "bg-amber-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              {data.orderStatus}
+            </Badge>
+            <Badge
+              className={`text-xs px-2 py-0.5 ${
+                data.paymentStatus
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-500 text-white"
+              }`}
+            >
+              {data.paymentStatus ? (
                 <>
-                  <Landmark className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-200" />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {data.paymentMethod}
-                  </span>
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  Paid
                 </>
               ) : (
                 <>
-                  <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-200" />
-                  <span className="text-xs sm:text-sm font-medium">
-                    {data.paymentMethod}
-                  </span>
+                  <Clock className="w-3 h-3 mr-1" />
+                  Unpaid
                 </>
               )}
-            </div>
+            </Badge>
+          </div>
+          <div className="text-xs bg-white/20 px-2 py-1 rounded">
+            {countItem} items
           </div>
         </div>
       </div>
 
-      {/* Order Details */}
-      <div className="relative px-4 sm:px-6 py-3 bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-sm">
-          <span className="font-medium text-emerald-800">
-            Order By:{" "}
-            <span className="font-bold">
-              {data.user.name} ({data.user.role.name})
-            </span>
+      {/* Customer Info */}
+      <div className="px-3 py-2 bg-gray-50 border-b text-xs">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-600">
+            <strong>{data.user.name}</strong> ({data.user.role.name})
           </span>
-          <span className="text-emerald-700 font-semibold bg-emerald-200/80 backdrop-blur-sm px-3 py-1 rounded-full border border-emerald-300/50 text-xs sm:text-sm">
-            {formatterUSD.format(data.discount)} discount applied
+          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">
+            {formatterUSD.format(data.discount)} off
           </span>
         </div>
       </div>
 
-      {/* Items Header */}
-      <div className="relative px-4 sm:px-6 py-4 bg-gradient-to-r from-slate-50 to-gray-50 border-b">
-        <h2 className="font-bold text-base sm:text-lg text-gray-800 flex items-center">
-          Items
-          <span className="ml-2 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 px-2 py-1 rounded-full text-xs sm:text-sm font-semibold shadow-sm">
-            {countItem}
-          </span>
-        </h2>
-      </div>
-
-      {/* Scrollable Items Section */}
-      <div className="relative flex-1 overflow-y-auto px-3 sm:px-6 py-2 space-y-3 max-h-64 scrollbar-thin scrollbar-thumb-emerald-200 scrollbar-track-gray-100">
-        {data.orderItems.map((orderItem, idx) => (
+      {/* Compact Items List */}
+      <div className="max-h-48 overflow-y-auto">
+        {data.orderItems.map((item, idx) => (
           <div
             key={idx}
-            className="group/item border border-gray-200/80 p-3 sm:p-4 rounded-xl shadow-sm bg-white/80 backdrop-blur-sm hover:shadow-lg hover:border-emerald-200 transition-all duration-300 hover:scale-[1.01]"
+            className="px-3 py-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors"
           >
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3">
-              <h3 className="font-bold text-gray-800 text-sm sm:text-lg leading-tight">
-                {orderItem.product.name} x{orderItem.quantity}
-              </h3>
-              <div className="text-left sm:text-right flex-shrink-0">
-                <div className="text-lg sm:text-xl font-bold text-gray-900">
-                  {formatterUSD.format(orderItem.price)}
+            <div className="flex justify-between items-start mb-1">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-sm text-gray-900 truncate">
+                  {item.product.name} x{item.quantity}
+                </h3>
+                <div className="flex gap-1 mt-1">
+                  <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
+                    {item.size.name}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
+                    {item.sugar}%
+                  </Badge>
+                  {item.product.discount > 0 && (
+                    <Badge className="text-xs px-1.5 py-0 h-5 bg-red-100 text-red-700">
+                      {item.product.discount}% OFF
+                    </Badge>
+                  )}
                 </div>
-                {orderItem.product.discount > 0 && (
-                  <div className="text-xs sm:text-sm text-gray-500 line-through">
+              </div>
+              <div className="text-right ml-2">
+                <div className="font-bold text-sm">
+                  {formatterUSD.format(item.price)}
+                </div>
+                {item.product.discount > 0 && (
+                  <div className="text-xs text-gray-500 line-through">
                     {formatterUSD.format(
-                      Number(
-                        orderItem.product.price + orderItem.size.priceModifier
-                      )
+                      Number(item.product.price + item.size.priceModifier)
                     )}
                   </div>
                 )}
               </div>
             </div>
-
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-300/50 font-medium text-xs hover:bg-emerald-200 transition-colors">
-                {orderItem.size.name}
-              </Badge>
-              <Badge className="bg-blue-100 text-blue-800 border border-blue-300/50 font-medium text-xs hover:bg-blue-200 transition-colors">
-                {orderItem.sugar}% sugar
-              </Badge>
-              {orderItem.product.discount > 0 && (
-                <Badge className="bg-red-100 text-red-800 border border-red-300/50 font-medium text-xs hover:bg-red-200 transition-colors">
-                  {orderItem.product.discount}% OFF
-                </Badge>
-              )}
-            </div>
-
-            <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-lg">
-              <p className="text-xs sm:text-sm text-amber-800">
-                <strong>Note:</strong> {orderItem.note || "No special notes"}
+            {item.note && (
+              <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded mt-1">
+                {item.note}
               </p>
-            </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Action Buttons */}
-      <div className="relative p-3 sm:p-4 bg-gradient-to-r from-gray-50 to-slate-50 border-t border-gray-200 flex flex-col sm:flex-row gap-2 sm:gap-3">
+      {/* Compact Action Buttons */}
+      <div className="p-3 bg-gray-50 flex gap-2">
         <Button
           disabled={isLoading}
           onClick={handleOrderComplete}
-          className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-70 disabled:scale-100"
+          size="sm"
+          className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
         >
-          {isLoading && <CgSpinnerTwoAlt className="mr-2 animate-spin" />}
-          {isLoading ? "Processing..." : "Mark Completed"}
+          {isLoading && (
+            <CgSpinnerTwoAlt className="w-3 h-3 mr-1 animate-spin" />
+          )}
+          {isLoading ? "Processing..." : "Complete"}
         </Button>
 
         <Button
           disabled={isLoading}
           onClick={() => router.push(`/dashboard/order/${data.id}`)}
-          size="icon"
+          size="sm"
           variant="outline"
-          className="h-10 w-10 sm:w-auto sm:px-4 border-2 border-emerald-600 text-emerald-600 cursor-pointer hover:bg-emerald-600 hover:text-white transition-all duration-300 rounded-xl shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-70 disabled:scale-100"
+          className="px-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
         >
-          <Eye className="w-4 h-4" />
-          <span className="hidden sm:inline ml-2">View</span>
+          <Eye className="w-3 h-3" />
         </Button>
+
         <Button
           disabled={isLoading}
           onClick={handleOrderCancell}
-          className="flex-1 cursor-pointer bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-70 disabled:scale-100"
+          size="sm"
+          className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs"
         >
-          Cancel Order
+          Cancel
         </Button>
       </div>
-
-      {/* Subtle corner accent */}
-      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-white/20 to-transparent pointer-events-none" />
     </Card>
   );
 }

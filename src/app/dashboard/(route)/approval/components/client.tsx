@@ -46,14 +46,7 @@ function ApprovalClient({ purchaseData, stockUsageData }: ApprovalColumnProps) {
 
       return statusMatch && requesterMatch;
     });
-  }, [
-    selectedTabHeader,
-    selectTable,
-    purchaseData,
-    stockUsageData,
-    setRequester,
-    requester,
-  ]);
+  }, [selectedTabHeader, selectTable, purchaseData, stockUsageData, requester]);
 
   const requesters = useMemo(() => {
     const data =
