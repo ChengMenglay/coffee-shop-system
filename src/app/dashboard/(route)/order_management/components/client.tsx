@@ -8,6 +8,15 @@ import { DataTable } from "@/components/ui/data-table";
 import { Badge } from "@/components/ui/badge";
 import NewOrder from "./NewOrder";
 import { PendingOrder } from "../page";
+import NoResult from "@/components/NoResult";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
@@ -36,10 +45,11 @@ function OrderManagementClient({
     useState<PendingOrder[]>(pendingOrderData);
   const [filterdData, setFilterdData] =
     useState<OrderManagementColumn[]>(orders);
+  const [paymentStatus, setPaymentStatus] = useState("");
   useEffect(() => {
     setFilterdData(orders);
-    setFilterPendingData(pendingData);
-  }, [orders]);
+    setFilterPendingData(pendingOrderData);
+  }, [orders, pendingOrderData]);
   const completedData = filterdData.filter(
     (order) => order.orderStatus === "Completed"
   );
@@ -67,10 +77,38 @@ function OrderManagementClient({
               onClick={() => {
                 setFilterdData(orders);
                 setDateRange(undefined);
+                setPaymentStatus("");
               }}
             >
               <RefreshCcw />
             </Button>
+            <Select
+              value={paymentStatus}
+              onValueChange={(val) => {
+                setPaymentStatus(val);
+                if (val === "paid") {
+                  setFilterdData(
+                    orders.filter((data) => data.paymentStatus === true)
+                  );
+                } else if (val === "unPaid") {
+                  setFilterdData(
+                    orders.filter((data) => data.paymentStatus === false)
+                  );
+                } else {
+                  setFilterdData(orders);
+                }
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder={"Select a Payment"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value={"paid"}>Paid</SelectItem>
+                  <SelectItem value={"unPaid"}>UnPaid</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -160,22 +198,58 @@ function OrderManagementClient({
       </div>
       <Separator className="my-4" />
       {selectedTab === "completed" ? (
-        <DataTable data={completedData} columns={columns} />
-      ) : selectedTab === "cancelled" ? (
-        <DataTable data={cancelledData} columns={columns} />
-      ) : selectedTab === "draft" ? (
-        <h1>Draft</h1>
-      ) : selectedTab === "new_order" ? (
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {pendingData.map((order) => (
-            <NewOrder
-              key={order.id}
-              data={order}
-              countItem={order.orderItems.length}
-            />
-          ))}
-        </div>
-      ) : null}
+  completedData.length > 0 ? (
+    <DataTable data={completedData} columns={columns} />
+  ) : (
+    <NoResult
+      title="No completed orders"
+      description="There are no completed orders yet. Orders will appear here once they are completed."
+    />
+  )
+) : selectedTab === "cancelled" ? (
+  cancelledData.length > 0 ? (
+    <DataTable data={cancelledData} columns={columns} />
+  ) : (
+    <NoResult
+      title="No cancelled orders"
+      description="There are no cancelled orders. Orders will appear here when they are cancelled."
+    />
+  )
+) : selectedTab === "draft" ? (
+  <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+    {draftData.length > 0 ? (
+      draftData.map((draft) => (
+        <NewOrder
+          key={draft.id}
+          data={draft}
+          countItem={draft.orderItems.length}
+        />
+      ))
+    ) : (
+      <NoResult
+        title="No draft orders"
+        description="There are no draft orders. Items will appear here when saved as drafts."
+      />
+    )}
+  </div>
+) : selectedTab === "new_order" ? (
+  <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+    {pendingData.length > 0 ? (
+      pendingData.map((order) => (
+        <NewOrder
+          key={order.id}
+          data={order}
+          countItem={order.orderItems.length}
+        />
+      ))
+    ) : (
+      <NoResult
+        title="No pending orders"
+        description="There are no pending orders. New orders will appear here when submitted."
+      />
+    )}
+  </div>
+) : null}
     </>
   );
 }

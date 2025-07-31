@@ -57,13 +57,13 @@ async function OrderManagementPage() {
       product: order.orderItems
         .map((orderItem) => orderItem.product.name)
         .join(", "),
+      userId: order.userId,
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,
       total: formatterUSD.format(Number(order.total)),
       createdAt: format(order.createdAt, "dd MMMM yyyy"),
     }));
-
     const formattedPendingOrder: PendingOrder[] = orders.map((order) => ({
       id: order.id,
       userId: order.userId,

@@ -28,3 +28,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [...authConfig.providers],
 });
+

@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import useCart from "@/hooks/use-cart";
+import useCart, { CartItem } from "@/hooks/use-cart";
 import { formatterUSD } from "@/lib/utils";
 import axios from "axios";
 import {
@@ -71,6 +71,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
   const [paidMoney, setPaidMoney] = useState("");
   const [currency, setCurrency] = useState<"dollar" | "riel">("dollar");
   const [loading, setLoading] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(false);
   const router = useRouter();
 
   const getSize = (sizeId: string) => {
@@ -86,6 +87,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
           (1 - discount / 100);
         return acc + priceAfterDiscount * Number(item.quantity);
       }, 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [items]
   );
 
@@ -103,7 +105,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
 
   const totalInRiel = Math.round((total * riel) / 100) * 100;
 
-  const calculateItemAfterDiscount = (item: any) => {
+  const calculateItemAfterDiscount = (item: CartItem) => {
     const discount = Math.min(100, Math.max(0, Number(item.discount) || 0));
     const size = getSize(item.sizeId as string);
     const priceAfterDiscount =
@@ -141,7 +143,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
             })
           );
           toast.success("Payment processed and order created!");
-          router.push(`order/${order.data.id}`);
+          window.location.href = `/dashboard/order/${order.data.id}`;
           removeAll();
         } catch {
           toast.error("Failed to create order items");
@@ -151,6 +153,47 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
       toast.warning("Something went wrong, cannot process the payment!");
     } finally {
       setLoading(false);
+    }
+  };
+  const handleDraft = async () => {
+    try {
+      setLoadingDraft(true);
+      const isFullyPaid = paidInDollar >= Number(total.toFixed(2));
+      const payload = {
+        userId: session?.user?.id as string,
+        paymentMethod: selectedPayment,
+        paymentStatus: isFullyPaid ? true : false,
+        orderStatus: "Draft",
+        discount: discountAmount > 0 ? discountAmount : 0,
+        total: Number(total.toFixed(2)),
+      };
+      const order = await axios.post("/api/order", payload);
+      if (order) {
+        try {
+          await Promise.all(
+            items.map((item) => {
+              return axios.post("/api/order_item", {
+                orderId: order.data.id,
+                productId: item.id,
+                price: calculateItemAfterDiscount(item) * Number(item.quantity),
+                quantity: item.quantity,
+                sizeId: item.sizeId,
+                sugar: item.sugar,
+                note: note || "",
+              });
+            })
+          );
+          toast.success("Payment processed and order created!");
+          window.location.href = "/dashboard/order";
+          removeAll();
+        } catch {
+          toast.error("Failed to create order items");
+        }
+      }
+    } catch {
+      toast.warning("Something went wrong, cannot process the payment!");
+    } finally {
+      setLoadingDraft(false);
     }
   };
 
@@ -339,6 +382,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Input
+                disabled={loading || loadingDraft}
                 type="number"
                 min={0}
                 placeholder="0.00"
@@ -376,27 +420,48 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
 
           {/* Buttons */}
           <div className="sm:flex hidden flex-wrap justify-between gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push("/dashboard/order")}
-            >
-              Back to Sale
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                disabled={loading || loadingDraft}
+                variant="outline"
+                onClick={() => router.push("/dashboard/order")}
+              >
+                Back to Sale
+              </Button>
+              <Button
+                disabled={loading || loadingDraft}
+                variant="outline"
+                onClick={handleDraft}
+              >
+                Draft
+              </Button>
+            </div>
             <Button
               onClick={handlePaymentProcessing}
-              disabled={paidInDollar < Number(total.toFixed(2))}
+              disabled={paidInDollar < Number(total.toFixed(2)) || loadingDraft}
             >
               {loading && <CgSpinnerAlt className="animate-spin mr-2" />}
               {loading ? "Processing..." : "Process Payment"}
             </Button>
           </div>
           <div className="flex sm:hidden pt-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push("/dashboard/order")}
-            >
-              Back to Sale
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                disabled={loading || loadingDraft}
+                variant="outline"
+                onClick={() => router.push("/dashboard/order")}
+              >
+                Back to Sale
+              </Button>
+              <Button
+                disabled={loading || loadingDraft}
+                variant="outline"
+                onClick={handleDraft}
+              >
+                {loadingDraft && <CgSpinnerAlt className="animate-spin mr-2" />}
+                {loadingDraft ? "Processing..." : "Draft"}
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
@@ -405,7 +470,7 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t p-4 sm:hidden z-10">
         <Button
           onClick={handlePaymentProcessing}
-          disabled={paidInDollar < Number(total.toFixed(2))}
+          disabled={paidInDollar < Number(total.toFixed(2)) || loadingDraft}
           className="w-full"
         >
           {loading && <CgSpinnerAlt className="animate-spin mr-2" />}

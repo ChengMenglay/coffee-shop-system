@@ -4,6 +4,7 @@ import CellAction from "./cellAction";
 
 export type OrderManagementColumn = {
   id: string;
+  userId: string;
   displayId: string;
   user: string;
   product: string;
@@ -77,6 +78,12 @@ export const columns: ColumnDef<OrderManagementColumn>[] = [
   {
     accessorKey: "action",
     header: "Action",
-    cell: ({ row }) => <CellAction canEdit={!row.original.paymentStatus} data={row.original} />,
+    cell: ({ row }) => (
+      <CellAction
+        editOrderStatus={row.original.orderStatus === "Cancelled"}
+        editPayment={!row.original.paymentStatus}
+        data={row.original}
+      />
+    ),
   },
 ];

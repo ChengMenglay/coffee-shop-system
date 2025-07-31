@@ -7,8 +7,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Copy, Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
-import React, { useState } from "react";
+import { Copy, Eye, MoreHorizontal } from "lucide-react";
+import React from "react";
 import { OrderManagementColumn } from "./column";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -16,21 +16,40 @@ import axios from "axios";
 
 type CellActionProps = {
   data: OrderManagementColumn;
-  canEdit: boolean;
+  editPayment: boolean;
+  editOrderStatus: boolean;
 };
-export default function CellAction({ data, canEdit }: CellActionProps) {
+export default function CellAction({
+  data,
+  editPayment,
+  editOrderStatus,
+}: CellActionProps) {
   const router = useRouter();
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
     toast.success("Order id copied");
   };
-  const onEdit = async () => {
+  const EditPayment = async () => {
     try {
       await axios.patch(`/api/order/${data.id}`, {
         ...data,
         paymentStatus: true,
       });
       toast.success(`Order #${data.displayId} placed as Paid`);
+      router.refresh();
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong!");
+    }
+  };
+  const EditOrderStatus = async () => {
+    try {
+      await axios.patch(`/api/order/${data.id}`, {
+        orderStatus: "Completed",
+        paymentStatus: true,
+      });
+      toast.success(`Order #${data.displayId} placed as Completed and Paid`);
       router.refresh();
       router.refresh();
     } catch (error) {
@@ -59,10 +78,14 @@ export default function CellAction({ data, canEdit }: CellActionProps) {
             <Eye className="w-4 h-4" />
             Reciept
           </DropdownMenuItem>
-          {canEdit && (
-            <DropdownMenuItem onClick={onEdit}>
-              <Trash className="w-4 h-4" />
-              Place as Paid
+          {editPayment && (
+            <DropdownMenuItem onClick={EditPayment}>
+              Set as Paid
+            </DropdownMenuItem>
+          )}
+          {editOrderStatus && (
+            <DropdownMenuItem onClick={EditOrderStatus}>
+              Set as Completed and Paid
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>

@@ -3,7 +3,7 @@ import { Product } from "types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface CartItem extends Product {
+export interface CartItem extends Product {
   quantity: number;
   size?: string; // Size name
   sizeId?: string; // Size ID for reference
@@ -36,7 +36,7 @@ const useCart = create(
       items: [],
       discount: undefined,
       note: undefined,
-      addItem: (data: Product, defaultSizeId?: string) => {
+      addItem: (data: Product) => {
         set((state) => {
           const existingItem = state.items.find((item) => item.id === data.id);
           if (existingItem) {

@@ -89,7 +89,7 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
                     {data.orderStatus}
                   </Badge>
                 ) : (
-                  <Badge className="bg-red-400 text-red-900 border-0 font-semibold px-3 py-1 shadow-sm">
+                  <Badge className="bg-red-400 text-white border-0 font-semibold px-3 py-1 shadow-sm">
                     {data.orderStatus}
                   </Badge>
                 )}
@@ -242,7 +242,7 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
           <Eye className="w-4 h-4" />
           <span className="hidden sm:inline ml-2">View</span>
         </Button>
-                <Button
+        <Button
           disabled={isLoading}
           onClick={handleOrderCancell}
           className="flex-1 cursor-pointer bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-70 disabled:scale-100"

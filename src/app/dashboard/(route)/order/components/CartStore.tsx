@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import useCart from "@/hooks/use-cart";
+import useCart, { CartItem } from "@/hooks/use-cart";
 import { formatterUSD } from "@/lib/utils";
 import { ArrowRight, Trash, XCircleIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
 import NoResult from "@/components/NoResult";
-import { Product, Size } from "types";
+import { Size } from "types";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -117,7 +117,7 @@ export default function CartStore({ sizes }: CardStoreProps) {
         const priceAfterDiscount = basePrice * (1 - discount / 100);
         return acc + priceAfterDiscount * Number(item.quantity);
       }, 0),
-    [items, sizes]
+    [getProductSizes, items]
   );
 
   const total = useMemo(() => {
@@ -159,7 +159,7 @@ export default function CartStore({ sizes }: CardStoreProps) {
     setOpenDiscount(false);
   };
 
-  const calculateItemAfterDiscount = (item: any) => {
+  const calculateItemAfterDiscount = (item: CartItem) => {
     // Get the selected size to use the correct price
     const selectedSize = getProductSizes(item.id).find(
       (size) => size.sizeName === item.size
@@ -174,7 +174,7 @@ export default function CartStore({ sizes }: CardStoreProps) {
   };
 
   // Get the current price for an item (including size modifier)
-  const getCurrentItemPrice = (item: any) => {
+  const getCurrentItemPrice = (item: CartItem) => {
     const selectedSize = getProductSizes(item.id).find(
       (size) => size.sizeName === item.size
     );
@@ -222,16 +222,6 @@ export default function CartStore({ sizes }: CardStoreProps) {
   const handleSugarChange = (itemId: string, sugarValue: string) => {
     updateItemSugar(itemId, sugarValue);
   };
-
-  // Check if an item is missing required selections
-  const isItemIncomplete = (item: any) => {
-    const productSizes = getProductSizes(item.id);
-    const missingSize =
-      productSizes.length > 0 && (!item.size || item.size.trim() === "");
-    const missingSugar = !item.sugar || item.sugar.trim() === "";
-    return missingSize || missingSugar;
-  };
-
   return (
     <div className="grid grid-rows-12 gap-2 h-full">
       <div className="row-span-8 flex flex-col">
