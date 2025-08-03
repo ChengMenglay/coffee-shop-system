@@ -12,7 +12,7 @@ export type ProductColumn = {
   image: string;
   category: string;
   status: boolean;
-  discount:string;
+  discount: string;
   createdAt: string;
 };
 
@@ -42,7 +42,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "price",
     header: "Price",
   },
-    {
+  {
     accessorKey: "discount",
     header: "Discount",
   },
@@ -50,12 +50,12 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      row.original.status ? (
+      return row.original.status ? (
         <Badge className="text-xs px-2 py-1 rounded bg-green-100 text-green-700 border border-green-300">
           Available
         </Badge>
       ) : (
-        <Badge className="text-xs px-2 py-1 rounded bg-green-100 text-green-700 border border-green-300">
+        <Badge className="text-xs px-2 py-1 rounded bg-red-100 text-red-700 border border-red-300">
           Disable
         </Badge>
       );

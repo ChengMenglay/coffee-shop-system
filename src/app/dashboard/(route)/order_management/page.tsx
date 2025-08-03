@@ -23,18 +23,28 @@ export type PendingOrder = {
     };
   };
   orderItems: {
+    id: string;
     product: {
       name: string;
-      discount: number;
+      discount?: number;
       price: number;
     };
-    size: {
+    size?: {
+      sizeName: string;
+      priceModifier: number;
+    } | null;
+    sugar?: {
+      name: string;
+    } | null;
+    ice?: {
+      name: string;
+    } | null;
+    extraShot?: {
       name: string;
       priceModifier: number;
-    };
-    sugar: string;
+    } | null;
     quantity: number;
-    note: string;
+    note?: string | null;
     price: number;
   }[];
 };
@@ -46,10 +56,19 @@ async function OrderManagementPage() {
     const orders = await prisma.order.findMany({
       include: {
         user: { include: { role: true } },
-        orderItems: { include: { product: true, size: true } },
+        orderItems: { 
+          include: { 
+            product: true, 
+            size: true,
+            sugar: true,
+            ice: true,
+            extraShot: true
+          } 
+        },
       },
       orderBy: { createdAt: "desc" },
     });
+
     const formattedOrders: OrderManagementColumn[] = orders.map((order) => ({
       id: order.id,
       displayId: `#${order.displayId}`,
@@ -82,18 +101,28 @@ async function OrderManagementPage() {
         role: { name: order.user.role.name },
       },
       orderItems: order.orderItems.map((orderItem) => ({
+        id: orderItem.id,
         product: {
           name: orderItem.product.name,
-          discount: orderItem.product.discount ?? 0, // Use nullish coalescing to default to 0
+          discount: orderItem.product.discount || 0,
           price: orderItem.product.price.toNumber(),
         },
-        size: {
-          name: orderItem.size.sizeName,
-          priceModifier: orderItem.size.priceModifier.toNumber() ?? 0,
-        },
-        sugar: orderItem.sugar,
+        size: orderItem.size ? {
+          sizeName: orderItem.size.sizeName,
+          priceModifier: orderItem.size.priceModifier.toNumber(),
+        } : null,
+        sugar: orderItem.sugar ? {
+          name: orderItem.sugar.name,
+        } : null,
+        ice: orderItem.ice ? {
+          name: orderItem.ice.name,
+        } : null,
+        extraShot: orderItem.extraShot ? {
+          name: orderItem.extraShot.name,
+          priceModifier: orderItem.extraShot.priceModifier.toNumber(),
+        } : null,
         quantity: orderItem.quantity,
-        note: orderItem.note || "",
+        note: orderItem.note || null,
         price: orderItem.price.toNumber(),
       })),
     }));
@@ -116,7 +145,6 @@ async function OrderManagementPage() {
     );
   } catch (error) {
     console.error("Error fetching order management data:", error);
-    // You might want to render an error component here
     throw error;
   }
 }

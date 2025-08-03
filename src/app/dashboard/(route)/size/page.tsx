@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { SizeColumn } from "./components/columns";
 import { formatterUSD } from "@/lib/utils";
-import PurchaseClient from "./components/client";
+import SizeClient from "./components/client";
 import { checkPermission } from "@/lib/check-permission";
 async function SizePage() {
   await checkPermission(["view:size"]);
@@ -25,7 +25,7 @@ async function SizePage() {
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 px-6 py-8">
-        <PurchaseClient data={formattedSize} />
+        <SizeClient data={formattedSize} />
       </div>
     </div>
   );

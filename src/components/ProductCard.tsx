@@ -3,7 +3,6 @@ import React from "react";
 
 import Image from "next/image";
 import { formatterUSD } from "@/lib/utils";
-import useCart from "@/hooks/use-cart";
 import { Product } from "types";
 import { Badge } from "./ui/badge";
 
@@ -11,10 +10,6 @@ interface ProductCardProps {
   product: Product | null;
 }
 export default function ProductCard({ product }: ProductCardProps) {
-  const cart = useCart();
-  const onAddToCart = () => {
-    cart.addItem(product as Product);
-  };
   const calculateItemAfterDiscount = (item: Product) => {
     const discount = Math.min(100, Math.max(0, Number(item.discount) || 0));
     const priceAfterDiscount = Number(item.price) * (1 - discount / 100);
@@ -22,7 +17,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
   return (
     <div
-      onClick={onAddToCart}
       className=" cursor-pointer relative space-y-2 flex flex-col border dark:border-foreground p-2 shadow dark:shadow-foreground rounded-sm dark:bg-white"
     >
       <div className="aspect-square relative">

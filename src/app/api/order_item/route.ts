@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { orderId, productId, quantity, price, sizeId, sugar, note } = body;
+    const { orderId, productId, quantity, price, sizeId, sugarId, iceId, extraShotId, note } = body;
     if (!orderId)
       return NextResponse.json("Order Id is required!", { status: 400 });
     if (!productId)
@@ -18,8 +18,8 @@ export async function POST(req: Request) {
       return NextResponse.json("Size Id of order is required!", {
         status: 400,
       });
-    if (!sugar)
-      return NextResponse.json("Sugar of order is required!", {
+    if (!sugarId)
+      return NextResponse.json("Sugar id of order is required!", {
         status: 400,
       });
     const orderItem = await prisma.orderItem.create({
@@ -29,13 +29,15 @@ export async function POST(req: Request) {
         quantity,
         price,
         sizeId,
-        sugar,
+        sugarId,
+        iceId,
+        extraShotId,
         note,
       },
     });
     return NextResponse.json(orderItem);
   } catch (error) {
-    console.error("[ORDERPOST]", { status: 500 });
+    console.error("[ORDER_ITEM_POST]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

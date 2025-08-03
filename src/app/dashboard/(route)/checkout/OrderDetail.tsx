@@ -24,10 +24,10 @@ import {
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { CgSpinnerAlt } from "react-icons/cg";
 import { toast } from "sonner";
-import { Size } from "types";
+import { Size, Sugar, Ice, ExtraShot } from "types";
 
 type PaymentType = "Cash" | "ABA" | "Credit Card";
 
@@ -62,11 +62,24 @@ const paymentMethod: {
 
 type OrderDetailProps = {
   sizes: Size[] | null;
+  sugars?: Sugar[] | null;
+  ices?: Ice[] | null;
+  extraShots?: ExtraShot[] | null;
 };
 
-export default function OrderDetail({ sizes }: OrderDetailProps) {
+export default function OrderDetail({ sizes, sugars }: OrderDetailProps) {
   const { data: session } = useSession();
-  const { items, discount, note, removeAll } = useCart();
+  const {
+    items,
+    note,
+    removeAll,
+    getCartSubtotal,
+    getCartTotal,
+    getDiscountAmount,
+    calculateItemPrice,
+    calculateItemPriceWithProductDiscount,
+  } = useCart();
+
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>("Cash");
   const [paidMoney, setPaidMoney] = useState("");
   const [currency, setCurrency] = useState<"dollar" | "riel">("dollar");
@@ -74,50 +87,74 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
   const [loadingDraft, setLoadingDraft] = useState(false);
   const router = useRouter();
 
-  const getSize = (sizeId: string) => {
-    return sizes?.filter((size) => size.id === sizeId);
-  };
-  const subTotal = useMemo(
-    () =>
-      items.reduce((acc, item) => {
-        const size = getSize(item.sizeId as string);
-        const discount = Math.min(100, Math.max(0, Number(item.discount) || 0));
-        const priceAfterDiscount =
-          (Number(item.price) + (size?.[0]?.priceModifier ?? 0)) *
-          (1 - discount / 100);
-        return acc + priceAfterDiscount * Number(item.quantity);
-      }, 0),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items]
-  );
+  // Use cart's built-in calculation methods
+  const subTotal = getCartSubtotal();
+  const discountAmount = getDiscountAmount();
+  const total = getCartTotal();
 
-  const discountAmount =
-    discount?.type === "percent"
-      ? Math.min(100, Math.max(0, discount.value * subTotal))
-      : discount?.value ?? 0;
-
-  const total = subTotal - discountAmount;
   const riel = 4100;
-
   const paid = Number(paidMoney) || 0;
   const paidInDollar = currency === "riel" ? paid / riel : paid;
   const change = Math.max(Number((paidInDollar - Number(total)).toFixed(2)), 0);
-
   const totalInRiel = Math.round((total * riel) / 100) * 100;
 
-  const calculateItemAfterDiscount = (item: CartItem) => {
-    const discount = Math.min(100, Math.max(0, Number(item.discount) || 0));
-    const size = getSize(item.sizeId as string);
-    const priceAfterDiscount =
-      (Number(item.price) + (size?.[0]?.priceModifier ?? 0)) *
-      (1 - discount / 100);
-    return priceAfterDiscount;
+  // Validate cart items for missing size or sugar selections
+  const validateCartItems = () => {
+    const itemsWithMissingInfo: string[] = [];
+
+    items.forEach((item) => {
+      const productSizes =
+        sizes?.filter((size) => size.productId === item.id) || [];
+      const productSugars =
+        sugars?.filter((sugar) => sugar.productId === item.id) || [];
+      const missingInfo: string[] = [];
+
+      // Check if product has size options but no size selected
+      if (
+        productSizes.length > 0 &&
+        (!item.size?.name || item.size.name.trim() === "")
+      ) {
+        missingInfo.push("size");
+      }
+
+      // Check if product has sugar options but no sugar level selected
+      if (
+        productSugars.length > 0 &&
+        (!item.sugar || item.sugar.trim() === "")
+      ) {
+        missingInfo.push("sugar level");
+      }
+
+      if (missingInfo.length > 0) {
+        itemsWithMissingInfo.push(`${item.name}: ${missingInfo.join(" and ")}`);
+      }
+    });
+
+    if (itemsWithMissingInfo.length > 0) {
+      toast.error(
+        `Please select missing options for: ${itemsWithMissingInfo.join(", ")}`
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  // Get display price for an item (including product discount)
+  const getDisplayPrice = (item: CartItem) => {
+    return calculateItemPriceWithProductDiscount(item);
   };
 
   const handlePaymentProcessing = async () => {
+    // Validate cart items before proceeding
+    if (!validateCartItems()) {
+      return;
+    }
+
     try {
       setLoading(true);
       const isFullyPaid = paidInDollar >= Number(total.toFixed(2));
+
       const payload = {
         userId: session?.user?.id as string,
         paymentMethod: selectedPayment,
@@ -126,19 +163,22 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
         discount: discountAmount > 0 ? discountAmount : 0,
         total: Number(total.toFixed(2)),
       };
+
       const order = await axios.post("/api/order", payload);
-      if (order) {
+      if (order?.data?.id) {
         try {
           await Promise.all(
             items.map((item) => {
               return axios.post("/api/order_item", {
                 orderId: order.data.id,
                 productId: item.id,
-                price: calculateItemAfterDiscount(item) * Number(item.quantity),
+                price: getDisplayPrice(item), // Price per item, not total
                 quantity: item.quantity,
-                sizeId: item.sizeId,
-                sugar: item.sugar,
-                note: note || "",
+                sizeId: item.sizeId || undefined,
+                sugarId: item.sugarId || undefined,
+                iceId: item.iceId || undefined,
+                extraShotId: item.extraShotId || undefined,
+                note: item.note || undefined,
               });
             })
           );
@@ -155,10 +195,17 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
       setLoading(false);
     }
   };
+
   const handleDraft = async () => {
+    // Validate cart items before proceeding
+    if (!validateCartItems()) {
+      return;
+    }
+
     try {
       setLoadingDraft(true);
       const isFullyPaid = paidInDollar >= Number(total.toFixed(2));
+
       const payload = {
         userId: session?.user?.id as string,
         paymentMethod: selectedPayment,
@@ -167,32 +214,34 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
         discount: discountAmount > 0 ? discountAmount : 0,
         total: Number(total.toFixed(2)),
       };
+
       const order = await axios.post("/api/order", payload);
-      if (order) {
+      if (order?.data?.id) {
         try {
           await Promise.all(
             items.map((item) => {
               return axios.post("/api/order_item", {
                 orderId: order.data.id,
                 productId: item.id,
-                price: calculateItemAfterDiscount(item) * Number(item.quantity),
+                price: getDisplayPrice(item), // Price per item, not total
                 quantity: item.quantity,
-                sizeId: item.sizeId,
-                sugar: item.sugar,
-                note: note || "",
+                sizeId: item.sizeId || undefined,
+                sugarId: item.sugarId || undefined,
+                iceId: item.iceId || undefined,
+                extraShotId: item.extraShotId || undefined,
+                note: item.note || undefined,
               });
             })
           );
-          toast.success("Payment processed and order created!");
-          window.location.href = "/dashboard/order";
-          // router.push("/dashboard/order")
+          toast.success("Draft order created!");
+          router.push("/dashboard/order");
           removeAll();
         } catch {
           toast.error("Failed to create order items");
         }
       }
     } catch {
-      toast.warning("Something went wrong, cannot process the payment!");
+      toast.warning("Something went wrong, cannot create draft!");
     } finally {
       setLoadingDraft(false);
     }
@@ -212,10 +261,11 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
           </div>
 
           {/* Desktop Table */}
-          <div className="hidden md:grid grid-cols-7 font-semibold border-b pb-2 text-sm text-muted-foreground">
+          <div className="hidden md:grid grid-cols-8 font-semibold border-b pb-2 text-sm text-muted-foreground">
             <span>Name</span>
             <span className="text-center">Size</span>
             <span className="text-center">Sugar</span>
+            <span className="text-center">Ice</span>
             <span className="text-center">Qty</span>
             <span className="text-center">Unit Price</span>
             <span className="text-center">Discount</span>
@@ -226,8 +276,8 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
           <div className="mt-2 space-y-3 divide-y divide-gray-200 dark:divide-gray-700">
             {items.map((item, idx) => (
               <div
-                key={item.id}
-                className={`md:grid md:grid-cols-7 items-center gap-2 py-3 px-2 rounded-lg ${
+                key={item.cartItemId}
+                className={`md:grid md:grid-cols-8 items-center gap-2 py-3 px-2 rounded-lg ${
                   idx % 2 === 0
                     ? "bg-gray-50 dark:bg-gray-800"
                     : "bg-white dark:bg-gray-900"
@@ -240,50 +290,64 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
                     <div>
                       <div>Qty: {item.quantity}</div>
                       <div>
-                        Price:{" "}
-                        {formatterUSD.format(
-                          item.price +
-                            (getSize(item.sizeId as string)?.[0]
-                              ?.priceModifier ?? 0)
-                        )}
+                        Price: {formatterUSD.format(calculateItemPrice(item))}
                       </div>
-                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600 dark:text-gray-400 text-sm">
-                            Discount Applied:
-                          </span>
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                            -{item.discount ?? 0}% OFF
-                          </span>
+                      {item.discount && (
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-600 dark:text-gray-400 text-sm">
+                              Discount Applied:
+                            </span>
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              -{item.discount}% OFF
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div className="text-right">
-                      <div>Size: {item.size}</div>
-                      <div>Sugar: {item.sugar}%</div>
+                      <div>Size: {item.size?.name || "N/A"}</div>
+                      <div>Sugar: {item.sugar || "N/A"}</div>
+                      <div>Ice: {item.ice || "N/A"}</div>
                       <div>
                         {formatterUSD.format(
-                          calculateItemAfterDiscount(item) *
-                            Number(item.quantity)
+                          getDisplayPrice(item) * Number(item.quantity)
                         )}
                       </div>
+                      {item.extraShot?.name && (
+                        <div className="text-xs text-blue-600">
+                          +{item.extraShot.name}
+                        </div>
+                      )}
+                      {item.note && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          Note: {item.note}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Desktop View */}
                 <span className="hidden md:block">{item.name}</span>
-                <span className="hidden md:block text-center">{item.size}</span>
                 <span className="hidden md:block text-center">
-                  {item.sugar + "%"}
+                  {item.size?.name || "N/A"}
+                </span>
+                <span className="hidden md:block text-center">
+                  {item.sugar || "N/A"}
+                </span>
+                <span className="hidden md:block text-center">
+                  {item.ice || "N/A"}
                 </span>
                 <span className="hidden md:block text-center">
                   {item.quantity}
                 </span>
                 <span className="hidden md:block text-right">
-                  {formatterUSD.format(
-                    item.price +
-                      (getSize(item.sizeId as string)?.[0]?.priceModifier ?? 0)
+                  {formatterUSD.format(calculateItemPrice(item))}
+                  {item.extraShot?.name && (
+                    <div className="text-xs text-blue-600">
+                      +{item.extraShot.name}
+                    </div>
                   )}
                 </span>
                 <span className="hidden md:block text-center">
@@ -291,7 +355,12 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
                 </span>
                 <span className="hidden md:block text-right">
                   {formatterUSD.format(
-                    calculateItemAfterDiscount(item) * Number(item.quantity)
+                    getDisplayPrice(item) * Number(item.quantity)
+                  )}
+                  {item.note && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Note: {item.note}
+                    </div>
                   )}
                 </span>
               </div>
@@ -310,9 +379,15 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
               <span>
                 {discountAmount > 0
                   ? `- ${formatterUSD.format(discountAmount)}`
-                  : "$0"}
+                  : "$0.00"}
               </span>
             </div>
+            {note && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Order Note:</span>
+                <span className="max-w-xs truncate">{note}</span>
+              </div>
+            )}
             <div className="flex justify-between font-bold text-lg pt-2 border-t">
               <span>Order Total:</span>
               <div className="flex flex-col text-right">
@@ -434,12 +509,17 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
                 variant="outline"
                 onClick={handleDraft}
               >
-                Draft
+                {loadingDraft && <CgSpinnerAlt className="animate-spin mr-2" />}
+                {loadingDraft ? "Processing..." : "Draft"}
               </Button>
             </div>
             <Button
               onClick={handlePaymentProcessing}
-              disabled={paidInDollar < Number(total.toFixed(2)) || loadingDraft}
+              disabled={
+                paidInDollar < Number(total.toFixed(2)) ||
+                loading ||
+                loadingDraft
+              }
             >
               {loading && <CgSpinnerAlt className="animate-spin mr-2" />}
               {loading ? "Processing..." : "Process Payment"}
@@ -471,7 +551,9 @@ export default function OrderDetail({ sizes }: OrderDetailProps) {
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t p-4 sm:hidden z-10">
         <Button
           onClick={handlePaymentProcessing}
-          disabled={paidInDollar < Number(total.toFixed(2)) || loadingDraft}
+          disabled={
+            paidInDollar < Number(total.toFixed(2)) || loading || loadingDraft
+          }
           className="w-full"
         >
           {loading && <CgSpinnerAlt className="animate-spin mr-2" />}

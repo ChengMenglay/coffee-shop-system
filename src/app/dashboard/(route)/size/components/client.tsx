@@ -36,7 +36,7 @@ function SizeClient({ data }: SizeColumnProps) {
         </div>
       </div>
       <Separator className="my-6" />
-      <DataTable searchKey="product" columns={columns} data={filterdData} />
+      <DataTable searchKey="sizeName" columns={columns} data={filterdData} />
     </>
   );
 }

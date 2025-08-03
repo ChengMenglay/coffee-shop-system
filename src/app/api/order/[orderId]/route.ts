@@ -8,16 +8,24 @@ export async function PATCH(
   try {
     const { orderId } = await params;
     const body = await req.json();
-    const { orderStatus, paymentStatus } = body;
+    const { orderStatus, paymentStatus } = body; // Add note field
+
     if (!orderId)
       return NextResponse.json("Order Id is required!", { status: 400 });
+
+    // Prepare update data - only include fields that are provided
+    const updateData: any = {};
+    if (orderStatus !== undefined) updateData.orderStatus = orderStatus;
+    if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
+
     const order = await prisma.order.update({
       where: { id: orderId },
-      data: { orderStatus,paymentStatus },
+      data: updateData,
     });
+
     return NextResponse.json(order);
   } catch (error) {
-    console.error("[ORDER_PATCH]",error);
+    console.error("[ORDER_PATCH]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
@@ -31,7 +39,17 @@ export async function DELETE(
     if (!orderId) {
       return NextResponse.json("Order Id is required!", { status: 400 });
     }
-    const order = await prisma.order.delete({ where: { id: orderId } });
+
+    // Delete order items first (if not using CASCADE)
+    await prisma.orderItem.deleteMany({
+      where: { orderId }
+    });
+
+    // Then delete the order
+    const order = await prisma.order.delete({ 
+      where: { id: orderId } 
+    });
+
     return NextResponse.json(order);
   } catch (error) {
     console.error("[ORDER_DELETE]", error);

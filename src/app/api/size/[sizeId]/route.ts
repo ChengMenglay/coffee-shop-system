@@ -1,10 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getUploadDir } from "@/lib/uploadConfig";
-import { existsSync } from "fs";
-import { unlink } from "fs/promises";
 import { NextResponse } from "next/server";
-import path from "path";
-
 export async function PATCH(
   req: Request,
   { params }: { params: { sizeId: string } }

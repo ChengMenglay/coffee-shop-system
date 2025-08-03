@@ -36,7 +36,6 @@ export type Category={
 export type Product = {
   id: string;
   categoryId: string;
-  category:Category
   name: string;
   price: number ;
   discount: number | null;
@@ -57,16 +56,61 @@ export type Order = {
   total: number;
 };
 
-export type OrderItem = {
+// In your types.ts file, update the OrderItem interface:
+export interface OrderItem {
   id: string;
-  order: Order;
-  productId: Product;
+  order: {
+    id: string;
+    displayId: number;
+    createdAt: Date;
+    note?: string | null;
+    user: {
+      id: string;
+      name: string;
+      phone: string;
+      role: {
+        id: string;
+        name: string;
+      };
+    };
+    orderStatus: string;
+    paymentStatus: boolean;
+    paymentMethod: string;
+    discount: number;
+    total: number;
+  };
+  productId: {
+    id: string;
+    categoryId: string;
+    name: string;
+    price: number;
+    discount: number | null;
+    description: string;
+    status: boolean;
+    image: string;
+  };
   quantity: number;
   price: number;
-  size: Size;
-  sugar: "0" | "25" | "50" | "75" | "100";
-  note: string | null;
-};
+  sizeId?: string | null;
+  size?: {
+    id: string;
+    sizeName: string;
+    priceModifier: number;
+    productId: string;
+    fullPrice: number;
+  } | null;
+  sugarId?: string | null;
+  sugar?: string | null;
+  iceId?: string | null;
+  ice?: string | null;
+  extraShotId?: string | null;
+  extraShot?: {
+    id: string;
+    name: string;
+    priceModifier: number;
+  } | null;
+  note?: string | null;
+}
 
 export type Size = {
   id: string;
@@ -74,4 +118,23 @@ export type Size = {
   priceModifier: number;
   productId: string;
   fullPrice: number;
+};
+
+export type Sugar={
+  id: string;
+  name: string;
+  productId: string;
+}
+
+export type Ice = {
+  id: string;
+  name: string;
+  productId: string;
+};
+
+export type ExtraShot = {
+  id: string;
+  name: string;
+  priceModifier: number;
+  productId: string;
 };

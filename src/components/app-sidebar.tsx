@@ -19,6 +19,9 @@ import {
   ReceiptText,
   Tags,
   StretchHorizontal,
+  Candy,
+  Snowflake,
+  Zap,
 } from "lucide-react";
 import {
   Sidebar,
@@ -93,6 +96,24 @@ const menuGroups = (counts: {
         url: "/dashboard/size",
         icon: StretchHorizontal,
         requiredPermission: "view:size",
+      },
+      {
+        title: "Sugar",
+        url: "/dashboard/sugar",
+        icon: Candy, // changed here
+        requiredPermission: "view:sugar",
+      },
+      {
+        title: "Ice",
+        url: "/dashboard/ice",
+        icon: Snowflake, // changed here
+        requiredPermission: "view:ice",
+      },
+      {
+        title: "Extra Shot",
+        url: "/dashboard/extra-shot",
+        icon: Zap, // changed here
+        requiredPermission: "view:extra-shot",
       },
       {
         title: "Order Management",

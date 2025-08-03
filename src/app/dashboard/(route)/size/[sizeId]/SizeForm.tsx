@@ -3,7 +3,6 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -69,7 +68,7 @@ function SizeForm({ initialData, products }: SizeFormProps) {
       toast.success(toastMessage);
       router.push("/dashboard/size");
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast.error(
         error?.response?.data || "Something went wrong. Please try again."
@@ -137,7 +136,7 @@ function SizeForm({ initialData, products }: SizeFormProps) {
                       disabled={isLoading}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder={"Select a size"} />
+                        <SelectValue placeholder={"Select a product"} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>

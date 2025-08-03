@@ -18,25 +18,29 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Product, Size } from "types";
+import { Product, Size, Sugar,Ice,ExtraShot } from "types";
 import { Category } from "@/generated/prisma";
 import NoResult from "@/components/NoResult";
+import useCart from "@/hooks/use-cart";
 
 interface SaleProps {
   products: Product[] | null;
   categories: Category[] | null;
   sizes: Size[] | null;
+  sugars?: Sugar[] | null;
+  ices?: Ice[] | null;
+  extraShots?: ExtraShot[] | null;
 }
-export default function Sale({ products, categories, sizes }: SaleProps) {
+export default function Sale({ products, categories, sizes, sugars, ices, extraShots }: SaleProps) {
   const [filteredProducts, setFilterdProducts] = useState<Product[] | null>(
     products
   );
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
   );
-
+  const cart = useCart();
   const [searchProducts, setSearchProducts] = useState("");
-   const router = useRouter();
+  const router = useRouter();
   const onSort = (id: string | null) => {
     setSelectedCategoryId(id);
     ProductFilter(searchProducts, id);
@@ -64,6 +68,9 @@ export default function Sale({ products, categories, sizes }: SaleProps) {
     }
 
     setFilterdProducts(filterdProducts);
+  };
+  const handleProductClick = (product: Product) => {
+    cart.addItem(product);
   };
   return (
     <>
@@ -127,14 +134,19 @@ export default function Sale({ products, categories, sizes }: SaleProps) {
           ) : (
             <div className=" grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-4 grid-cols-3 gap-2 ">
               {filteredProducts?.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div
+                  key={product.id}
+                  onClick={() => handleProductClick(product)}
+                >
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           )}
         </div>
       </Card>
       <Card className=" lg:col-span-5 md:col-span-7 md:h-[80vh] md:row-span-5 row-span-7 flex flex-col rounded-sm p-4">
-        <CartStore sizes={sizes} />
+        <CartStore sizes={sizes} sugars={sugars} ices={ices} extraShots={extraShots} />
       </Card>
     </>
   );
