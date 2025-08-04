@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 import AccountForm from "./AccountForm";
 import { checkPermission } from "@/lib/check-permission";
 
-async function AccountPage({ params }: { params: { accountId: string } }) {
+async function AccountPage({
+  params,
+}: {
+  params: Promise<{ accountId: string }>;
+}) {
   const { accountId } = await params;
   const account = await prisma.user.findUnique({
     where: { id: accountId },

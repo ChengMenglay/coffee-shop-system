@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import ProductForm from "./ProductForm";
 
-async function CategoryPage({ params }: { params: { productId: string } }) {
+async function CategoryPage({ params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
   const [product, categories] = await Promise.all([
     prisma.product.findUnique({ where: { id: productId } }),

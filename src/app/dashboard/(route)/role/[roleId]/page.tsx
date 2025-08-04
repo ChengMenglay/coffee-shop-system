@@ -6,17 +6,17 @@ import { checkPermission } from "@/lib/check-permission";
 async function permissionPage({
   params,
 }: {
-  params: { roleId: string };
+  params: Promise<{ roleId: string }>;
 }) {
-  const{roleId}= await params
+  const { roleId } = await params;
   const role = await prisma.role.findUnique({
-    where: { id:roleId },
+    where: { id: roleId },
     include: { permissions: true },
   });
-  const permissions= await prisma.permission.findMany();
-  if(role===null){
+  const permissions = await prisma.permission.findMany();
+  if (role === null) {
     await checkPermission(["create:role"]);
-  }else{
+  } else {
     await checkPermission(["edit:role"]);
   }
   return (

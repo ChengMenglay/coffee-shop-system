@@ -2,8 +2,9 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import SizeForm from "./SizeForm";
+import { Product } from "@/generated/prisma";
 
-async function IngredientPage({ params }: { params: { sizeId: string } }) {
+async function IngredientPage({ params }: { params: Promise<{ sizeId: string }> }) {
   const { sizeId } = await params;
   const [size, products] = await Promise.all([
     prisma.size.findUnique({
@@ -24,7 +25,7 @@ async function IngredientPage({ params }: { params: { sizeId: string } }) {
       }
     : null;
   const formattedProduct = products
-    ? products.map((item) => ({ ...item, price: item.price.toNumber() }))
+    ? products.map((item: Product) => ({ ...item, price: item.price.toNumber() }))
     : null;
   return (
     <div className="flex-col h-full">

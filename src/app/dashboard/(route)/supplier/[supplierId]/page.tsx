@@ -4,7 +4,7 @@ import SupplierForm from "./SupplierForm";
 import { Ingredient, Supplier } from "@/generated/prisma";
 import { checkPermission } from "@/lib/check-permission";
 
-async function SupplierPage({ params }: { params: { supplierId: string } }) {
+async function SupplierPage({ params }: { params: Promise<{ supplierId: string }> }) {
   const { supplierId } = await params;
   const supplier = (await prisma.supplier.findUnique({
     include: { suppliedIngredients: true },

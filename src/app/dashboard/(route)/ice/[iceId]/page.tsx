@@ -2,8 +2,9 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import IceForm from "./IceForm";
+import { Product } from "@/generated/prisma";
 
-async function IcePage({ params }: { params: { iceId: string } }) {
+async function IcePage({ params }: { params: Promise<{ iceId: string }> }) {
   const { iceId } = await params;
   const [ice, products] = await Promise.all([
     prisma.ice.findUnique({
@@ -17,7 +18,10 @@ async function IcePage({ params }: { params: { iceId: string } }) {
     await checkPermission(["edit:ice"]);
   }
   const formattedProduct = products
-    ? products.map((item) => ({ ...item, price: item.price.toNumber() }))
+    ? products.map((item: Product) => ({
+        ...item,
+        price: item.price.toNumber(),
+      }))
     : null;
   return (
     <div className="flex-col h-full">

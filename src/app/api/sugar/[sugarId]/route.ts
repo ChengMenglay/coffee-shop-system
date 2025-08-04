@@ -1,9 +1,10 @@
+import { Sugar } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { sugarId: string } }
+  { params }: { params: Promise<{ sugarId: string }> }
 ) {
   try {
     const { sugarId } = await params;
@@ -16,7 +17,7 @@ export async function PATCH(
     if (!productId)
       return NextResponse.json("productId is required", { status: 400 });
     const currentSugars = await prisma.sugar.findMany({ where: { productId } });
-    const existedSugar = currentSugars.find((sugar) => sugar.name === name);
+    const existedSugar = currentSugars.find((sugar:Sugar) => sugar.name === name);
     if (existedSugar) {
       return NextResponse.json("Sugar's already existed!", { status: 400 });
     }
@@ -33,7 +34,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { sugarId: string } }
+  { params }: { params: Promise<{ sugarId: string }> }
 ) {
   try {
     const { sugarId } = await params;

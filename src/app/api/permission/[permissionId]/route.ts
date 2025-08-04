@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { permissionId: string } }
+  { params }: { params: Promise<{ permissionId: string }> }
 ) {
   try {
     const { permissionId } = await params;
     if (!permissionId)
       return new NextResponse("Permission Id is required", { status: 400 });
     const permission = await prisma.permission.findUnique({
-      where: { id: params.permissionId },
+      where: { id: permissionId },
     });
     return NextResponse.json(permission);
   } catch (error) {
@@ -44,7 +44,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { permissionId: string } }
+  { params }: { params: Promise<{ permissionId: string }> }
 ) {
   try {
     const { permissionId } = await params;

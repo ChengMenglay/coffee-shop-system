@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
     const { orderId } = await params;
@@ -14,7 +14,7 @@ export async function PATCH(
       return NextResponse.json("Order Id is required!", { status: 400 });
 
     // Prepare update data - only include fields that are provided
-    const updateData: any = {};
+    const updateData: { orderStatus?: string; paymentStatus?: string } = {};
     if (orderStatus !== undefined) updateData.orderStatus = orderStatus;
     if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
 
@@ -32,7 +32,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
     const { orderId } = await params;

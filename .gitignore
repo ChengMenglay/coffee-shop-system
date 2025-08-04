@@ -39,5 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-/src/generated/prisma
+/src/generated/**/*.js.map
+/src/generated/**/*.d.ts.map

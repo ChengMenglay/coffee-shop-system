@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function PATCH(request:Request, { params }: { params: { roleId: string } }) {
+export async function PATCH(request:Request, { params }: { params: Promise<{ roleId: string }> }) {
   try {
     const body = await request.json();
     const { name, permissions } = body;
@@ -33,7 +33,7 @@ const { roleId } = await params;
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { roleId: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ roleId: string }> }) {
   try {
     const { roleId } = await params;
 

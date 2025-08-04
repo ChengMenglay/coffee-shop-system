@@ -1,8 +1,9 @@
+import { Size } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 export async function PATCH(
   req: Request,
-  { params }: { params: { sizeId: string } }
+  { params }: { params: Promise<{ sizeId: string }> }
 ) {
   try {
     const { sizeId } = await params;
@@ -18,7 +19,7 @@ export async function PATCH(
       where: { id: productId },
     });
     const currentSizes = await prisma.size.findMany({ where: { productId } });
-    const existedSize = currentSizes.find((size) => size.sizeName === sizeName);
+    const existedSize = currentSizes.find((size: Size) => size.sizeName === sizeName);
     if (existedSize) {
       return NextResponse.json("Size's already exsited!", { status: 400 });
     }
@@ -36,7 +37,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { sizeId: string } }
+  { params }: { params: Promise<{ sizeId: string }> }
 ) {
   try {
     const { sizeId } = await params;

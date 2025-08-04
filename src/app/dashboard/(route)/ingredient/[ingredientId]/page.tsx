@@ -6,7 +6,7 @@ import { checkPermission } from "@/lib/check-permission";
 async function IngredientPage({
   params,
 }: {
-  params: { ingredientId: string };
+  params: Promise<{ ingredientId: string }>;
 }) {
   const { ingredientId } = await params;
   const ingredient = await prisma.ingredient.findUnique({

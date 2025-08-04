@@ -49,12 +49,12 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import Singout from "./Singout";
 import { Badge } from "@/components/ui/badge";
-import { prisma } from "@/lib/prisma";
 import NotificationBell from "./NotificaitonBell"; // fix spelling if needed
 import { Notification } from "types";
 import { formatDistanceStrict } from "date-fns";
 import { getUserId } from "@/app/(auth)/actions/authAction";
 import AutoRefresh from "./AutoRefresh";
+import { prisma } from "@/lib/prisma";
 
 const menuGroups = (counts: {
   purchase: number;
@@ -255,18 +255,20 @@ export async function AppSidebar() {
   });
 
   // Optional: format notifications if needed for NotificaitonBell
-  const formattedNotifications: Notification[] = notifications.map((item) => ({
-    id: item.id,
-    name: item.user.name,
-    role: item.user.role.name,
-    title: item.title,
-    message: item.message,
-    type: item.type,
-    read: item.read,
-    createdAt: formatDistanceStrict(new Date(item.createdAt), new Date(), {
-      addSuffix: true,
-    }),
-  }));
+  const formattedNotifications: Notification[] = notifications.map(
+    (item: any) => ({
+      id: item.id,
+      name: item.user.name,
+      role: item.user.role.name,
+      title: item.title,
+      message: item.message,
+      type: item.type,
+      read: item.read,
+      createdAt: formatDistanceStrict(new Date(item.createdAt), new Date(), {
+        addSuffix: true,
+      }),
+    })
+  );
 
   return (
     <Sidebar className="py-2">

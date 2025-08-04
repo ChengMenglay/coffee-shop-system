@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { accountId: string } }
+  { params }: { params: Promise<{ accountId: string }> }
 ) {
   try {
     const body = await req.json();
@@ -16,7 +16,7 @@ export async function PATCH(
     if (!phone) return NextResponse.json("Phone is required", { status: 400 });
     if (!roleId)
       return NextResponse.json("Role Id is required", { status: 400 });
-    const updateData: any = {
+    const updateData: { name: string; phone: string; roleId: string; password?: string } = {
       name,
       phone,
       roleId,
@@ -39,7 +39,7 @@ const user = await prisma.user.update({
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { accountId: string } }
+  { params }: { params: Promise<{ accountId: string }> }
 ) {
   try {
     const { accountId } = await params;

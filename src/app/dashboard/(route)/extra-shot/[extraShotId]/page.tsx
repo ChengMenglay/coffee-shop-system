@@ -2,8 +2,13 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import ExtraShotForm from "./ExtraShotForm";
+import { Product } from "@/generated/prisma";
 
-async function ExtraShotPage({ params }: { params: { extraShotId: string } }) {
+async function ExtraShotPage({
+  params,
+}: {
+  params: Promise<{ extraShotId: string }>;
+}) {
   const { extraShotId } = await params;
   const [extraShot, products] = await Promise.all([
     prisma.extraShot.findUnique({
@@ -17,15 +22,21 @@ async function ExtraShotPage({ params }: { params: { extraShotId: string } }) {
     await checkPermission(["edit:extra-shot"]);
   }
   const formattedProduct = products
-    ? products.map((item) => ({ ...item, price: item.price.toNumber() }))
+    ? products.map((item: Product) => ({
+        ...item,
+        price: item.price.toNumber(),
+      }))
     : null;
-    const formattedExtraShot = extraShot
-      ? { ...extraShot, priceModifier: extraShot.priceModifier.toNumber() }
-      : null;
+  const formattedExtraShot = extraShot
+    ? { ...extraShot, priceModifier: extraShot.priceModifier.toNumber() }
+    : null;
   return (
     <div className="flex-col h-full">
       <div className="space-y-4 px-6 py-8">
-        <ExtraShotForm products={formattedProduct} initialData={formattedExtraShot} />
+        <ExtraShotForm
+          products={formattedProduct}
+          initialData={formattedExtraShot}
+        />
       </div>
     </div>
   );

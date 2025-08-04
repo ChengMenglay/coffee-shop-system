@@ -1,9 +1,10 @@
+import { Ice } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { iceId: string } }
+  { params }: { params: Promise<{ iceId: string }> }
 ) {
   try {
     const { iceId } = await params;
@@ -16,7 +17,7 @@ export async function PATCH(
     if (!productId)
       return NextResponse.json("productId is required", { status: 400 });
     const currentIces = await prisma.ice.findMany({ where: { productId } });
-    const existedIce = currentIces.find((ice) => ice.name === name);
+    const existedIce = currentIces.find((ice: Ice) => ice.name === name);
     if (existedIce) {
       return NextResponse.json("Ice's already existed!", { status: 400 });
     }
@@ -33,7 +34,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { iceId: string } }
+  { params }: { params: Promise<{ iceId: string }>  }
 ) {
   try {
     const { iceId } = await params;

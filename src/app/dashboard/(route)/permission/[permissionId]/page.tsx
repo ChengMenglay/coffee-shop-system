@@ -6,7 +6,7 @@ import { checkPermission } from "@/lib/check-permission";
 async function permissionPage({
   params,
 }: {
-  params: { permissionId: string };
+  params: Promise<{ permissionId: string }>;
 }) {
   const {permissionId}= await params
   const permission = await prisma.permission.findUnique({

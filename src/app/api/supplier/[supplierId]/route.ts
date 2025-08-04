@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { supplierId: string } }
+  { params }: { params: Promise<{ supplierId: string }> }
 ) {
   try {
     const { supplierId } = await params;
@@ -59,10 +59,10 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { supplierId: string } }
+  { params }: { params: Promise<{ supplierId: string }> }
 ) {
   try {
-    const { supplierId } = params;
+    const { supplierId } = await params;
     if (!supplierId)
       return new NextResponse("Supplier Id is required", { status: 400 });
     const supplier = await prisma.supplier.delete({

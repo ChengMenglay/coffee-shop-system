@@ -6,7 +6,7 @@ import { checkPermission } from "@/lib/check-permission";
 async function CategoryPage({
   params,
 }: {
-  params: { categoryId: string };
+  params: Promise<{ categoryId: string }>;
 }) {
   const { categoryId } = await params;
   const category = await prisma.category.findUnique({

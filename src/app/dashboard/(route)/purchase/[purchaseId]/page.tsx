@@ -5,7 +5,7 @@ import PurchaseForm from "./PurchaseForm";
 import { checkPermission } from "@/lib/check-permission";
 import { getUserId } from "@/app/(auth)/actions/authAction";
 
-async function PurchasePage({ params }: { params: { purchaseId: string } }) {
+async function PurchasePage({ params }: { params: Promise<{ purchaseId: string }> }) {
   const { purchaseId } = await params;
   const [purchase, ingredients, suppliers, userId] = await Promise.all([
     prisma.purchase.findUnique({

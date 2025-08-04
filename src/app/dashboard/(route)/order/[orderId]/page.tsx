@@ -4,7 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { OrderItem } from "types";
 import { checkPermission } from "@/lib/check-permission";
 
-async function OrderReciept({ params }: { params: { orderId: string } }) {
+async function OrderReciept({
+  params,
+}: {
+  params: Promise<{ orderId: string }>;
+}) {
   await checkPermission(["view:receipt"]);
   const { orderId } = await params;
 

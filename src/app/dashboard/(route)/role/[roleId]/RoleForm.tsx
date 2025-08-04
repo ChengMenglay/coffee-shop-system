@@ -112,7 +112,9 @@ function RoleForm({ initialData, permissions }: SupplierFormProps) {
                 const grouped = permissions.reduce(
                   (acc: Record<string, Permission[]>, perm) => {
                     const [_action, module] = perm.key.split(":");
-                    if (!module) return acc;
+                    if (!_action || !module) {
+                      return acc;
+                    }
                     if (!acc[module]) acc[module] = [];
                     acc[module].push(perm);
                     return acc;

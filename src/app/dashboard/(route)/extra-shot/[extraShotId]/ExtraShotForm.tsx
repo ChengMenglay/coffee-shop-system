@@ -70,7 +70,7 @@ function ExtraShotForm({ initialData, products }: ExtraShotFormProps) {
       toast.success(toastMessage);
       router.push("/dashboard/extra-shot");
       router.refresh();
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
       toast.error(
         error?.response?.data || "Something went wrong. Please try again."

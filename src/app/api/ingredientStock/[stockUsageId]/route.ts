@@ -23,7 +23,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { stockUsageId: string } }
+  { params }: { params: Promise<{ stockUsageId: string }> }
 ) {
   try {
     const body = await req.json();
@@ -120,7 +120,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { stockUsageId: string } }
+  { params }: { params: Promise<{ stockUsageId: string }> }
 ) {
   try {
     const { stockUsageId } = await params;

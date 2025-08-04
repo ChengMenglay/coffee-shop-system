@@ -2,11 +2,12 @@ import { prisma } from "@/lib/prisma";
 import React from "react";
 import ProductDetail from "./ProductDetail";
 import { Product } from "types";
+import { ExtraShot, Size } from "@/generated/prisma";
 
 async function ProductDetailPage({
   params,
 }: {
-  params: { productId: string };
+  params: Promise<{ productId: string }>;
 }) {
   const { productId } = await params;
   const [product, sugars, ices, extraShots, sizes] = await Promise.all([
@@ -29,12 +30,12 @@ async function ProductDetailPage({
       where: { productId },
     }),
   ]);
-  const formattedExtraShots = extraShots.map((extraShot) => ({
+  const formattedExtraShots = extraShots.map((extraShot: ExtraShot) => ({
     ...extraShot,
     id: extraShot.id ?? "",
     priceModifier: extraShot.priceModifier?.toNumber() || 0,
   }));
-  const formattedSizes = sizes.map((size) => ({
+  const formattedSizes = sizes.map((size: Size) => ({
     ...size,
     id: size.id ?? "",
     priceModifier: size.priceModifier?.toNumber() || 0,
