@@ -21,9 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import axios from "axios";
 import {
-  SearchX,
   Clock,
-  User,
   Package,
   FileText,
   CheckCircle,
@@ -70,7 +68,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
       });
       if (response.status === 200) {
         await axios.post("/api/notification", {
-          title: "Stock Usage Request Approved",
+          title: `Your ${ingredient} Request Approved`,
           userId: response.data.userId,
           message: `Your stock usage request for ${ingredient} has been approved.`,
           type: "success",
@@ -102,10 +100,10 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
       });
       if (response.status === 200) {
         await axios.post("/api/notification", {
-          title: "Stock Usage Request Rejected",
+          title: `Your ${selectedIngredient} Request Rejected`,
           userId: response.data.userId,
           message: `Your stock usage request for ${selectedIngredient} has been rejected. Reason: ${response.data.rejectionReason}`,
-          type: "warning",
+          type: "error",
         });
         toast.success("Stock Usage request rejected successfully");
         setOpenAlert(false);
@@ -209,7 +207,7 @@ function StockUsageClient({ data, userId }: StockUsageColumnProps) {
                     <FileText className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
                     <div className="bg-gray-50 rounded-lg p-3 flex-1">
                       <p className="text-sm text-gray-700 italic">
-                        "{item.note}"
+                        {item.note}
                       </p>
                     </div>
                   </div>

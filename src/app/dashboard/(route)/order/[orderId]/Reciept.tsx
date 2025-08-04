@@ -69,7 +69,7 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
         <div className="mb-4 text-xs space-y-1">
           <div className="flex justify-between">
             <span className="font-medium">Order ID:</span>
-            <span className="font-mono">{order.displayId}</span>
+            <span className="font-mono">{"# " + order.displayId}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-medium">Date:</span>
@@ -259,13 +259,6 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
           <p className="text-xs text-gray-400">
             Printed: {format(new Date(), "MM/dd/yyyy hh:mm:ss a")}
           </p>
-
-          {/* QR Code placeholder */}
-          <div className="mt-3 flex justify-center">
-            <div className="w-16 h-16 border-2 border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">
-              QR CODE
-            </div>
-          </div>
         </div>
       </div>
 

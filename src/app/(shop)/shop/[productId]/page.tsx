@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import React from "react";
 import ProductDetail from "./ProductDetail";
+import { Product } from "types";
 
 async function ProductDetailPage({
   params,
@@ -8,29 +9,31 @@ async function ProductDetailPage({
   params: { productId: string };
 }) {
   const { productId } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    include: {
-      category: true,
-    },
-  });
-  const sugars = await prisma.sugar.findMany({
-    where: { productId },
-  });
-  const ices = await prisma.ice.findMany({
-    where: { productId },
-  });
-  const extraShots = await prisma.extraShot.findMany({
-    where: { productId },
-  });
+  const [product, sugars, ices, extraShots, sizes] = await Promise.all([
+    prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        category: true,
+      },
+    }),
+    prisma.sugar.findMany({
+      where: { productId },
+    }),
+    prisma.ice.findMany({
+      where: { productId },
+    }),
+    prisma.extraShot.findMany({
+      where: { productId },
+    }),
+    prisma.size.findMany({
+      where: { productId },
+    }),
+  ]);
   const formattedExtraShots = extraShots.map((extraShot) => ({
     ...extraShot,
     id: extraShot.id ?? "",
     priceModifier: extraShot.priceModifier?.toNumber() || 0,
   }));
-  const sizes = await prisma.size.findMany({
-    where: { productId },
-  });
   const formattedSizes = sizes.map((size) => ({
     ...size,
     id: size.id ?? "",
@@ -48,7 +51,7 @@ async function ProductDetailPage({
     <div className="my-6 max-w-6xl mx-auto">
       <ProductDetail
         sizes={formattedSizes}
-        product={formattedProduct}
+        product={formattedProduct as Product}
         sugars={sugars}
         ices={ices}
         extraShots={formattedExtraShots}

@@ -194,7 +194,7 @@ function ProductDetail({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-lg font-semibold">
-                    Available Sizes
+                    Available Sizes *
                   </FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -254,7 +254,7 @@ function ProductDetail({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-lg font-semibold">
-                      Sugar Level
+                      Sugar Level *
                     </FormLabel>
                     <FormControl>
                       <div className="flex flex-wrap gap-2 mt-2">

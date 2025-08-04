@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import { StockUsageColumn } from "./components/type";
-import { format, formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 import { checkPermission } from "@/lib/check-permission";
 import StockUsageClient from "./components/client";
 import { getUserId } from "@/app/(auth)/actions/authAction";

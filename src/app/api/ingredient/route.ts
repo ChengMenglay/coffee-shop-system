@@ -6,7 +6,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, stock, unit, lowStockThreshold } = body;
     if (!name) return NextResponse.json("Name is required", { status: 400 });
-    if (!stock) return NextResponse.json("Stock is required", { status: 400 });
     if (!unit) return NextResponse.json("Unit is required", { status: 400 });
     if (!lowStockThreshold)
       return NextResponse.json("Low stock threshold is required", {

@@ -3,7 +3,6 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IngredientColumn } from "../components/columns";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -65,10 +63,6 @@ function IngredientForm({ initialData }: IngredientFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const onSubmitted = async (data: IngredientSchema) => {
     try {
-      if (data.stock <= 0) {
-        toast.warning("Stock must be greater than 0");
-        return;
-      }
       if (data.lowStockThreshold <= 0) {
         toast.warning("Low Stock must be greater than 0");
         return;
@@ -149,18 +143,21 @@ function IngredientForm({ initialData }: IngredientFormProps) {
                       onValueChange={field.onChange}
                       disabled={isLoading}
                     >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={"Select a unit"} />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a unit" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectLabel>Unit</SelectLabel>
-                          <SelectItem value="ml">ML</SelectItem>
-                          <SelectItem value="g">G</SelectItem>
-                          <SelectItem value="kg">KG</SelectItem>
-                          <SelectItem value="bottle">Bottles</SelectItem>
-                          <SelectItem value="pack">Pack</SelectItem>
+                          <SelectLabel>Weight & Volume</SelectLabel>
+                          <SelectItem value="ml">Milliliters (ml)</SelectItem>
                           <SelectItem value="l">Liters (L)</SelectItem>
+                          <SelectItem value="g">Grams (g)</SelectItem>
+                          <SelectItem value="kg">Kilograms (kg)</SelectItem>
+                          <SelectLabel>Packaging</SelectLabel>
+                          <SelectItem value="bottle">Bottles</SelectItem>
+                          <SelectItem value="pack">Packs</SelectItem>
+                          <SelectItem value="box">Boxes</SelectItem>
+                          <SelectItem value="piece">Pieces</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>

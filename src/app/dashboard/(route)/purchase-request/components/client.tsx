@@ -7,7 +7,6 @@ import { PurchaseColumn } from "./type";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { formatterUSD } from "@/lib/utils";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -23,9 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import axios from "axios";
 import {
-  SearchX,
   DollarSign,
-  User,
   Package,
   FileText,
   CheckCircle,
@@ -73,7 +70,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
       });
       if (response.status === 200) {
         await axios.post("/api/notification", {
-          title: "Purchase Request Approved",
+          title: `Your Purchase ${ingredient} Request Approved`,
           userId: response.data.userId,
           message: `Your purchase request for ${ingredient} has been approved.`,
           type: "success",
@@ -105,10 +102,10 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
       });
       if (response.status === 200) {
         await axios.post("/api/notification", {
-          title: "Purchase Request Rejected",
+          title: `Your Purchase ${selectedIngredient} Request Rejected`,
           userId: response.data.userId,
           message: `Your purchase request for ${selectedIngredient} has been rejected. Reason: ${response.data.rejectionReason}`,
-          type: "warning",
+          type: "error",
         });
         toast.success("Purchase request rejected successfully");
         setOpenAlert(false);
@@ -223,7 +220,7 @@ function PurchaseClient({ data, userId }: PurchaseColumnProps) {
                     <FileText className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
                     <div className="bg-gray-50 rounded-lg p-3 flex-1">
                       <p className="text-sm text-gray-700 italic">
-                        "{item.note}"
+                        {item.note}
                       </p>
                     </div>
                   </div>

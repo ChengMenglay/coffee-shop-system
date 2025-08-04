@@ -41,15 +41,17 @@ function PurchaseClient({ data, ingredients }: PurchaseColumnProps) {
   }, [data]);
   const exportToCSV = () => {
     if (!filterdData.length) return;
-
-    const csvData = filterdData.map((item, idx) => ({
-      ID: item.id,
-      Ingredient: item.ingredient,
-      Quantity: item.quantity,
-      Supplier: item.supplier,
-      PurchasedBy: item.purchasedBy,
-      Date: new Date(item.createdAt).toLocaleDateString(),
-    }));
+    const csvData = filterdData.map((item, idx) => {
+      return {
+        ID: idx + 1,
+        Ingredient: item.ingredient,
+        Quantity: item.quantity,
+        Price: item.price,
+        Supplier: item.supplier,
+        PurchasedBy: item.purchasedBy,
+        Date: new Date(item.createdAt).toLocaleDateString(),
+      };
+    });
 
     const csv = unparse(csvData);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });

@@ -2,13 +2,9 @@ import React from "react";
 
 import { prisma } from "@/lib/prisma";
 import PurchaseForm from "./PurchaseForm";
-import { Ingredient, Supplier } from "@/generated/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import { getUserId } from "@/app/(auth)/actions/authAction";
 
-type SupplierWithIngredients = Supplier & {
-  suppliedIngredients: Ingredient[];
-};
 async function PurchasePage({ params }: { params: { purchaseId: string } }) {
   const { purchaseId } = await params;
   const [purchase, ingredients, suppliers, userId] = await Promise.all([
