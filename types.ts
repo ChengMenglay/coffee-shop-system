@@ -36,6 +36,7 @@ export type Category={
 export type Product = {
   id: string;
   categoryId: string;
+  category?: Category;
   name: string;
   price: number ;
   discount: number | null;

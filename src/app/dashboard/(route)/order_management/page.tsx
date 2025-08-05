@@ -56,14 +56,14 @@ async function OrderManagementPage() {
     const orders = await prisma.order.findMany({
       include: {
         user: { include: { role: true } },
-        orderItems: { 
-          include: { 
-            product: true, 
+        orderItems: {
+          include: {
+            product: true,
             size: true,
             sugar: true,
             ice: true,
-            extraShot: true
-          } 
+            extraShot: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -107,20 +107,28 @@ async function OrderManagementPage() {
           discount: orderItem.product.discount || 0,
           price: orderItem.product.price.toNumber(),
         },
-        size: orderItem.size ? {
-          sizeName: orderItem.size.sizeName,
-          priceModifier: orderItem.size.priceModifier.toNumber(),
-        } : null,
-        sugar: orderItem.sugar ? {
-          name: orderItem.sugar.name,
-        } : null,
-        ice: orderItem.ice ? {
-          name: orderItem.ice.name,
-        } : null,
-        extraShot: orderItem.extraShot ? {
-          name: orderItem.extraShot.name,
-          priceModifier: orderItem.extraShot.priceModifier.toNumber(),
-        } : null,
+        size: orderItem.size
+          ? {
+              sizeName: orderItem.size.sizeName,
+              priceModifier: orderItem.size.priceModifier.toNumber(),
+            }
+          : null,
+        sugar: orderItem.sugar
+          ? {
+              name: orderItem.sugar.name,
+            }
+          : null,
+        ice: orderItem.ice
+          ? {
+              name: orderItem.ice.name,
+            }
+          : null,
+        extraShot: orderItem.extraShot
+          ? {
+              name: orderItem.extraShot.name,
+              priceModifier: orderItem.extraShot.priceModifier.toNumber(),
+            }
+          : null,
         quantity: orderItem.quantity,
         note: orderItem.note || null,
         price: orderItem.price.toNumber(),

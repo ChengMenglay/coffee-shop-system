@@ -17,7 +17,7 @@ function ShopComponent({ categories, products }: ShopTypeProps) {
       setFilterProduct(products);
     } else {
       setFilterProduct(
-        products.filter((product) => product.category.name === selectedCategory)
+        products.filter((product) => product?.category?.name === selectedCategory)
       );
     }
   }, [selectedCategory, products]);

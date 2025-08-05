@@ -172,21 +172,6 @@ const userManagementItems = [
   },
 ];
 
-const settingsItems = [
-  {
-    title: "Profile Settings",
-    url: "/dashboard/profile",
-    icon: UserCog,
-    requiredPermission: "view:profile",
-  },
-  {
-    title: "Billing",
-    url: "/dashboard/billing",
-    icon: CreditCard,
-    requiredPermission: "view:billing",
-  },
-];
-
 const productItems = [
   {
     title: "Products",
@@ -412,52 +397,6 @@ export async function AppSidebar() {
                   </CollapsibleContent>
                 </Collapsible>
               </SidebarMenuItem>
-
-              {/* Settings Dropdown */}
-              <SidebarMenuItem>
-                <Collapsible>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton className="h-12 flex justify-between items-center hover:bg-gray-100 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <Settings className="w-5 h-5 text-gray-600" />
-                        <span className="font-medium text-gray-700">
-                          Settings
-                        </span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-gray-500 transition-transform duration-200" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="ml-4 mt-1">
-                    <SidebarMenuSub>
-                      {settingsItems
-                        .filter(
-                          (item) =>
-                            !item.requiredPermission ||
-                            users?.permissions.includes(item.requiredPermission)
-                        )
-                        .map((item) => (
-                          <SidebarMenuSubItem key={item.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              className="h-10 hover:bg-gray-50 rounded-md"
-                            >
-                              <a
-                                href={item.url}
-                                className="flex items-center gap-3"
-                              >
-                                <item.icon className="w-4 h-4 text-gray-500" />
-                                <span className="text-sm text-gray-600">
-                                  {item.title}
-                                </span>
-                              </a>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-
               <div className="border-t border-gray-200 my-2" />
 
               {/* Sign Out */}

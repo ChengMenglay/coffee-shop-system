@@ -9,7 +9,6 @@ import {
   CheckCircle,
   Clock,
   CreditCard,
-  Eye,
   Landmark,
   ShoppingBag,
 } from "lucide-react";
@@ -84,7 +83,7 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       const order = await axios.patch(`/api/order/${data.id}`, {
         ...data,
         orderStatus: "Completed",
-               paymentStatus: true,
+        paymentStatus: true,
       });
       router.refresh();
       toast.success(`The Order #${order.data.displayId} placed as Completed.`);
@@ -308,6 +307,14 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       <div className="p-3 bg-gray-50 flex gap-2">
         <Button
           disabled={isLoading}
+          onClick={handleOrderCancell}
+          size="sm"
+          className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs"
+        >
+          Cancel
+        </Button>
+        <Button
+          disabled={isLoading}
           onClick={handleOrderComplete}
           size="sm"
           className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
@@ -316,25 +323,6 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
             <CgSpinnerTwoAlt className="w-3 h-3 mr-1 animate-spin" />
           )}
           {isLoading ? "Processing..." : "Complete"}
-        </Button>
-
-        <Button
-          disabled={isLoading}
-          onClick={() => router.push(`/dashboard/order/${data.id}`)}
-          size="sm"
-          variant="outline"
-          className="px-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-        >
-          <Eye className="w-3 h-3" />
-        </Button>
-
-        <Button
-          disabled={isLoading}
-          onClick={handleOrderCancell}
-          size="sm"
-          className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs"
-        >
-          Cancel
         </Button>
       </div>
     </Card>

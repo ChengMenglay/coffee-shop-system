@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import CartItems from "./CartItems";
 import { CgSpinner } from "react-icons/cg";
 import { ShoppingBag } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 function CartSheet() {
   const {
@@ -34,7 +34,6 @@ function CartSheet() {
   const router = useRouter();
   const { open, onOpen, onClose } = useSheet();
   const [loading, setLoading] = React.useState(false);
-  const { data: session } = useSession();
   // Calculate totals
   const cartDiscount = getDiscountAmount();
   const total = getCartTotal();
@@ -43,12 +42,13 @@ function CartSheet() {
   const getDisplayPrice = (item: CartItem) => {
     return calculateItemPriceWithProductDiscount(item);
   };
-
   const handleOrder = async () => {
+    const freshSession = await getSession();
+    console.log("Current Session:", freshSession);
     try {
       setLoading(true);
       const payload = {
-        userId: session?.user.id,
+        userId: freshSession?.user.id,
         paymentMethod: "Cash",
         paymentStatus: false,
         orderStatus: "Pending",
