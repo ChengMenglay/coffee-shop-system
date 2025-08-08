@@ -21,7 +21,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { permissionId: string } }
+  { params }: { params: Promise<{ permissionId: string }> }
 ) {
   try {
     const { permissionId } = await params;

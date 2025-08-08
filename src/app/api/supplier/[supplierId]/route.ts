@@ -21,7 +21,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { supplierId: string } }
+  { params }: { params: Promise<{ supplierId: string }> }
 ) {
   try {
     const { supplierId } = await params;
