@@ -3,12 +3,14 @@ import React from "react";
 import ProductDetail from "./ProductDetail";
 import { Product } from "types";
 import { ExtraShot, Size } from "@/generated/prisma";
+import { checkPermission } from "@/lib/check-permission";
 
 async function ProductDetailPage({
   params,
 }: {
   params: Promise<{ productId: string }>;
 }) {
+  await checkPermission(["view:product-detail"]);
   const { productId } = await params;
   const [product, sugars, ices, extraShots, sizes] = await Promise.all([
     prisma.product.findUnique({

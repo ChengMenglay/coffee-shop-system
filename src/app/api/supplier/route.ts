@@ -6,8 +6,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, contact, isActive, suppliedIngredients } = body;
     if (!name) return NextResponse.json("Name is required", { status: 400 });
-    if (!contact)
-      return NextResponse.json("contact is required", { status: 400 });
     if (!Array.isArray(suppliedIngredients) || !suppliedIngredients.length) {
       return NextResponse.json("Ingredients supplied is required", {
         status: 400,

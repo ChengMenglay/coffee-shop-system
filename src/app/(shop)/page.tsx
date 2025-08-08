@@ -2,6 +2,7 @@ import React from "react";
 import ShopComponent from "./Shop";
 import { prisma } from "@/lib/prisma";
 import { Product } from "@/generated/prisma";
+import NoResult from "@/components/NoResult";
 async function Home() {
   const [categories, products] = await Promise.all([
     prisma.category.findMany({
@@ -10,12 +11,23 @@ async function Home() {
     prisma.product.findMany({
       include: { category: true },
       orderBy: { createdAt: "desc" },
+      where: { status: true },
     }),
   ]);
   const formattedProduct = products.map((product: Product) => ({
     ...product,
     price: product.price.toNumber(),
   }));
+  if (categories.length === 0 || formattedProduct.length === 0) {
+    return (
+      <div>
+        <NoResult
+          title="No products available."
+          description="Please check back later."
+        />
+      </div>
+    );
+  }
   return (
     <div>
       <ShopComponent categories={categories} products={formattedProduct} />

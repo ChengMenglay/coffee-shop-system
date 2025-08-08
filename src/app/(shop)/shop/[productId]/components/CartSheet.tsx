@@ -44,7 +44,6 @@ function CartSheet() {
   };
   const handleOrder = async () => {
     const freshSession = await getSession();
-    console.log("Current Session:", freshSession);
     try {
       setLoading(true);
       const payload = {
@@ -75,6 +74,17 @@ function CartSheet() {
               });
             })
           );
+          const notificationResponse = await fetch("/api/telegram/notify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId: order.data.id,
+            }),
+          });
+
+          console.log("Notification response:", notificationResponse);
 
           toast.success("Your order has been placed successfully!");
           router.push(`/`);

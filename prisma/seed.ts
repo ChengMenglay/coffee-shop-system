@@ -4,7 +4,7 @@ async function main() {
   const user = {
     name: "ChengMenglay",
     password: await bcrypt.hash("123123123", 10),
-    roleId: "cmcvim1jt00007k8c8ifmmsez",
+    roleId: "cmdzdjb9n0000f8io75h7k0yb",
   };
   await prisma.user.create({ data: user });
   console.log("✅ User seeded successfully!");

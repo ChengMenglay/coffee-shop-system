@@ -38,7 +38,7 @@ interface SupplierDialogProps {
 
 const supplierSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  contact: z.string().min(1, "Contact is required"),
+  contact: z.string().optional(),
   isActive: z.boolean(),
   suppliedIngredients: z.array(z.string()),
 });

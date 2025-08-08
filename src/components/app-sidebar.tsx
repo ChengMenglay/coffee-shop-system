@@ -7,15 +7,12 @@ import {
   Package,
   PackageOpen,
   Puzzle,
-  Settings,
   ShieldCheck,
   ShoppingCart,
   UserCircle,
-  UserCog,
   UtensilsCrossed,
   Building2,
   Bell,
-  CreditCard,
   ReceiptText,
   Tags,
   StretchHorizontal,
@@ -260,7 +257,7 @@ export async function AppSidebar() {
       <AutoRefresh interval={20000} />
       <SidebarContent>
         <SidebarGroup className="gap-y-4">
-          <SidebarGroupLabel className="flex items-center justify-between">
+          <SidebarGroupLabel className="flex items-center justify-between sticky top-0  z-10">
             <Link href="/" className="font-bold text-black text-2xl">
               Coffee Shop
             </Link>

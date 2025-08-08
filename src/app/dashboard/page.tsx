@@ -16,6 +16,8 @@ async function DashboardPage() {
       // Today's orders
       prisma.order.findMany({
         where: {
+          orderStatus: "Completed",
+          paymentStatus: true,
           createdAt: {
             gte: today,
             lt: tomorrow,
@@ -33,11 +35,14 @@ async function DashboardPage() {
             },
           },
         },
+        orderBy: { createdAt: "desc" },
       }),
 
       // Yesterday's orders
       prisma.order.findMany({
         where: {
+          orderStatus: "Completed",
+          paymentStatus: true,
           createdAt: {
             gte: yesterday,
             lt: today,
@@ -58,6 +63,7 @@ async function DashboardPage() {
       }),
       // All orders
       prisma.order.findMany({
+        where: { orderStatus: "Completed", paymentStatus: true },
         include: {
           user: { include: { role: true } },
           orderItems: {

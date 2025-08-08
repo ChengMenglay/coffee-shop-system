@@ -11,20 +11,20 @@ import {
   OrderManagementColumn,
 } from "./(route)/order_management/components/column";
 import { formatterUSD } from "@/lib/utils";
-import { format } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 import { Card } from "@/components/ui/card";
 
 interface OverviewProps {
   todayOrders: PendingOrder[];
   yesterdayOrders: PendingOrder[];
-allOrders: PendingOrder[];
+  allOrders: PendingOrder[];
   ingredients: Ingredient[];
 }
 
 function Overview({
   todayOrders,
   yesterdayOrders,
-    allOrders,
+  allOrders,
   ingredients,
 }: OverviewProps) {
   const calculatePercentageChange = (
@@ -148,7 +148,9 @@ function Overview({
     paymentStatus: order.paymentStatus,
     paymentMethod: order.paymentMethod,
     total: formatterUSD.format(Number(order.total)),
-    createdAt: format(order.createdAt, "dd MMMM yyyy"),
+    createdAt: formatDistanceToNowStrict(new Date(order.createdAt), {
+    addSuffix: true,
+    }),
   }));
 
   return (

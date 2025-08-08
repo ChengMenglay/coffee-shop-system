@@ -1,4 +1,3 @@
-import { Size } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 export async function PATCH(
@@ -18,12 +17,7 @@ export async function PATCH(
     const product = await prisma.product.findUnique({
       where: { id: productId },
     });
-    const currentSizes = await prisma.size.findMany({ where: { productId } });
-    const existedSize = currentSizes.find((size: Size) => size.sizeName === sizeName);
-    if (existedSize) {
-      return NextResponse.json("Size's already exsited!", { status: 400 });
-    }
-    const fullPrice = product?.price + priceModifier;
+    const fullPrice = Number(product?.price) + Number(priceModifier);
     const size = await prisma.size.update({
       where: { id: sizeId },
       data: { sizeName, priceModifier, productId, fullPrice },
