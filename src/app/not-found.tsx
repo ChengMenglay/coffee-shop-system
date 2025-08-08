@@ -16,7 +16,7 @@ export default function NotFound() {
 
         {/* Description */}
         <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md">
-          Sorry, we couldn't find the page you're looking for.
+          Sorry, we could not find the page you are looking for.
         </p>
 
         {/* Back to home button */}
