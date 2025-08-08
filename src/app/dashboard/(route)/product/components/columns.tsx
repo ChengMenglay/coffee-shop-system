@@ -16,6 +16,18 @@ export type ProductColumn = {
   createdAt: string;
 };
 
+const ActionCell = ({ row }: { row: { original: ProductColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:product"])}
+      canDelete={canPerformAction(["delete:product"])}
+      data={row.original}
+    />
+  );
+};
+
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "image",
@@ -67,15 +79,6 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:product"])}
-          canDelete={canPerformAction(["delete:product"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

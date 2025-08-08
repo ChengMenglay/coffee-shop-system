@@ -2,7 +2,7 @@
 import { DashboardStats, SectionCards } from "@/components/section-cards";
 import React from "react";
 import { PendingOrder } from "./(route)/order_management/page";
-import { Ingredient } from "@/generated/prisma";
+import { Ingredient } from "@prisma/client";
 import { ChartLineDots } from "@/components/chart-line-dots";
 import { ChartPieLabelList } from "@/components/chat-pie-list";
 import { DataTable } from "@/components/ui/data-table";

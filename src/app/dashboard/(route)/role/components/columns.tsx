@@ -10,6 +10,18 @@ export type RoleColumn = {
   permissions: string[];
 };
 
+const ActionCell = ({ row }: { row: { original: RoleColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:role"])}
+      canDelete={canPerformAction(["delete:role"])}
+      data={row.original}
+    />
+  );
+};
+
 export const columns: ColumnDef<RoleColumn>[] = [
   {
     accessorKey: "name",
@@ -40,15 +52,6 @@ export const columns: ColumnDef<RoleColumn>[] = [
   },
 {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:role"])}
-          canDelete={canPerformAction(["delete:role"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

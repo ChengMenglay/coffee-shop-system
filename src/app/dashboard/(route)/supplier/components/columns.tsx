@@ -11,6 +11,17 @@ export type SupplierColumn = {
   isActive: boolean;
   ingredients: string[];
 };
+const ActionCell = ({ row }: { row: { original: SupplierColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:supplier"])}
+      canDelete={canPerformAction(["delete:supplier"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<SupplierColumn>[] = [
   {
@@ -58,15 +69,6 @@ export const columns: ColumnDef<SupplierColumn>[] = [
   },
     {
       accessorKey: "Action",
-      cell: ({ row }) => {
-        const { canPerformAction } = usePermissions();
-        return (
-          <CellAction
-            canEdit={canPerformAction(["edit:stock"])}
-            canDelete={canPerformAction(["delete:stock"])}
-            data={row.original}
-          />
-        );
-      },
+      cell: ({ row }) => <ActionCell row={row} />,
     },
 ];

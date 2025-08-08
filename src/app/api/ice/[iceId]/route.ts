@@ -1,4 +1,4 @@
-import { Ice } from "@/generated/prisma";
+import { Ice } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 

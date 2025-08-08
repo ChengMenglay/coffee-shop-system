@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import React from "react";
 import ProductDetail from "./ProductDetail";
 import { Product } from "types";
-import { ExtraShot, Size } from "@/generated/prisma";
+import { ExtraShot, Size } from "@prisma/client";
 import { checkPermission } from "@/lib/check-permission";
 
 async function ProductDetailPage({

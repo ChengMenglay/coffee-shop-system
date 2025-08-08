@@ -8,6 +8,17 @@ export type PermissionColumn = {
   name: string;
   key: string;
 };
+const ActionCell = ({ row }: { row: { original: PermissionColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:permission"])}
+      canDelete={canPerformAction(["delete:permission"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<PermissionColumn>[] = [
   {
@@ -17,15 +28,6 @@ export const columns: ColumnDef<PermissionColumn>[] = [
   { accessorKey: "key", header: "Key" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:permission"])}
-          canDelete={canPerformAction(["delete:permission"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

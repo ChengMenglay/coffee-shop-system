@@ -29,7 +29,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ingredient, Supplier } from "@/generated/prisma";
+import { Ingredient, Supplier } from "@prisma/client";
 import {
   ChevronLeft,
   Plus,

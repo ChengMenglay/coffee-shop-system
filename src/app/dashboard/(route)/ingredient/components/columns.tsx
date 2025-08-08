@@ -12,6 +12,18 @@ export type IngredientColumn = {
   createdAt: string;
 };
 
+const ActionCell = ({ row }: { row: { original: IngredientColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:ingredient"])}
+      canDelete={canPerformAction(["delete:ingredient"])}
+      data={row.original}
+    />
+  );
+};
+
 export const columns: ColumnDef<IngredientColumn>[] = [
   {
     accessorKey: "name",
@@ -26,15 +38,6 @@ export const columns: ColumnDef<IngredientColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:ingredient"])}
-          canDelete={canPerformAction(["delete:ingredient"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

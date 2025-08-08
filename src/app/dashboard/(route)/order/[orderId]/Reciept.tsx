@@ -12,6 +12,17 @@ interface OrderInvoiceProps {
 }
 
 const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
+  // Move all hooks to the top, before any conditional logic
+  const router = useRouter();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({
+    contentRef,
+    documentTitle: orderItems?.[0]?.order?.displayId
+      ? `Receipt-${orderItems[0].order.displayId}`
+      : "Receipt",
+  });
+
+  // Early return AFTER all hooks
   if (!orderItems || orderItems.length === 0) {
     return <div className="p-4">No order items found</div>;
   }
@@ -21,12 +32,6 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ orderItems }) => {
   const orderDate = new Date(order.createdAt);
   const formattedDate = format(orderDate, "MM/dd/yyyy");
   const formattedTime = format(orderDate, "hh:mm:ss a");
-  const router = useRouter();
-  const contentRef = useRef<HTMLDivElement>(null);
-  const reactToPrintFn = useReactToPrint({
-    contentRef,
-    documentTitle: `Receipt-${order.displayId}`,
-  });
 
   // Calculate totals
   const subtotal = orderItems.reduce((sum, item) => {

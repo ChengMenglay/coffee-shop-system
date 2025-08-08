@@ -3,7 +3,6 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,20 +17,12 @@ import {
 import z from "zod";
 import { useState } from "react";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Category } from "@/generated/prisma";
 import { ChevronLeft } from "lucide-react";
+import { Category } from "@prisma/client";
 
 type CategoryFormProps = {
   initialData: Category | null;

@@ -11,6 +11,18 @@ export type AccountColumn = {
   createdAt: string;
 };
 
+const ActionCell = ({ row }: { row: { original: AccountColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:account"])}
+      canDelete={canPerformAction(["delete:account"])}
+      data={row.original}
+    />
+  );
+};
+
 export const columns: ColumnDef<AccountColumn>[] = [
   {
     accessorKey: "name",
@@ -21,15 +33,6 @@ export const columns: ColumnDef<AccountColumn>[] = [
   { accessorKey: "createdAt", header: "Created At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:account"])}
-          canDelete={canPerformAction(["delete:account"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

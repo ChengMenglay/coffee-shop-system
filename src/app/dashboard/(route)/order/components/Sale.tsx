@@ -19,7 +19,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Product, Size, Sugar,Ice,ExtraShot } from "types";
-import { Category } from "@/generated/prisma";
+import { Category } from "@prisma/client";
 import NoResult from "@/components/NoResult";
 import useCart from "@/hooks/use-cart";
 

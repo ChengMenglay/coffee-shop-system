@@ -1,8 +1,8 @@
 import React from "react";
 import ShopComponent from "./Shop";
 import { prisma } from "@/lib/prisma";
-import { Product } from "@/generated/prisma";
 import NoResult from "@/components/NoResult";
+import { Product } from "@prisma/client";
 async function Home() {
   const [categories, products] = await Promise.all([
     prisma.category.findMany({

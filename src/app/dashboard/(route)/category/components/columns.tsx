@@ -8,6 +8,17 @@ export type CategoryColumn = {
   name: string;
   createdAt: string;
 };
+const ActionCell = ({ row }: { row: { original: CategoryColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:category"])}
+      canDelete={canPerformAction(["delete:category"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<CategoryColumn>[] = [
   {
@@ -20,15 +31,6 @@ export const columns: ColumnDef<CategoryColumn>[] = [
   },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:category"])}
-          canDelete={canPerformAction(["delete:category"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

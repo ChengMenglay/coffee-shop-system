@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Ice, Product } from "types";
@@ -34,11 +34,20 @@ type IceFormProps = {
   initialData: Ice | null;
   products: Product[] | null;
 };
+
+// Define error response type
+interface ErrorResponse {
+  message?: string;
+  error?: string;
+}
+
 const iceSchema = z.object({
   name: z.string().min(1, "Name is required"),
   productId: z.string().min(1, "Product id is required"),
 });
+
 type IceSchema = z.infer<typeof iceSchema>;
+
 function IceForm({ initialData, products }: IceFormProps) {
   const title = initialData ? "Update Ice" : "Create Ice";
   const subtitle = initialData ? "Edit a ice" : "Add a new ice";
@@ -54,6 +63,7 @@ function IceForm({ initialData, products }: IceFormProps) {
         },
   });
   const [isLoading, setIsLoading] = useState(false);
+
   const onSubmitted = async (data: IceSchema) => {
     try {
       setIsLoading(true);
@@ -67,13 +77,26 @@ function IceForm({ initialData, products }: IceFormProps) {
       router.refresh();
     } catch (error) {
       console.log(error);
-      toast.error(
-        error?.response?.data || "Something went wrong. Please try again."
-      );
+
+      // Type-safe error handling
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof AxiosError) {
+        // Handle Axios errors
+        const responseData = error.response?.data as ErrorResponse;
+        errorMessage =
+          responseData?.message || responseData?.error || error.message;
+      } else if (error instanceof Error) {
+        // Handle regular errors
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <div className="flex overflow-y-auto items-center justify-between">

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import React from "react";
 import ApprovalClient from "./components/client";
 import { PurchaseColumn, StockUsageColumn } from "./components/columns";
-import { format, formatDate, formatDistanceToNowStrict } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 export default async function Approval() {
   await checkPermission(["view:approval"]);

@@ -22,7 +22,7 @@ const UnauthorizedPage = () => {
 
         {/* Simple Message */}
         <p className="text-gray-600 mb-8">
-          You don't have permission to view this page.
+          You do not have permission to view this page.
         </p>
 
         {/* Single Action */}

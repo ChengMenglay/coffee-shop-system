@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import { PurchaseColumn } from "./components/type";
-import { format, formatDistanceToNowStrict } from "date-fns";
+import {  formatDistanceToNowStrict } from "date-fns";
 import { checkPermission } from "@/lib/check-permission";
 import { formatterUSD } from "@/lib/utils";
 import PurchaseClient from "./components/client";

@@ -9,6 +9,17 @@ export type IceColumn = {
   product: string;
   createdAt: string;
 };
+const ActionCell = ({ row }: { row: { original: IceColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:ice"])}
+      canDelete={canPerformAction(["delete:ice"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<IceColumn>[] = [
   {
@@ -19,15 +30,6 @@ export const columns: ColumnDef<IceColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:ice"])}
-          canDelete={canPerformAction(["delete:ice"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

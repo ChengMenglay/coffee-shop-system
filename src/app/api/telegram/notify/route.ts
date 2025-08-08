@@ -2,11 +2,50 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendOrderNotification } from '@/lib/telegram';
 
+interface CallbackQuery {
+    id: string;
+    data: string;
+    message: {
+        chat: {
+            id: number;
+        };
+        message_id: number;
+    };
+}
+
+interface TelegramWebhookBody {
+    orderId?: string;
+    callback_query?: CallbackQuery;
+}
+
+export interface InlineKeyboardButton {
+    text: string;
+    callback_data?: string;
+    url?: string;
+}
+
+export interface ReplyMarkup {
+    inline_keyboard: InlineKeyboardButton[][];
+}
+
+export interface EditMessageRequestBody {
+    chat_id: string;
+    message_id: number;
+    text: string;
+    parse_mode: string;
+    reply_markup?: ReplyMarkup;
+}
+
+interface AnswerCallbackQueryResponse {
+    ok: boolean;
+    result?: boolean;
+    description?: string;
+}
+
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
-        console.log('Received request:', body);
-        
+        const body: TelegramWebhookBody = await request.json();
+
         // Handle new order notification
         if (body.orderId) {
             return await handleNewOrderNotification(body.orderId);
@@ -126,7 +165,8 @@ async function handleNewOrderNotification(orderId: string) {
         return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
     }
 }
-async function handleOrderComplete(callback_query: any, orderId: string, chatId: number, messageId: number) {
+
+async function handleOrderComplete(callback_query: CallbackQuery, orderId: string, chatId: number, messageId: number) {
     try {
         // Update order status in database
         await prisma.order.update({
@@ -149,7 +189,7 @@ async function handleOrderComplete(callback_query: any, orderId: string, chatId:
     }
 }
 
-async function handleOrderCancel(callback_query: any, orderId: string, chatId: number, messageId: number) {
+async function handleOrderCancel(callback_query: CallbackQuery, orderId: string, chatId: number, messageId: number) {
     try {
         // Update order status in database
         await prisma.order.update({
@@ -171,13 +211,19 @@ async function handleOrderCancel(callback_query: any, orderId: string, chatId: n
         console.error('Error cancelling order:', error);
     }
 }
-async function editTelegramMessage(chatId: string, messageId: number, text: string, inlineKeyboard?: any) {
+
+async function editTelegramMessage(
+    chatId: string, 
+    messageId: number, 
+    text: string, 
+    inlineKeyboard?: InlineKeyboardButton[][] | null
+) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) return;
 
     const url = `https://api.telegram.org/bot${token}/editMessageText`;
-    
-    const requestBody: any = {
+
+    const requestBody: EditMessageRequestBody = {
         chat_id: chatId,
         message_id: messageId,
         text,
@@ -201,7 +247,7 @@ async function editTelegramMessage(chatId: string, messageId: number, text: stri
     }
 }
 
-async function answerCallbackQuery(callbackQueryId: string, text: string) {
+async function answerCallbackQuery(callbackQueryId: string, text: string): Promise<AnswerCallbackQueryResponse | null> {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) {
         console.error('TELEGRAM_BOT_TOKEN not found');
@@ -221,7 +267,7 @@ async function answerCallbackQuery(callbackQueryId: string, text: string) {
             })
         });
         
-        const result = await response.json();
+        const result: AnswerCallbackQueryResponse = await response.json();
         console.log('Answer callback API response:', result);
         
         if (!response.ok) {

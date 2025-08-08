@@ -2,7 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import SizeForm from "./SizeForm";
-import { Product } from "@/generated/prisma";
+import { Product } from "@prisma/client";
 
 async function IngredientPage({ params }: { params: Promise<{ sizeId: string }> }) {
   const { sizeId } = await params;

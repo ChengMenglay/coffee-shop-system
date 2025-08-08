@@ -1,7 +1,6 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cell-action";
-import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/hooks/usePermission";
 export type IngredientStockColumn = {
@@ -15,9 +14,19 @@ export type IngredientStockColumn = {
   createdAt: string;
 };
 
-export function getColumns(
-  userRole: string
-): ColumnDef<IngredientStockColumn>[] {
+const ActionCell = ({ row }: { row: { original: IngredientStockColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:stock"])}
+      canDelete={canPerformAction(["delete:stock"])}
+      data={row.original}
+    />
+  );
+};
+
+export function getColumns(): ColumnDef<IngredientStockColumn>[] {
   const baseColumns: ColumnDef<IngredientStockColumn>[] = [
     { accessorKey: "ingredient", header: "Ingredient" },
     { accessorKey: "quantity", header: "Qty" },
@@ -48,16 +57,7 @@ export function getColumns(
     { accessorKey: "createdAt", header: "Create At" },
     {
       accessorKey: "Action",
-      cell: ({ row }) => {
-        const { canPerformAction } = usePermissions();
-        return (
-          <CellAction
-            canEdit={canPerformAction(["edit:stock"])}
-            canDelete={canPerformAction(["delete:stock"])}
-            data={row.original}
-          />
-        );
-      },
+      cell: ({ row }) => <ActionCell row={row} />,
     },
   ];
 

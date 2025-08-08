@@ -27,7 +27,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Role, User } from "@/generated/prisma";
+import { Role, User } from  "@prisma/client";
 import { ChevronLeft } from "lucide-react";
 import { registerSchema, RegisterSchema } from "@/lib/schema/authSchema";
 import { RegisterUser } from "@/app/(auth)/actions/authAction";

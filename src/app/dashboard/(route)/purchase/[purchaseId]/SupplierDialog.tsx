@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
-import { Ingredient } from "@/generated/prisma";
+import { Ingredient } from "@prisma/client";
 
 interface SupplierDialogProps {
   open?: boolean;

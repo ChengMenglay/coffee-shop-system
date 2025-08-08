@@ -2,7 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import SugarForm from "./SugarForm";
-import { Product } from "@/generated/prisma";
+import { Product } from "@prisma/client";
 
 async function SugarPage({ params }: { params: Promise<{ sugarId: string }> }) {
   const { sugarId } = await params;

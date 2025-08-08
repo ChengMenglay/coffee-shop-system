@@ -24,7 +24,7 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { columns, PurchaseColumn } from "./columns";
-import { Ingredient } from "@/generated/prisma";
+import { Ingredient } from "@prisma/client";
 import { unparse } from "papaparse";
 
 type PurchaseColumnProps = {

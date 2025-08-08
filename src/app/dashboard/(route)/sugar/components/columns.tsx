@@ -9,6 +9,17 @@ export type SugarColumn = {
   product: string;
   createdAt: string;
 };
+const ActionCell = ({ row }: { row: { original: SugarColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:sugar"])}
+      canDelete={canPerformAction(["delete:sugar"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<SugarColumn>[] = [
   {
@@ -19,15 +30,6 @@ export const columns: ColumnDef<SugarColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:sugar"])}
-          canDelete={canPerformAction(["delete:sugar"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

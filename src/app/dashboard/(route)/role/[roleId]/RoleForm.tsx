@@ -21,7 +21,7 @@ import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Permission, Role } from "@/generated/prisma";
+import { Permission, Role } from "@prisma/client";
 import { ChevronLeft } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 

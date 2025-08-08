@@ -20,7 +20,7 @@ import { CgSpinnerTwoAlt } from "react-icons/cg";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Permission } from "@/generated/prisma";
+import { Permission } from "@prisma/client";
 import { ChevronLeft } from "lucide-react";
 
 type PermissionFormProps = {

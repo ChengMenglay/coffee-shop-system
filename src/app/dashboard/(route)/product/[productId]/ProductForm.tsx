@@ -29,7 +29,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Category } from "@/generated/prisma";
+import { Category } from "@prisma/client";
 import { ChevronLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";

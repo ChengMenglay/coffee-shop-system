@@ -12,6 +12,17 @@ export type PurchaseColumn = {
   supplier: string;
   createdAt: string;
 };
+const ActionCell = ({ row }: { row: { original: PurchaseColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:purchases"])}
+      canDelete={canPerformAction(["delete:purchases"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<PurchaseColumn>[] = [
   {
@@ -31,15 +42,6 @@ export const columns: ColumnDef<PurchaseColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
 {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:purchases"])}
-          canDelete={canPerformAction(["delete:purchases"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

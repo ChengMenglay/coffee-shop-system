@@ -11,6 +11,17 @@ export type SizeColumn = {
  fullPrice:string;
  createdAt:string;
 };
+const ActionCell = ({ row }: { row: { original: SizeColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:size"])}
+      canDelete={canPerformAction(["delete:size"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<SizeColumn>[] = [
   {
@@ -29,15 +40,6 @@ export const columns: ColumnDef<SizeColumn>[] = [
   { accessorKey: "createdAt", header: "Create At" },
 {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:size"])}
-          canDelete={canPerformAction(["delete:size"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

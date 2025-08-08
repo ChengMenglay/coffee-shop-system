@@ -2,7 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import ExtraShotForm from "./ExtraShotForm";
-import { Product } from "@/generated/prisma";
+import { Product } from "@prisma/client";
 
 async function ExtraShotPage({
   params,

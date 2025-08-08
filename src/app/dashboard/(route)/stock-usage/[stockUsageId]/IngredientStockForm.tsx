@@ -29,7 +29,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ingredient, IngredientStock } from "@/generated/prisma";
+import { Ingredient, IngredientStock } from "@prisma/client";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, Plus, Trash2, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -24,7 +24,6 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
 
 type IngredientStockColumnProps = {
   data: IngredientStockColumn[];
@@ -34,9 +33,7 @@ function IngredientStockClient({ data }: IngredientStockColumnProps) {
   const [filterdData, setFilterdData] = useState<IngredientStockColumn[]>(data);
   const [status, setStatus] = useState("");
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
-  const { data: session } = useSession();
-  const userRole = session?.user.role ?? "";
-  const columns = getColumns(userRole);
+  const columns = getColumns();
   useEffect(() => {
     setFilterdData(data);
   }, [data]);

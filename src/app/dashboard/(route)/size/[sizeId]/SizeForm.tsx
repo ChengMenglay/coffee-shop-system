@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Product, Size } from "types";
@@ -35,12 +35,21 @@ type SizeFormProps = {
   initialData: Size | null;
   products: Product[] | null;
 };
+
+// Define error response type
+interface ErrorResponse {
+  message?: string;
+  error?: string;
+}
+
 const sizeSchema = z.object({
   sizeName: z.string().min(1, "Size is required"),
   priceModifier: z.coerce.number(),
   productId: z.string().min(1, "Product id is required"),
 });
+
 type SizeSchema = z.infer<typeof sizeSchema>;
+
 function SizeForm({ initialData, products }: SizeFormProps) {
   const title = initialData ? "Update Size" : "Create Size";
   const subtitle = initialData ? "Edit an size" : "Add a new size";
@@ -57,6 +66,7 @@ function SizeForm({ initialData, products }: SizeFormProps) {
         },
   });
   const [isLoading, setIsLoading] = useState(false);
+
   const onSubmitted = async (data: SizeSchema) => {
     try {
       setIsLoading(true);
@@ -70,13 +80,26 @@ function SizeForm({ initialData, products }: SizeFormProps) {
       router.refresh();
     } catch (error) {
       console.log(error);
-      toast.error(
-        error?.response?.data || "Something went wrong. Please try again."
-      );
+
+      // Type-safe error handling
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof AxiosError) {
+        // Handle Axios errors
+        const responseData = error.response?.data as ErrorResponse;
+        errorMessage =
+          responseData?.message || responseData?.error || error.message;
+      } else if (error instanceof Error) {
+        // Handle regular errors
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <div className="flex overflow-y-auto items-center justify-between">

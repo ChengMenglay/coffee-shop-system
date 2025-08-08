@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { ExtraShot, Product } from "types";
@@ -35,6 +35,10 @@ type ExtraShotFormProps = {
   initialData: ExtraShot | null;
   products: Product[] | null;
 };
+interface ErrorResponse {
+  message?: string;
+  error?: string;
+}
 const extraShotSchema = z.object({
   name: z.string().min(1, "Name is required"),
   productId: z.string().min(1, "Product id is required"),
@@ -70,11 +74,23 @@ function ExtraShotForm({ initialData, products }: ExtraShotFormProps) {
       toast.success(toastMessage);
       router.push("/dashboard/extra-shot");
       router.refresh();
-    } catch (error:any) {
+    } catch (error) {
       console.log(error);
-      toast.error(
-        error?.response?.data || "Something went wrong. Please try again."
-      );
+
+      // Type-safe error handling
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (error instanceof AxiosError) {
+        // Handle Axios errors
+        const responseData = error.response?.data as ErrorResponse;
+        errorMessage =
+          responseData?.message || responseData?.error || error.message;
+      } else if (error instanceof Error) {
+        // Handle regular errors
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

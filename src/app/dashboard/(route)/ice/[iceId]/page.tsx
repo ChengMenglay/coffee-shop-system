@@ -2,7 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { checkPermission } from "@/lib/check-permission";
 import IceForm from "./IceForm";
-import { Product } from "@/generated/prisma";
+import { Product } from "@prisma/client";
 
 async function IcePage({ params }: { params: Promise<{ iceId: string }> }) {
   const { iceId } = await params;

@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import SupplierForm from "./SupplierForm";
-import { Ingredient, Supplier } from "@/generated/prisma";
+import { Ingredient, Supplier } from "@prisma/client";
 import { checkPermission } from "@/lib/check-permission";
 
 async function SupplierPage({ params }: { params: Promise<{ supplierId: string }> }) {

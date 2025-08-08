@@ -1,4 +1,4 @@
-import { Sugar } from "@/generated/prisma";
+import { Sugar } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 

@@ -1,3 +1,4 @@
+import { InlineKeyboardButton, ReplyMarkup } from "@/app/api/telegram/notify/route";
 import { PendingOrder } from "@/app/dashboard/(route)/order_management/page";
 
 interface OrderWithRelations {
@@ -89,7 +90,7 @@ ${Number(order.order.discount) > 0 ? `🎟️ *Discount:* $${Number(order.order.
     }
 }
 
-export async function sendTelegramMessage(chatId: string, text: string, parseMode?: string, inlineKeyboard?: any[]) {
+export async function sendTelegramMessage(chatId: string, text: string, parseMode?: string, inlineKeyboard?: InlineKeyboardButton[][]|null) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) {
         console.error('TELEGRAM_BOT_TOKEN not set in environment variables');
@@ -99,10 +100,13 @@ export async function sendTelegramMessage(chatId: string, text: string, parseMod
     const url = `https://api.telegram.org/bot${token}/sendMessage`;
     
     try {
-        const requestBody: any = {
+        const requestBody: {chat_id: string;
+    text: string;
+    parse_mode: string;
+    reply_markup?: ReplyMarkup;} = {
             chat_id: chatId, 
             text,
-            parse_mode: parseMode
+            parse_mode: parseMode as string
         };
 
         // Add inline keyboard if provided

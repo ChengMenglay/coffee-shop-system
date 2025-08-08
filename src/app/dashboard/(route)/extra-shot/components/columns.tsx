@@ -10,6 +10,17 @@ export type ExtraShotColumn = {
   priceModifier: string;
   createdAt: string;
 };
+const ActionCell = ({ row }: { row: { original: ExtraShotColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+    <CellAction
+      canEdit={canPerformAction(["edit:extra-shot"])}
+      canDelete={canPerformAction(["delete:extra-shot"])}
+      data={row.original}
+    />
+  );
+};
 
 export const columns: ColumnDef<ExtraShotColumn>[] = [
   {
@@ -22,15 +33,6 @@ export const columns: ColumnDef<ExtraShotColumn>[] = [
 
   {
     accessorKey: "Action",
-    cell: ({ row }) => {
-      const { canPerformAction } = usePermissions();
-      return (
-        <CellAction
-          canEdit={canPerformAction(["edit:extra-shot"])}
-          canDelete={canPerformAction(["delete:extra-shot"])}
-          data={row.original}
-        />
-      );
-    },
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];
