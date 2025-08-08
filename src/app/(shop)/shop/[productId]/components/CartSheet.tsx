@@ -74,7 +74,7 @@ function CartSheet() {
               });
             })
           );
-          const notificationResponse = await fetch("/api/telegram/notify", {
+          await fetch("/api/telegram/notify", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -84,7 +84,7 @@ function CartSheet() {
             }),
           });
 
-          console.log("Notification response:", notificationResponse);
+
 
           toast.success("Your order has been placed successfully!");
           router.push(`/`);
