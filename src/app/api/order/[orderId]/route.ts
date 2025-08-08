@@ -14,13 +14,13 @@ export async function PATCH(
       return NextResponse.json("Order Id is required!", { status: 400 });
 
     // Prepare update data - only include fields that are provided
-    const updateData: { orderStatus?: string; paymentStatus?: string } = {};
+    const updateData: { orderStatus?: string; paymentStatus?: boolean } = {};
     if (orderStatus !== undefined) updateData.orderStatus = orderStatus;
     if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
 
     const order = await prisma.order.update({
       where: { id: orderId },
-      data: updateData,
+      data: {orderStatus:updateData.orderStatus, paymentStatus:updateData.paymentStatus},
     });
 
     return NextResponse.json(order);

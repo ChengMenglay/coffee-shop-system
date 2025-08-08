@@ -1,26 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { stockUsageId: string } }
-) {
-  try {
-    const { stockUsageId } = await params;
-    if (!stockUsageId)
-      return new NextResponse("Ingredient stock Id is required", {
-        status: 400,
-      });
-    const ingredientStock = await prisma.ingredientStock.findUnique({
-      where: { id: stockUsageId },
-    });
-    return NextResponse.json(ingredientStock);
-  } catch (error) {
-    console.log("[INGREDIENT_STOCK_GET]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
-}
-
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ stockUsageId: string }> }
