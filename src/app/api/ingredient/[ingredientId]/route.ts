@@ -21,7 +21,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { ingredientId: string } }
+  { params }: { params: Promise<{ ingredientId: string }> }
 ) {
   try {
     const body = await req.json();
@@ -37,7 +37,7 @@ export async function PATCH(
         status: 400,
       });
     const ingredient = await prisma.ingredient.update({
-      where: { id:ingredientId },
+      where: { id: ingredientId },
       data: { name, stock, unit, lowStockThreshold },
     });
     return NextResponse.json(ingredient);
