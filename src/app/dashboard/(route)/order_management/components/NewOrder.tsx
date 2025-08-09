@@ -85,16 +85,6 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
         orderStatus: "Completed",
         paymentStatus: true,
       });
-      try {
-        await axios.post("/api/telegram/notify", {
-          statusUpdate: {
-            action: "complete",
-            displayId: data.displayId,
-          },
-        });
-      } catch (telegramError) {
-        console.log("Failed to send Telegram notification:", telegramError);
-      }
       router.refresh();
       toast.success(`The Order #${order.data.displayId} placed as Completed.`);
     } catch (error) {
@@ -111,16 +101,6 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
         ...data,
         orderStatus: "Cancelled",
       });
-      try {
-        await axios.post("/api/telegram/notify", {
-          statusUpdate: {
-            action: "cancel",
-            displayId: data.displayId,
-          },
-        });
-      } catch (telegramError) {
-        console.log("Failed to send Telegram notification:", telegramError);
-      }
       router.refresh();
       toast.success(`The Order #${order.data.displayId} placed as Cancelled.`);
     } catch (error) {
