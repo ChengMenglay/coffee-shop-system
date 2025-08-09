@@ -82,8 +82,8 @@ ${Number(order.order.discount) > 0 ? `🎟️ *Discount:* $${Number(order.order.
             return false;
         }
 
-        await sendTelegramMessage(adminChatId, message, "Markdown", inlineKeyboard);
-        return true;
+        const result = await sendTelegramMessage(adminChatId, message, "Markdown", inlineKeyboard);
+        return result;
     } catch (error) {
         console.error("[TELEGRAM_WEBHOOK]", error);
         return false;

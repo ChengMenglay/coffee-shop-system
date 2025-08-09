@@ -13,9 +13,14 @@ interface CallbackQuery {
     };
 }
 
+interface StatusUpdateBody{
+    action:'complete' | 'cancel';
+     orderId: string;
+}
 interface TelegramWebhookBody {
     orderId?: string;
     callback_query?: CallbackQuery;
+    status_update?: StatusUpdateBody;
 }
 
 export interface InlineKeyboardButton {
@@ -27,6 +32,7 @@ export interface InlineKeyboardButton {
 export interface ReplyMarkup {
     inline_keyboard: InlineKeyboardButton[][];
 }
+
 
 export interface EditMessageRequestBody {
     chat_id: string;
@@ -42,6 +48,8 @@ interface AnswerCallbackQueryResponse {
     description?: string;
 }
 
+const orderMessageMap = new Map<string, number>();
+
 export async function POST(request: NextRequest) {
     try {
         const body: TelegramWebhookBody = await request.json();
@@ -49,6 +57,11 @@ export async function POST(request: NextRequest) {
         // Handle new order notification
         if (body.orderId) {
             return await handleNewOrderNotification(body.orderId);
+        }
+
+        //Handle status update from admin
+        if(body.status_update){
+            return await handleStatusUpdate(body.status_update);
         }
         
         // Handle callback queries (button clicks)
@@ -154,6 +167,9 @@ async function handleNewOrderNotification(orderId: string) {
 
         // Send the notification with converted order
         const success = await sendOrderNotification({ order: convertedOrder });
+            if (success && success.message_id) {
+                orderMessageMap.set(orderId, success.message_id);
+            }
         
         if (success) {
             return NextResponse.json({ success: true, message: 'Notification sent successfully' });
@@ -169,7 +185,7 @@ async function handleNewOrderNotification(orderId: string) {
 async function handleOrderComplete(callback_query: CallbackQuery, orderId: string, chatId: number, messageId: number) {
     try {
         // Update order status in database
-        await prisma.order.update({
+        const order= await prisma.order.update({
             where: { id: orderId },
             data: { orderStatus: 'Completed' }
         });
@@ -178,12 +194,12 @@ async function handleOrderComplete(callback_query: CallbackQuery, orderId: strin
         await editTelegramMessage(
             chatId.toString(),
             messageId,
-            '✅ Order has been marked as COMPLETED!',
+            `✅ Order #${order.displayId} has been marked as COMPLETED!`,
             null // Remove keyboard
         );
 
         // Send confirmation
-        await answerCallbackQuery(callback_query.id, 'Order marked as completed!');
+        await answerCallbackQuery(callback_query.id, `Order #${order.displayId} marked as completed!`);
     } catch (error) {
         console.error('Error completing order:', error);
     }
@@ -192,7 +208,7 @@ async function handleOrderComplete(callback_query: CallbackQuery, orderId: strin
 async function handleOrderCancel(callback_query: CallbackQuery, orderId: string, chatId: number, messageId: number) {
     try {
         // Update order status in database
-        await prisma.order.update({
+       const order = await prisma.order.update({
             where: { id: orderId },
             data: { orderStatus: 'Cancelled' }
         });
@@ -201,12 +217,12 @@ async function handleOrderCancel(callback_query: CallbackQuery, orderId: string,
         await editTelegramMessage(
             chatId.toString(),
             messageId,
-            '❌ Order has been CANCELLED!',
+            `❌ Order #${order.displayId} has been CANCELLED!`,
             null // Remove keyboard
         );
 
         // Send confirmation
-        await answerCallbackQuery(callback_query.id, 'Order cancelled!');
+        await answerCallbackQuery(callback_query.id, `Order #${order.displayId} cancelled!`);
     } catch (error) {
         console.error('Error cancelling order:', error);
     }
@@ -247,6 +263,63 @@ async function editTelegramMessage(
     }
 }
 
+async function handleStatusUpdate(statusUpdate: StatusUpdateBody) {
+    try {
+        const { action, orderId } = statusUpdate;
+        const adminChatId = process.env.TELEGRAM_BOT_ADMIN_ID;
+        if (!adminChatId) {
+            return NextResponse.json({ error: 'Telegram not configured' }, { status: 500 });
+        }
+
+        // Find the order by displayId to get the orderId
+    const order = await prisma.order.findFirst({
+    where: {
+        id: orderId
+    }
+});
+
+        if (!order) {
+            return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+        }
+
+        // Get the message ID from our map
+        const messageId = orderMessageMap.get(order.id);
+
+        let message: string;
+        
+        if (action === 'complete') {
+            message = `✅ Order #${order.displayId} has been marked as COMPLETED!`;
+        } else {
+            message = `❌ Order #${order.displayId} has been CANCELLED!`;
+        }
+
+        // If we have the message ID, edit the existing message
+        if (messageId) {
+            await editTelegramMessage(
+                adminChatId,
+                messageId,
+                message,
+                null // Remove keyboard
+            );
+            
+            // Remove from map as the order is now completed/cancelled
+            orderMessageMap.delete(order.id);
+        } else {
+            // Fallback: send a new message if we don't have the original message ID
+            const { sendTelegramMessage } = await import('@/lib/telegram');
+            await sendTelegramMessage(adminChatId, message);
+        }
+        
+        return NextResponse.json({ 
+            success: true, 
+            message: `${action} notification sent successfully` 
+        });
+        
+    } catch (error) {
+        console.error('Error handling status update:', error);
+        return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
+    }
+}
 async function answerCallbackQuery(callbackQueryId: string, text: string): Promise<AnswerCallbackQueryResponse | null> {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) {
