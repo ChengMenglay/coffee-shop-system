@@ -20,7 +20,8 @@ import {
   Snowflake,
   Zap,
   Tag,
-  PersonStanding,
+  User,
+  FileText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -143,6 +144,17 @@ const menuGroups = (counts: {
         url: "/dashboard/approval",
         icon: Inbox,
         requiredPermission: "view:approval",
+      },
+    ],
+  },
+  {
+    title: "Report Management",
+    items: [
+      {
+        title: "Report",
+        url: "/dashboard/report",
+        icon: FileText, // general report icon
+        requiredPermission: "view:report",
       },
     ],
   },
@@ -354,7 +366,7 @@ export async function AppSidebar() {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className="h-12 flex justify-between items-center hover:bg-gray-100 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <PersonStanding className="w-5 h-5 text-gray-600" />
+                        <User className="w-5 h-5 text-gray-600" />
                         <span className="font-medium text-gray-700">
                           User Management
                         </span>
