@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                         String              @id @default(cuid())
+  name                       String
+  password                   String
+  phone                      String?
+  roleId                     String
+  role                       Role                @relation(fields: [roleId], references: [id])
+  createdAt                  DateTime            @default(now())
+  orders                     Order[]
+  IngredientStocks           IngredientStock[]
+  purchases                  Purchase[]
+  pendingPurchases           PendingPurchase[]
+  approvedPendingPurchases   PendingPurchase[]   @relation("ApprovedBy")
+  approvedPendingStockUsages PendingStockUsage[] @relation("ApprovedStockUsage")
+  pendingStockUsages         PendingStockUsage[]
+  notification               Notification[]
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String
+  permissions Permission[] @relation("RolePermissions")
+  users       User[]
+}
+
+model Permission {
+  id    String @id @default(cuid())
+  name  String
+  key   String
+  roles Role[] @relation("RolePermissions")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  price       Decimal
+  image       String
+  description String
+  categoryId  String
+  status      Boolean     @default(true)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime    @default(now())
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  orderStatus   String      @default("Pending")
+  paymentStatus Boolean     @default(false)
+  paymentMethod String      @default("Cash")
+  createdAt     DateTime    @default(now())
+  orderItems    OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int     @default(1)
+  price     Decimal
+  size      String
+  sugar     String
+  note      String?
+}
+
+model Ingredient {
+  id                 String              @id @default(cuid())
+  name               String
+  stock              Int
+  unit               String
+  lowStockThreshold  Int
+  createdAt          DateTime            @default(now())
+  suppliers          Supplier[]          @relation("SupplierIngredients")
+  ingredientStocks   IngredientStock[]
+  Purchases          Purchase[]
+  pendingPurchases   PendingPurchase[]
+  pendingStockUsages PendingStockUsage[]
+}
+
+model IngredientStock {
+  id           String     @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  quantity     Int
+  status       String     @default("Use")
+  note         String?
+  createdAt    DateTime   @default(now())
+}
+
+model PendingStockUsage {
+  id              String     @id @default(cuid())
+  ingredientId    String
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+  userId          String
+  user            User       @relation(fields: [userId], references: [id])
+  quantity        Int
+  note            String?
+  status          String     @default("Use")
+  approvalStatus  String     @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvedById    String?
+  approvedBy      User?      @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
+  rejectionReason String?
+  approvedAt      DateTime?
+  createdAt       DateTime   @default(now())
+}
+
+model Purchase {
+  id           String     @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  supplierId   String
+  supplier     Supplier   @relation(fields: [supplierId], references: [id])
+  quantity     Int
+  price        Decimal
+  createdAt    DateTime   @default(now())
+}
+
+model PendingPurchase {
+  id              String     @id @default(cuid())
+  ingredientId    String
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+  supplierId      String
+  supplier        Supplier   @relation(fields: [supplierId], references: [id])
+  userId          String
+  user            User       @relation(fields: [userId], references: [id])
+  quantity        Int
+  price           Decimal
+  note            String?
+  approvalStatus  String     @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvedById    String? // Optional, in case you want to track
+  approvedBy      User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  rejectionReason String?
+  approvedAt      DateTime?
+  createdAt       DateTime   @default(now())
+}
+
+model Supplier {
+  id                  String            @id @default(cuid())
+  name                String
+  contact             String
+  isActive            Boolean           @default(true)
+  purchases           Purchase[]
+  suppliedIngredients Ingredient[]      @relation("SupplierIngredients")
+  createdAt           DateTime          @default(now())
+  pendingPurchases    PendingPurchase[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
