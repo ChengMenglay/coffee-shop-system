@@ -22,6 +22,7 @@ import {
   Tag,
   User,
   FileText,
+  Megaphone,
 } from "lucide-react";
 import {
   Sidebar,
@@ -187,6 +188,12 @@ const productItems = [
     url: "/dashboard/product",
     icon: Package,
     requiredPermission: "view:product",
+  },
+    {
+    title: "Promotion",
+    url: "/dashboard/promotion",
+    icon: Megaphone,
+    requiredPermission: "view:promotion",
   },
   {
     title: "Category",

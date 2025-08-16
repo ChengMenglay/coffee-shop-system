@@ -1,3 +1,5 @@
+import { PromotionType } from "@prisma/client";
+
 export type Notification = {
   id: string;
   name: string;
@@ -45,6 +47,18 @@ export type Product = {
   image: string;
   quantity?: number | null;
 };
+
+export type Promotion={
+  id:string;
+  name:string;
+  type:PromotionType;
+  buyQuantity?: number | null;
+  freeQuantity?: number | null;
+  discount?: number | null;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+}
 
 export type Order = {
   id: string;
