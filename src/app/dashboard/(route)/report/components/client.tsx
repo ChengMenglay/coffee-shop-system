@@ -20,9 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import SectionCard from "./section-card";
+import DayCloseTable from "./day-close-table";
 import { Separator } from "@/components/ui/separator";
 import { ChartBar } from "@/components/chat-bar";
 import { ChartBarLabelCustom } from "@/components/chart-bar-label";
+import { SaleReportData } from "types";
 
 interface ReportData {
   totalSales: {
@@ -64,7 +66,9 @@ function ReportClient() {
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
   const [selectedDate, setSelectedDate] = useState<string>("daily");
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [dayCloseData, setDayCloseData] = useState<SaleReportData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDayClose, setIsLoadingDayClose] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Function to fetch report data based on filters
@@ -118,10 +122,39 @@ function ReportClient() {
     }
   }, [selectedDate, dateRange]);
 
+  // Function to fetch day close data
+  const fetchDayCloseData = useCallback(async () => {
+    setIsLoadingDayClose(true);
+
+    try {
+      const response = await fetch("/api/day-close");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch day close data");
+      }
+
+      const data = await response.json();
+      setDayCloseData(data);
+    } catch (error) {
+      console.error("Error fetching day close data:", error);
+      setDayCloseData([]);
+    } finally {
+      setIsLoadingDayClose(false);
+    }
+  }, []);
+
+  // Function to handle day close deletion
+  const handleDayCloseDelete = useCallback((deletedId: string) => {
+    setDayCloseData((prevData) =>
+      prevData.filter((item) => item.id !== deletedId)
+    );
+  }, []);
+
   // Fetch data when filters change
   useEffect(() => {
     fetchReportData();
-  }, [fetchReportData]);
+    fetchDayCloseData();
+  }, [fetchReportData, fetchDayCloseData]);
 
   const handleExport = async () => {
     if (!reportData) return;
@@ -312,6 +345,7 @@ function ReportClient() {
           isLoading={isLoading}
         />
       </div>
+
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-4 mt-6">
         <ChartBar />
         <ChartBarLabelCustom
@@ -320,6 +354,13 @@ function ReportClient() {
           isLoading={isLoading}
         />
       </div>
+      {/* CloseDay Data Table */}
+      <DayCloseTable
+        data={dayCloseData}
+        isLoading={isLoadingDayClose}
+        onRefresh={fetchDayCloseData}
+        onDelete={handleDayCloseDelete}
+      />
     </>
   );
 }

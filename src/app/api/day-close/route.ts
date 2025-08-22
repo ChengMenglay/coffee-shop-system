@@ -7,10 +7,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { date, closeData } = body;
 
+    console.log("[DAY_CLOSE] Received data:", {
+      date,
+      hasCloseData: !!closeData,
+      hasHourlyBreakdown: !!closeData?.hourlyBreakdown,
+      hourlyBreakdownLength: closeData?.hourlyBreakdown?.length || 0,
+    });
+
     if (!date || !closeData) {
       return NextResponse.json("Date and close data are required", {
         status: 400,
       });
+    }
+
+    // Log the hourly breakdown specifically
+    if (closeData.hourlyBreakdown) {
+      console.log(
+        "[DAY_CLOSE] Hourly breakdown data:",
+        closeData.hourlyBreakdown
+      );
+    } else {
+      console.log("[DAY_CLOSE] WARNING: No hourly breakdown data received!");
     }
     // Check if day is already closed
     const existingClose = await prisma.dayClose.findFirst({

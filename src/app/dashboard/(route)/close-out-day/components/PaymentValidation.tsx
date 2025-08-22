@@ -339,15 +339,15 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
+      <Card className="p-3 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-0">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Calculator className="w-5 h-5" />
             Payment Validation
           </h3>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Currency Switcher */}
             <div className="flex items-center gap-2">
               <Banknote className="w-4 h-4 text-gray-600" />
@@ -383,6 +383,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
               size="sm"
               onClick={fetchPaymentData}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               <RefreshCw
                 className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
@@ -399,8 +400,8 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
               <DollarSign className="w-4 h-4" />
               {`Today’s`} Payment Summary
             </h4>
-            <div className="grid grid-cols-3 gap-4 text-sm">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div className="text-center sm:text-left">
                 <span className="text-gray-600">Cash Sales:</span>
                 <p className="font-semibold text-lg">
                   {formatCurrency(
@@ -410,7 +411,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                   )}
                 </p>
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <span className="text-gray-600">ABA Sales:</span>
                 <p className="font-semibold text-lg">
                   {formatCurrency(
@@ -418,7 +419,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                   )}
                 </p>
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <span className="text-gray-600">Credit Card Sales:</span>
                 <p className="font-semibold text-lg">
                   {formatCurrency(
@@ -440,18 +441,18 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       </Card>
 
       {/* Cash Count Section */}
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         <h4 className="font-medium mb-4 flex items-center gap-2">
           💵 Cash Count
           <span className="text-sm font-normal text-gray-600">
             ({currency === "USD" ? "US Dollars" : "Cambodian Riel"})
           </span>
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Bills */}
           <div>
             <h5 className="font-medium mb-3">Bills</h5>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {getCurrentDenominations().map((denomination, index) => {
                 const billKey = Object.keys(paymentData.cash.bills)[
                   index
@@ -461,9 +462,11 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                 return (
                   <div
                     key={denomination.name}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between gap-2"
                   >
-                    <span className="w-16 text-sm">{denomination.label}</span>
+                    <span className="w-16 sm:w-20 text-xs sm:text-sm font-medium">
+                      {denomination.label}
+                    </span>
                     <Input
                       type="number"
                       min="0"
@@ -471,9 +474,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                       onChange={(e) =>
                         updateBill(billKey, parseInt(e.target.value) || 0)
                       }
-                      className="w-20 text-center"
+                      className="w-16 sm:w-20 text-center text-sm"
                     />
-                    <span className="w-20 text-right text-sm">
+                    <span className="w-20 sm:w-24 text-right text-xs sm:text-sm">
                       {formatCurrency(billValue * denomination.value)}
                     </span>
                   </div>
@@ -485,7 +488,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
           {/* Coins */}
           <div>
             <h5 className="font-medium mb-3">Coins</h5>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {getCurrentCoins().map((denomination, index) => {
                 const coinKey = Object.keys(paymentData.cash.coins)[
                   index
@@ -495,9 +498,11 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                 return (
                   <div
                     key={denomination.name}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between gap-2"
                   >
-                    <span className="w-16 text-sm">{denomination.label}</span>
+                    <span className="w-16 sm:w-20 text-xs sm:text-sm font-medium">
+                      {denomination.label}
+                    </span>
                     <Input
                       type="number"
                       min="0"
@@ -505,9 +510,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                       onChange={(e) =>
                         updateCoin(coinKey, parseInt(e.target.value) || 0)
                       }
-                      className="w-20 text-center"
+                      className="w-16 sm:w-20 text-center text-sm"
                     />
-                    <span className="w-20 text-right text-sm">
+                    <span className="w-20 sm:w-24 text-right text-xs sm:text-sm">
                       {formatCurrency(coinValue * denomination.value)}
                     </span>
                   </div>
@@ -518,18 +523,18 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
         </div>
 
         {/* Cash Totals */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-3 gap-4 text-center">
+        <div className="mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-sm text-gray-600">System Total</p>
-              <p className="text-lg font-bold">
+              <p className="text-xs sm:text-sm text-gray-600">System Total</p>
+              <p className="text-base sm:text-lg font-bold">
                 {formatCurrency(
                   convertToDisplayCurrency(paymentData.cash.systemTotal),
                   "USD"
                 )}
               </p>
               {currency === "KHR" && (
-                <p className="text-sm text-gray-500">
+                <p className="text-xs text-gray-500">
                   (
                   {formatCurrency(
                     convertToDisplayCurrency(paymentData.cash.systemTotal)
@@ -539,15 +544,15 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
               )}
             </div>
             <div>
-              <p className="text-sm text-gray-600">Counted Total</p>
-              <p className="text-lg font-bold">
+              <p className="text-xs sm:text-sm text-gray-600">Counted Total</p>
+              <p className="text-base sm:text-lg font-bold">
                 {formatCurrency(
                   convertToDisplayCurrency(paymentData.cash.totalCounted),
                   "USD"
                 )}
               </p>
               {currency === "KHR" && (
-                <p className="text-sm text-gray-500">
+                <p className="text-xs text-gray-500">
                   (
                   {formatCurrency(
                     convertToDisplayCurrency(paymentData.cash.totalCounted)
@@ -557,9 +562,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
               )}
             </div>
             <div>
-              <p className="text-sm text-gray-600">Difference</p>
+              <p className="text-xs sm:text-sm text-gray-600">Difference</p>
               <p
-                className={`text-lg font-bold ${getDifferenceColor(
+                className={`text-base sm:text-lg font-bold ${getDifferenceColor(
                   paymentData.cash.difference
                 )}`}
               >
@@ -580,9 +585,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       </Card>
 
       {/* ABA Payment Validation */}
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         <h4 className="font-medium mb-4">🏦 ABA Payment Validation</h4>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">
               Enter ABA Amount
@@ -637,9 +642,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       </Card>
 
       {/* Credit Card Payment Validation */}
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         <h4 className="font-medium mb-4">💳 Credit Card Payment Validation</h4>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">
               Enter Credit Card Amount
@@ -700,7 +705,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       </Card>
 
       {/* Notes */}
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         <label className="block text-sm font-medium mb-2">Notes</label>
         <Textarea
           value={paymentData.notes}
@@ -713,17 +718,17 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       </Card>
 
       {/* Complete Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-center sm:justify-end">
         <Button
           onClick={handleComplete}
           size="lg"
-          className={
+          className={`w-full sm:w-auto ${
             Math.abs(paymentData.cash.difference) > 5 ||
             Math.abs(paymentData.aba.difference) > 5 ||
             Math.abs(paymentData.creditCard.difference) > 5
               ? "bg-yellow-600 hover:bg-yellow-700"
               : "bg-green-600 hover:bg-green-700"
-          }
+          }`}
         >
           {Math.abs(paymentData.cash.difference) > 5 ||
           Math.abs(paymentData.aba.difference) > 5 ||

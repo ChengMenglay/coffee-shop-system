@@ -80,10 +80,37 @@ function CloseTimeReport({ onCloseDay }: CloseTimeReportProps) {
     try {
       setIsLoading(true);
       const today = new Date().toISOString().split("T")[0];
+      console.log("[CloseTimeReport] Fetching data for date:", today);
+
       const response = await axios.get(`/api/reports/daily?date=${today}`);
 
       if (response.data) {
-        setCloseData(response.data);
+        console.log("[CloseTimeReport] Received data:", response.data);
+        console.log(
+          "[CloseTimeReport] Hourly breakdown:",
+          response.data.hourlyBreakdown
+        );
+
+        // Ensure hourlyBreakdown exists, create empty array if missing
+        const processedData = {
+          ...response.data,
+          hourlyBreakdown: response.data.hourlyBreakdown || [],
+          // Ensure all required fields exist
+          totalSales: response.data.totalSales || 0,
+          totalOrders: response.data.totalOrders || 0,
+          totalCustomers: response.data.totalCustomers || 0,
+          paymentMethods: response.data.paymentMethods || {
+            cash: 0,
+            aba: 0,
+            creditCard: 0,
+          },
+          topProducts: response.data.topProducts || [],
+          promotionsUsed: response.data.promotionsUsed || [],
+          lowStockItems: response.data.lowStockItems || [],
+        };
+
+        console.log("[CloseTimeReport] Processed data:", processedData);
+        setCloseData(processedData);
       } else {
         throw new Error("No data received from API");
       }
@@ -135,6 +162,12 @@ function CloseTimeReport({ onCloseDay }: CloseTimeReportProps) {
         ...closeData,
         closedBy: userName,
       };
+
+      console.log("[CloseTimeReport] Sending close data:", closeDataWithUser);
+      console.log(
+        "[CloseTimeReport] Hourly breakdown being sent:",
+        closeDataWithUser.hourlyBreakdown
+      );
 
       // Call API to close the day
       await axios.post("/api/day-close", {

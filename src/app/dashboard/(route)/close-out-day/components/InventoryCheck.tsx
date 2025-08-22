@@ -129,97 +129,112 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
 
   const getStatusBadge = (item: InventoryItem) => {
     if (item.physicalCount === undefined) {
-      return <Badge variant="secondary">Pending</Badge>;
+      return (
+        <Badge variant="secondary" className="text-xs">
+          Pending
+        </Badge>
+      );
     }
     if (Math.abs(item.discrepancy || 0) === 0) {
       return (
-        <Badge variant="default" className="bg-green-600">
+        <Badge variant="default" className="bg-green-600 text-xs">
           Match
         </Badge>
       );
     }
     if (Math.abs(item.discrepancy || 0) <= 2) {
       return (
-        <Badge variant="secondary" className="bg-yellow-600">
+        <Badge variant="secondary" className="bg-yellow-600 text-xs">
           Minor
         </Badge>
       );
     }
-    return <Badge variant="destructive">Major</Badge>;
+    return (
+      <Badge variant="destructive" className="text-xs">
+        Major
+      </Badge>
+    );
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Package className="w-5 h-5" />
+    <Card className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3 sm:gap-0">
+        <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Package className="w-4 h-4 sm:w-5 sm:h-5" />
           Inventory Check
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={fetchInventoryData}
             disabled={isLoading}
+            className="w-full sm:w-auto"
           >
             <RefreshCw
               className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
             />
             Refresh
           </Button>
-          <Badge
-            variant={
-              inventoryData.lowStockCount > 0 ? "destructive" : "default"
-            }
-          >
-            {inventoryData.lowStockCount} Low Stock
-          </Badge>
-          <Badge
-            variant={
-              inventoryData.totalDiscrepancies > 0 ? "secondary" : "default"
-            }
-          >
-            {inventoryData.totalDiscrepancies.toFixed(1)} Total Variance
-          </Badge>
+          <div className="flex flex-wrap gap-2">
+            <Badge
+              variant={
+                inventoryData.lowStockCount > 0 ? "destructive" : "default"
+              }
+              className="text-xs"
+            >
+              {inventoryData.lowStockCount} Low Stock
+            </Badge>
+            <Badge
+              variant={
+                inventoryData.totalDiscrepancies > 0 ? "secondary" : "default"
+              }
+              className="text-xs"
+            >
+              {inventoryData.totalDiscrepancies.toFixed(1)} Total Variance
+            </Badge>
+          </div>
         </div>
       </div>
 
       {isLoading && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-          <div className="animate-pulse">Loading inventory data...</div>
+        <div className="mb-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+          <div className="animate-pulse text-sm">Loading inventory data...</div>
         </div>
       )}
 
       {inventoryData.items.length === 0 && !isLoading && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-center gap-2 text-yellow-700">
-            <AlertTriangle className="w-5 h-5" />
-            <span>
+        <div className="mb-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start gap-2 text-yellow-700">
+            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5" />
+            <span className="text-sm">
               No inventory items found. Please check your database connection.
             </span>
           </div>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {inventoryData.items.map((item: InventoryItem) => (
-          <Card key={item.id} className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <h4 className="font-medium">{item.name}</h4>
+          <Card key={item.id} className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <h4 className="font-medium text-sm sm:text-base">
+                  {item.name}
+                </h4>
                 {item.isLow && (
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
                 )}
                 {getStatusBadge(item)}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 System: {item.currentStock} {item.unit}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-xs sm:text-sm font-medium mb-1">
                   Physical Count
                 </label>
                 <input
@@ -233,17 +248,17 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
                       parseFloat(e.target.value) || 0
                     )
                   }
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="w-full px-2 sm:px-3 py-2 border rounded-md text-sm"
                   placeholder="0"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-xs sm:text-sm font-medium mb-1">
                   Variance
                 </label>
                 <div
-                  className={`px-3 py-2 rounded-md ${
+                  className={`px-2 sm:px-3 py-2 rounded-md text-sm ${
                     item.discrepancy === undefined
                       ? "bg-gray-100"
                       : Math.abs(item.discrepancy) === 0
@@ -262,14 +277,16 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
+                <label className="block text-xs sm:text-sm font-medium mb-1">
+                  Status
+                </label>
                 <div className="flex items-center py-2">
                   {item.isLow ? (
-                    <span className="text-red-600 text-sm">
+                    <span className="text-red-600 text-xs sm:text-sm">
                       Below Threshold
                     </span>
                   ) : (
-                    <span className="text-green-600 text-sm">
+                    <span className="text-green-600 text-xs sm:text-sm">
                       Adequate Stock
                     </span>
                   )}
@@ -277,12 +294,14 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Notes</label>
+                <label className="block text-xs sm:text-sm font-medium mb-1">
+                  Notes
+                </label>
                 <input
                   type="text"
                   value={item?.notes || ""}
                   onChange={(e) => updateItemNotes(item.id, e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md text-sm"
+                  className="w-full px-2 sm:px-3 py-2 border rounded-md text-xs sm:text-sm"
                   placeholder="Any notes..."
                 />
               </div>
@@ -291,8 +310,10 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
         ))}
       </div>
 
-      <div className="mt-6">
-        <label className="block text-sm font-medium mb-2">Overall Notes</label>
+      <div className="mt-4 sm:mt-6">
+        <label className="block text-xs sm:text-sm font-medium mb-2">
+          Overall Notes
+        </label>
         <Textarea
           value={inventoryData.notes}
           onChange={(e) =>
@@ -300,18 +321,19 @@ const InventoryCheck: React.FC<InventoryCheckProps> = ({
           }
           placeholder="Any general inventory notes or observations..."
           rows={3}
+          className="text-sm"
         />
       </div>
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-4 sm:mt-6 flex justify-center sm:justify-end">
         <Button
           onClick={handleComplete}
           disabled={inventoryData.completed}
-          className={
+          className={`w-full sm:w-auto ${
             inventoryData.totalDiscrepancies > 5
               ? "bg-yellow-600 hover:bg-yellow-700"
               : ""
-          }
+          }`}
         >
           {inventoryData.completed ? (
             <>

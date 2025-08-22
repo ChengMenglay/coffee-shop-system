@@ -7,9 +7,13 @@ export async function GET(request: NextRequest) {
     const date =
       searchParams.get("date") || new Date().toISOString().split("T")[0];
 
-    // Get start and end of the day
+    console.log("[DAILY_REPORT] Processing date:", date);
+
+    // Get start and end of the day - handling timezone more carefully
     const startOfDay = new Date(date + "T00:00:00.000Z");
     const endOfDay = new Date(date + "T23:59:59.999Z");
+
+    console.log("[DAILY_REPORT] Date range:", { startOfDay, endOfDay });
 
     // Get all orders for the day
     const orders = await prisma.order.findMany({
@@ -33,7 +37,6 @@ export async function GET(request: NextRequest) {
         user: true,
       },
     });
-
     // Calculate totals
     const totalSales = orders.reduce(
       (sum, order) => sum + Number(order.total),
@@ -101,25 +104,28 @@ export async function GET(request: NextRequest) {
       threshold: item.lowStockThreshold,
     }));
 
-    // Hourly breakdown
-    const hourlyBreakdown = Array.from({ length: 17 }, (_, i) => {
-      const hour = i + 7; // 7 AM to 11 PM
+    // Hourly breakdown - simplified and more reliable approach
+    const hourlyBreakdown = Array.from({ length: 24 }, (_, i) => {
+      const hour = i; // 0 to 23 (24-hour format)
       const hourString = hour.toString().padStart(2, "0") + ":00";
+
       const hourOrders = orders.filter((order) => {
-        const orderHour = new Date(order.createdAt).getHours();
+        const orderDate = new Date(order.createdAt);
+        const orderHour = orderDate.getHours();
         return orderHour === hour;
       });
+
+      const hourRevenue = hourOrders.reduce(
+        (sum, order) => sum + Number(order.total),
+        0
+      );
 
       return {
         hour: hourString,
         orders: hourOrders.length,
-        revenue: hourOrders.reduce(
-          (sum, order) => sum + Number(order.total),
-          0
-        ),
+        revenue: hourRevenue,
       };
-    });
-
+    }).filter((h) => h.orders > 0 || (h.hour >= "07:00" && h.hour <= "23:00")); // Only include business hours or hours with orders
     // Get orders with promotion discounts
     const totalPromotionDiscount = orders.reduce((sum, order) => {
       // Assuming you have a promotion discount field in your order
@@ -143,7 +149,7 @@ export async function GET(request: NextRequest) {
       topProducts,
       promotionsUsed,
       lowStockItems: formattedLowStockItems,
-      hourlyBreakdown: hourlyBreakdown.filter((h) => h.orders > 0),
+      hourlyBreakdown: hourlyBreakdown, // Don't filter out hours with 0 orders
     };
 
     return NextResponse.json(dayData);
