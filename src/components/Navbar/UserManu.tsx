@@ -38,7 +38,7 @@ function UserMenu({ name, role }: UserMenuTypeProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 p-2 rounded-lg shadow-md bg-white z-10">
+      <DropdownMenuContent className="w-64 p-2 rounded-lg shadow-md bg-white z-[1000]">
         <DropdownMenuLabel className="p-2 font-semibold text-lg">
           My Account
         </DropdownMenuLabel>

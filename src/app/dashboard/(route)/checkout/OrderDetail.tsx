@@ -78,6 +78,8 @@ export default function OrderDetail({ sizes, sugars }: OrderDetailProps) {
     getDiscountAmount,
     calculateItemPrice,
     calculateItemPriceWithProductDiscount,
+    getPromotionDiscount,
+    getAppliedPromotions,
   } = useCart();
 
   const [selectedPayment, setSelectedPayment] = useState<PaymentType>("Cash");
@@ -91,7 +93,8 @@ export default function OrderDetail({ sizes, sugars }: OrderDetailProps) {
   const subTotal = getCartSubtotal();
   const discountAmount = getDiscountAmount();
   const total = getCartTotal();
-
+  const promotionDiscount = getPromotionDiscount();
+  const appliedPromotions = getAppliedPromotions();
   const riel = 4100;
   const paid = Number(paidMoney) || 0;
   const paidInDollar = currency === "riel" ? paid / riel : paid;
@@ -159,7 +162,7 @@ export default function OrderDetail({ sizes, sugars }: OrderDetailProps) {
         userId: session?.user?.id as string,
         paymentMethod: selectedPayment,
         paymentStatus: isFullyPaid ? true : false,
-        orderStatus: "Completed",
+        orderStatus: "Pending",
         discount: discountAmount > 0 ? discountAmount : 0,
         total: Number(total.toFixed(2)),
       };
@@ -382,6 +385,41 @@ export default function OrderDetail({ sizes, sugars }: OrderDetailProps) {
                   : "$0.00"}
               </span>
             </div>
+            {promotionDiscount > 0 && (
+              <li className="flex justify-between items-center p-2 rounded-sm border-t bg-green-50 dark:bg-green-900/10">
+                <span className="font-semibold text-green-700">
+                  Promotion Discount:
+                </span>
+                <span className="text-green-700 font-semibold">
+                  -{formatterUSD.format(promotionDiscount)}
+                </span>
+              </li>
+            )}
+            {appliedPromotions.length > 0 && (
+              <li className="p-2 rounded-sm border-t bg-blue-50 dark:bg-blue-900/10">
+                <span className="font-semibold text-blue-700 text-xs">
+                  Applied Promotions:
+                </span>
+                <div className="space-y-1 mt-1">
+                  {appliedPromotions.map(
+                    (
+                      promo: { promotionName: string; discountAmount: number },
+                      index: number
+                    ) => (
+                      <div
+                        key={index}
+                        className="text-xs text-blue-600 flex justify-between"
+                      >
+                        <span>{promo.promotionName}</span>
+                        <span>
+                          -{formatterUSD.format(promo.discountAmount)}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </li>
+            )}
             {note && (
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Order Note:</span>

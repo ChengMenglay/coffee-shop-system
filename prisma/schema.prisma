@@ -260,3 +260,22 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model DayClose {
+  id               String   @id @default(cuid())
+  date             DateTime @unique
+  totalSales       Decimal
+  totalOrders      Int
+  totalCustomers   Int
+  cashSales        Decimal  @default(0)
+  abaSales         Decimal  @default(0)
+  creditCardSales  Decimal  @default(0)
+  topProducts      String?
+  promotionsUsed   String?
+  lowStockItems    String?
+  hourlyBreakdown  String?
+  notes            String?
+  closedBy         String?
+  closedAt         DateTime @default(now())
+  createdAt        DateTime @default(now())
+}

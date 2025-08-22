@@ -5,7 +5,7 @@ import { checkPermission } from "@/lib/check-permission";
 
 async function SalePage() {
   await checkPermission(["view:order"]);
-  const [products, categories, sizes, sugars, ices, extraShots] =
+  const [products, categories, sizes, sugars, ices, extraShots, promotions] =
     await Promise.all([
       prisma.product.findMany({
         where: { status: true },
@@ -18,6 +18,11 @@ async function SalePage() {
       prisma.sugar.findMany(),
       prisma.ice.findMany(),
       prisma.extraShot.findMany(),
+      prisma.promotion.findMany({
+        where: {
+          isActive: true,
+        },
+      }),
     ]);
   const formattedProducts = products.map((item) => ({
     ...item,
@@ -34,8 +39,12 @@ async function SalePage() {
     ...extraShot,
     priceModifier: extraShot.priceModifier.toNumber(),
   }));
+  const formattedPromotions = promotions?.map((promotion) => ({
+    ...promotion,
+    discount: promotion.discount ? promotion?.discount.toNumber() : 0,
+  }));
   return (
-    <div className=" grid md:grid-cols-12 grid-row-12 gap-2 md:h-[80vh]">
+    <div className=" grid md:grid-cols-12 grid-row-12 gap-2 ">
       <Sale
         products={formattedProducts}
         categories={categories}
@@ -43,6 +52,7 @@ async function SalePage() {
         sugars={sugars}
         ices={ices}
         extraShots={formattedExtraShots}
+        promotions={formattedPromotions}
       />
     </div>
   );

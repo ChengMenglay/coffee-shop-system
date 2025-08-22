@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { CgSpinnerTwoAlt } from "react-icons/cg";
 import NoResult from "@/components/NoResult";
-import { Size, Sugar, Ice, ExtraShot } from "types";
+import { Size, Sugar, Ice, ExtraShot, Promotion } from "types";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -28,12 +28,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
 
 type CartStoreProps = {
   sizes: Size[] | null;
   sugars?: Sugar[] | null;
   ices?: Ice[] | null;
   extraShots?: ExtraShot[] | null;
+  promotions?: Promotion[] | null;
+  disabled?: boolean;
 };
 
 export default function CartStore({
@@ -41,6 +44,8 @@ export default function CartStore({
   sugars,
   ices,
   extraShots,
+  promotions,
+  disabled = false,
 }: CartStoreProps) {
   const {
     items,
@@ -61,12 +66,20 @@ export default function CartStore({
     getCartTotal,
     getDiscountAmount,
     calculateItemPrice,
+    setPromotions,
+    getPromotionDiscount,
+    getAppliedPromotions,
   } = useCart();
 
   const [discountInput, setDiscountInput] = useState<string>("");
   const [onOpenDiscount, setOpenDiscount] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  // Set promotions when component mounts or promotions change
+  useEffect(() => {
+    setPromotions(promotions || null);
+  }, [promotions, setPromotions]);
 
   // Get available sizes for a specific product
   const getProductSizes = (productId: string) => {
@@ -132,6 +145,8 @@ export default function CartStore({
   const subTotal = getCartSubtotal();
   const total = getCartTotal();
   const discountAmount = getDiscountAmount();
+  const promotionDiscount = getPromotionDiscount();
+  const appliedPromotions = getAppliedPromotions();
 
   const updateQuantity = useCallback(
     (cartItemId: string, delta: number) => {
@@ -242,8 +257,35 @@ export default function CartStore({
   };
 
   return (
-    <div className="grid grid-rows-12 gap-2 h-full">
-      <div className="row-span-8 flex flex-col">
+    <div className="grid grid-rows-12 gap-2 h-full relative">
+      {/* Disabled Overlay */}
+      {disabled && (
+        <div className="absolute inset-0 bg-gray-900/30 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+          <div className="bg-white p-6 rounded-lg shadow-xl text-center">
+            <div className="text-gray-600 mb-2">
+              <svg
+                className="w-12 h-12 mx-auto mb-3 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                ></path>
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              Cart Disabled
+            </h3>
+            <p className="text-sm text-gray-600">Store is closed for today</p>
+          </div>
+        </div>
+      )}
+
+      <div className="md:row-span-7 row-span-8 flex flex-col">
         <div className="flex justify-between sticky top-0 z-10 ">
           <div></div>
           <h1 className="text-center font-bold ">
@@ -256,6 +298,7 @@ export default function CartStore({
               }}
               variant={"destructive"}
               size={"icon"}
+              disabled={disabled}
             >
               <Trash className="w-3 h-3" />
             </Button>
@@ -504,8 +547,8 @@ export default function CartStore({
         </div>
       </div>
 
-      {/* ...existing code for the rest of the component... */}
-      <div className="row-span-4 h-full flex flex-col justify-between space-y-1">
+      {/* Summary Section */}
+      <div className="md:row-span-5 row-span-4 h-full flex flex-col justify-between space-y-1">
         <div className="space-y-2">
           <Separator className="my-1" />
           <ul className="space-y-1">
@@ -515,7 +558,7 @@ export default function CartStore({
             </li>
             {discount && (
               <li className="flex justify-between items-center p-2 rounded-sm border-t">
-                <span className="font-semibold">Discount:</span>
+                <span className="font-semibold">Manual Discount:</span>
                 <span className="flex items-center space-x-6">
                   <span>
                     -
@@ -531,6 +574,34 @@ export default function CartStore({
                     <XCircleIcon className="text-foreground w-4 h-4" />
                   </span>
                 </span>
+              </li>
+            )}
+            {promotionDiscount > 0 && (
+              <li className="flex justify-between items-center p-2 rounded-sm border-t bg-green-50 dark:bg-green-900/10">
+                <span className="font-semibold text-green-700">
+                  Promotion Discount:
+                </span>
+                <span className="text-green-700 font-semibold">
+                  -{formatterUSD.format(promotionDiscount)}
+                </span>
+              </li>
+            )}
+            {appliedPromotions.length > 0 && (
+              <li className="p-2 rounded-sm border-t bg-blue-50 dark:bg-blue-900/10">
+                <span className="font-semibold text-blue-700 text-xs">
+                  Applied Promotions:
+                </span>
+                <div className="space-y-1 mt-1">
+                  {appliedPromotions.map((promo, index: number) => (
+                    <div
+                      key={index}
+                      className="text-xs text-blue-600 flex justify-between"
+                    >
+                      <span>{promo.promotionName}</span>
+                      <span>-{formatterUSD.format(promo.discountAmount)}</span>
+                    </div>
+                  ))}
+                </div>
               </li>
             )}
             {note && (
@@ -618,7 +689,7 @@ export default function CartStore({
 
           <div>
             <Button
-              disabled={items.length === 0}
+              disabled={items.length === 0 || disabled}
               variant={"default"}
               className="flex justify-between w-full py-6"
               onClick={handlePayNow}

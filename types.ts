@@ -30,17 +30,17 @@ export type Purchase = {
   price: number;
 };
 
-export type Category={
-  id:string;
-  name:string;
-}
+export type Category = {
+  id: string;
+  name: string;
+};
 
 export type Product = {
   id: string;
   categoryId: string;
   category?: Category;
   name: string;
-  price: number ;
+  price: number;
   discount: number | null;
   description: string;
   status: boolean;
@@ -48,17 +48,17 @@ export type Product = {
   quantity?: number | null;
 };
 
-export type Promotion={
-  id:string;
-  name:string;
-  type:PromotionType;
+export type Promotion = {
+  id: string;
+  name: string;
+  type: PromotionType;
   buyQuantity?: number | null;
   freeQuantity?: number | null;
   discount?: number | null;
   startDate: Date;
   endDate: Date;
   isActive: boolean;
-}
+};
 
 export type Order = {
   id: string;
@@ -67,7 +67,7 @@ export type Order = {
   paymentStatus: boolean;
   paymentMethod: string;
   discount: number;
-  displayId:number;
+  displayId: number;
   total: number;
 };
 
@@ -135,11 +135,11 @@ export type Size = {
   fullPrice: number;
 };
 
-export type Sugar={
+export type Sugar = {
   id: string;
   name: string;
   productId: string;
-}
+};
 
 export type Ice = {
   id: string;
@@ -153,3 +153,115 @@ export type ExtraShot = {
   priceModifier: number;
   productId: string;
 };
+
+export interface InventoryData {
+  id: string;
+  isLow: boolean;
+  name: string;
+  physicalCount: number;
+  threshold: number;
+  unit: string;
+  currentStock: number;
+  discrepancy: number;
+}
+
+export interface CashCountData {
+  cashCountData: CashCountData;
+  totalCashSales: number;
+  totalCashOrders: number;
+  expectedCash: number;
+  denominations: Array<{
+    value: number;
+    name: string;
+    count: number;
+  }>;
+  orders: Array<{
+    id: string;
+    displayId: string;
+    total: number;
+    createdAt: Date;
+  }>;
+}
+
+export interface PaymentValidationData {
+  aba: {
+    difference: number;
+    enteredAmount: number;
+    systemTotal: number;
+  };
+  allPaymentsValidated?: boolean;
+  cash: {
+    bills: {
+      fifties: number;
+      fives: number;
+      hundreds: number;
+      ones: number;
+      tens: number;
+      twenties: number;
+    };
+    coins: {
+      quarters: number;
+      dimes: number;
+      nickels: number;
+      pennies: number;
+    };
+    difference: number;
+    systemTotal: number;
+    totalCounted: number;
+  };
+  creditCard: {
+    difference: number;
+    enteredAmount: number;
+    systemTotal: number;
+  };
+  notes?: string;
+}
+
+export interface SaleReportData {
+  id: string;
+  createdAt: Date;
+  date: Date;
+  totalSales: number;
+  totalOrders: number;
+  totalCustomers: number;
+  cashSales: number;
+  abaSales: number;
+  creditCardSales: number;
+  topProducts: string | null;
+  promotionsUsed: string | null;
+  lowStockItems: string | null;
+  hourlyBreakdown: string | null;
+  notes: string | null;
+  closedBy: string | null;
+  closedAt: Date;
+}
+
+export interface CheckListdataType {
+  cashCountData: PaymentValidationData | null;
+  inventoryData: {
+    completed: boolean;
+    items: InventoryData[];
+    lowStockCount: number;
+    notes?: string;
+    totalDiscrepancies: number;
+  };
+  salesData: {
+    hourlyBreakDown: { hour: string; orders: number; revenue: number }[];
+    lowStockItems: { name: string; currentStock: number; threshold: number }[];
+    totalSales: number;
+    totalOrders: number;
+    totalCustomers: number;
+    paymentMethods: {
+      cash: number;
+      creditCard: number;
+      aba: number;
+    };
+    topProducts: { name: string; quantity: number; revenue: number }[];
+    promotionsUsed: { name: string; count: number; totalDiscount: number }[];
+  };
+  paymentData: {
+    cash: number;
+    creditCard: number;
+    aba: number;
+  };
+}

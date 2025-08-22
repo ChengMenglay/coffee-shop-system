@@ -1,7 +1,8 @@
 import { toast } from "sonner";
-import { Product } from "types";
+import { Product, Promotion } from "types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { calculatePromotions, PromotionApplication } from "@/lib/promotion-utils";
 
 export interface CartItem extends Product {
   cartItemId: string;
@@ -22,11 +23,13 @@ export interface CartItem extends Product {
 
 interface CartStore {
   items: CartItem[];
+  promotions?: Promotion[] | null;
   discount?: {
     type: "percent" | "amount";
     value: number;
   };
   note?: string;
+  setPromotions: (promotions: Promotion[] | null) => void;
   addItem: (data: Product, options?: {
     defaultSizeId?: string;
     defaultSizeName?: string;
@@ -61,8 +64,9 @@ interface CartStore {
   getCartSubtotalWithProductDiscounts: () => number;
   getDiscountAmount: () => number;
   getTotalProductDiscounts: () => number;
+  getPromotionDiscount: () => number;
+  getAppliedPromotions: () => PromotionApplication[];
 }
-
 // Helper function to generate unique cart item ID
 const generateCartItemId = () => `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -75,8 +79,13 @@ const useCart = create(
   persist<CartStore>(
     (set, get) => ({
       items: [],
+      promotions: null,
       discount: undefined,
       note: undefined,
+
+      setPromotions: (promotions: Promotion[] | null) => {
+        set({ promotions });
+      },
 
       // Calculate base price with modifiers (before product discount)
       calculateItemPrice: (item: CartItem) => {
@@ -147,8 +156,26 @@ getCartSubtotal: () => {
 
       // Get final cart total (subtotal - product discounts - cart discount)
       getCartTotal: () => {
-        const { getCartSubtotalWithProductDiscounts, getDiscountAmount } = get();
-        return Math.max(0, getCartSubtotalWithProductDiscounts() - getDiscountAmount());
+        const { getCartSubtotalWithProductDiscounts, getDiscountAmount, getPromotionDiscount } = get();
+        return Math.max(0, getCartSubtotalWithProductDiscounts() - getDiscountAmount() - getPromotionDiscount());
+      },
+
+      // Get promotion discount amount
+      getPromotionDiscount: () => {
+        const { items, promotions, calculateItemPriceWithProductDiscount } = get();
+        if (!promotions || promotions.length === 0) return 0;
+        
+        const result = calculatePromotions(items, promotions, calculateItemPriceWithProductDiscount);
+        return result.totalDiscount;
+      },
+
+      // Get applied promotions
+      getAppliedPromotions: () => {
+        const { items, promotions, calculateItemPriceWithProductDiscount } = get();
+        if (!promotions || promotions.length === 0) return [];
+        
+        const result = calculatePromotions(items, promotions, calculateItemPriceWithProductDiscount);
+        return result.appliedPromotions;
       },
 
       addItem: (data: Product, options = {}) => {

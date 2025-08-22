@@ -83,7 +83,6 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       const order = await axios.patch(`/api/order/${data.id}`, {
         ...data,
         orderStatus: "Completed",
-        paymentStatus: true,
       });
       router.refresh();
       toast.success(`The Order #${order.data.displayId} placed as Completed.`);

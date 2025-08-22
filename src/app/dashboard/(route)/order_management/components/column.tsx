@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
 import CellAction from "./cellAction";
+import { usePermissions } from "@/hooks/usePermission";
 
 export type OrderManagementColumn = {
   id: string;
@@ -13,6 +14,21 @@ export type OrderManagementColumn = {
   paymentMethod: string;
   total: string;
   createdAt: string;
+};
+
+const ActionCell = ({ row }: { row: { original: OrderManagementColumn } }) => {
+  const { canPerformAction } = usePermissions();
+
+  return (
+      <CellAction
+        editOrderStatusCompleted={row.original.orderStatus === "Completed"}
+        editOrderStatusCancelled={row.original.orderStatus === "Cancelled"}
+        editPaymentPaid={!row.original.paymentStatus}
+        editPaymentUnPaid={row.original.paymentStatus}
+        data={row.original}
+        canDelete={canPerformAction(["delete:order_management"])}
+      />
+  );
 };
 
 export const columns: ColumnDef<OrderManagementColumn>[] = [
@@ -78,12 +94,6 @@ export const columns: ColumnDef<OrderManagementColumn>[] = [
   {
     accessorKey: "action",
     header: "Action",
-    cell: ({ row }) => (
-      <CellAction
-        editOrderStatus={row.original.orderStatus === "Cancelled"}
-        editPayment={!row.original.paymentStatus}
-        data={row.original}
-      />
-    ),
+    cell: ({ row }) => <ActionCell row={row} />
   },
 ];

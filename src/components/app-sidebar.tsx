@@ -23,6 +23,7 @@ import {
   User,
   FileText,
   Megaphone,
+  Clock,
 } from "lucide-react";
 import {
   Sidebar,
@@ -157,6 +158,12 @@ const menuGroups = (counts: {
         icon: FileText, // general report icon
         requiredPermission: "view:report",
       },
+      {
+        title: "Close Out Day",
+        url: "/dashboard/close-out-day",
+        icon: Clock,
+        requiredPermission: "view:close-out-day",
+      },
     ],
   },
 ];
@@ -189,7 +196,7 @@ const productItems = [
     icon: Package,
     requiredPermission: "view:product",
   },
-    {
+  {
     title: "Promotion",
     url: "/dashboard/promotion",
     icon: Megaphone,
