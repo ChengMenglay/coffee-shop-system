@@ -171,14 +171,63 @@ function PromotionForm({ initialData }: PromotionFormProps) {
                 </FormItem>
               )}
             />
-            {selectedType === PromotionType.BUY_X_GET_Y && (
-              <>
+            {selectedType === PromotionType.BUY_X_GET_Y ||
+              (initialData?.type === PromotionType.BUY_X_GET_Y && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="buyQuantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Buy Quantity</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || 0}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            type="number"
+                            disabled={isLoading}
+                            placeholder="Buy quantity..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="freeQuantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Free Quantity</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || 0}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            type="number"
+                            disabled={isLoading}
+                            placeholder="Free quantity..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ))}
+            {selectedType === PromotionType.FIXED_DISCOUNT ||
+              (initialData?.type === PromotionType.FIXED_DISCOUNT && (
                 <FormField
                   control={form.control}
-                  name="buyQuantity"
+                  name="discount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Buy Quantity</FormLabel>
+                      <FormLabel>Discount Amount </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -188,19 +237,22 @@ function PromotionForm({ initialData }: PromotionFormProps) {
                           }
                           type="number"
                           disabled={isLoading}
-                          placeholder="Buy quantity..."
+                          placeholder="Discount amount..."
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              ))}
+            {selectedType === PromotionType.PERCENT_DISCOUNT ||
+              (initialData?.type === PromotionType.PERCENT_DISCOUNT && (
                 <FormField
                   control={form.control}
-                  name="freeQuantity"
+                  name="discount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Free Quantity</FormLabel>
+                      <FormLabel>Discount Percent </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -210,59 +262,14 @@ function PromotionForm({ initialData }: PromotionFormProps) {
                           }
                           type="number"
                           disabled={isLoading}
-                          placeholder="Free quantity..."
+                          placeholder="Discount percent..."
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </>
-            )}
-            {selectedType === PromotionType.FIXED_DISCOUNT && (
-              <FormField
-                control={form.control}
-                name="discount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Discount Amount </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value || 0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        type="number"
-                        disabled={isLoading}
-                        placeholder="Discount amount..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            {selectedType === PromotionType.PERCENT_DISCOUNT && (
-              <FormField
-                control={form.control}
-                name="discount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Discount Percent </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value || 0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        type="number"
-                        disabled={isLoading}
-                        placeholder="Discount percent..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+              ))}
             <FormField
               control={form.control}
               name="startDate"

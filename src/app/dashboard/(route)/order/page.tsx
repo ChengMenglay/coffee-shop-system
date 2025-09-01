@@ -21,6 +21,9 @@ async function SalePage() {
       prisma.promotion.findMany({
         where: {
           isActive: true,
+          endDate: {
+            gte: new Date(),
+          },
         },
       }),
     ]);

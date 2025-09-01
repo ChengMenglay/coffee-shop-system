@@ -29,6 +29,8 @@ function CartSheet() {
     calculateItemPriceWithProductDiscount,
     getDiscountAmount,
     removeAll,
+    getAppliedPromotions,
+    getCartSubtotal,
   } = useCart();
 
   const router = useRouter();
@@ -37,14 +39,15 @@ function CartSheet() {
   // Calculate totals
   const cartDiscount = getDiscountAmount();
   const total = getCartTotal();
+  const subtotal = getCartSubtotal();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
+  const appliedPromotions = getAppliedPromotions();
   const getDisplayPrice = (item: CartItem) => {
     return calculateItemPriceWithProductDiscount(item);
   };
   const handleOrder = async () => {
-    const freshSession = await getSession();
     try {
+      const freshSession = await getSession();
       setLoading(true);
       const payload = {
         userId: freshSession?.user.id,
@@ -83,8 +86,6 @@ function CartSheet() {
               orderId: order.data.id,
             }),
           });
-
-
 
           toast.success("Your order has been placed successfully!");
           router.push(`/`);
@@ -125,9 +126,9 @@ function CartSheet() {
             <CartItems />
           ) : (
             <div className="flex flex-col items-center justify-center h-full space-y-4">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+              {/* <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                 <ShoppingBag className="w-8 h-8 text-gray-400" />
-              </div>
+              </div> */}
               <NoResult
                 title="Your cart is empty"
                 description="Add items to your cart to get started."
@@ -141,7 +142,32 @@ function CartSheet() {
           <SheetFooter className="flex-col space-y-0 border-t pt-4">
             <div className="w-full space-y-2">
               <Separator />
-
+              <div className="flex justify-between font-bold text-lg">
+                <span>Subtotal</span>
+                <span className="text-green-600">
+                  {formatterUSD.format(subtotal)}
+                </span>
+              </div>
+              {appliedPromotions.length > 0 && (
+                <li className="p-2 rounded-sm border-t bg-blue-50 dark:bg-blue-900/10">
+                  <span className="font-semibold text-blue-700 text-xs">
+                    Applied Promotions:
+                  </span>
+                  <div className="space-y-1 mt-1">
+                    {appliedPromotions.map((promo, index: number) => (
+                      <div
+                        key={index}
+                        className="text-xs text-blue-600 flex justify-between"
+                      >
+                        <span>{promo.promotionName}</span>
+                        <span>
+                          -{formatterUSD.format(promo.discountAmount)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </li>
+              )}
               {/* Total */}
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
