@@ -10,12 +10,6 @@ import { CashCountData, CheckListdataType, PaymentValidationData } from "types";
 
 type Currency = "USD" | "KHR";
 
-interface CurrencyDenomination {
-  name: string;
-  label: string;
-  value: number;
-}
-
 interface CashCountProps {
   onCashCountComplete: (paymentData: PaymentValidationData) => void;
 }
@@ -23,39 +17,6 @@ interface CashCountProps {
 const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
   const [currency, setCurrency] = React.useState<Currency>("USD");
   const [exchangeRate, setExchangeRate] = React.useState(4100); // 1 USD = 4100 KHR (approximate)
-
-  // Currency denominations
-  const usdDenominations: CurrencyDenomination[] = [
-    { name: "hundreds", label: "$100", value: 100 },
-    { name: "fifties", label: "$50", value: 50 },
-    { name: "twenties", label: "$20", value: 20 },
-    { name: "tens", label: "$10", value: 10 },
-    { name: "fives", label: "$5", value: 5 },
-    { name: "ones", label: "$1", value: 1 },
-  ];
-
-  const khrDenominations: CurrencyDenomination[] = [
-    { name: "hundreds", label: "100,000 ៛", value: 100000 },
-    { name: "fifties", label: "50,000 ៛", value: 50000 },
-    { name: "twenties", label: "20,000 ៛", value: 20000 },
-    { name: "tens", label: "10,000 ៛", value: 10000 },
-    { name: "fives", label: "5,000 ៛", value: 5000 },
-    { name: "ones", label: "1,000 ៛", value: 1000 },
-  ];
-
-  const usdCoins: CurrencyDenomination[] = [
-    { name: "quarters", label: "$0.25", value: 0.25 },
-    { name: "dimes", label: "$0.10", value: 0.1 },
-    { name: "nickels", label: "$0.05", value: 0.05 },
-    { name: "pennies", label: "$0.01", value: 0.01 },
-  ];
-
-  const khrCoins: CurrencyDenomination[] = [
-    { name: "quarters", label: "500 ៛", value: 500 },
-    { name: "dimes", label: "200 ៛", value: 200 },
-    { name: "nickels", label: "100 ៛", value: 100 },
-    { name: "pennies", label: "50 ៛", value: 50 },
-  ];
 
   const [paymentData, setPaymentData] = React.useState<PaymentValidationData>({
     cash: {
@@ -86,6 +47,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
     allPaymentsValidated: false,
   });
 
+  // Simple cash input amount (to replace bill/coin counting)
+  const [cashInputAmount, setCashInputAmount] = React.useState<number>(0);
+
   const [isLoading, setIsLoading] = React.useState(false);
   const [systemData, setSystemData] = React.useState<{
     cash: CashCountData;
@@ -96,8 +60,9 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
     fetchPaymentData();
   }, []);
 
-  // Reset cash counts when currency changes
+  // Reset cash count when currency changes
   React.useEffect(() => {
+    setCashInputAmount(0);
     setPaymentData((prev) => ({
       ...prev,
       cash: {
@@ -135,14 +100,6 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
 
   const convertToUSD = (amount: number) => {
     return currency === "USD" ? amount : amount / exchangeRate;
-  };
-
-  const getCurrentDenominations = () => {
-    return currency === "USD" ? usdDenominations : khrDenominations;
-  };
-
-  const getCurrentCoins = () => {
-    return currency === "USD" ? usdCoins : khrCoins;
   };
 
   const fetchPaymentData = async () => {
@@ -186,53 +143,17 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
     }
   };
 
-  const updateBill = (
-    denomination: keyof PaymentValidationData["cash"]["bills"],
-    count: number
-  ) => {
-    const newBills = { ...paymentData.cash.bills, [denomination]: count };
-    calculateCashTotal(newBills, paymentData.cash.coins);
-  };
+  const updateCashAmount = (amount: number) => {
+    setCashInputAmount(amount);
 
-  const updateCoin = (
-    denomination: keyof PaymentValidationData["cash"]["coins"],
-    count: number
-  ) => {
-    const newCoins = { ...paymentData.cash.coins, [denomination]: count };
-    calculateCashTotal(paymentData.cash.bills, newCoins);
-  };
-
-  const calculateCashTotal = (
-    bills: PaymentValidationData["cash"]["bills"],
-    coins: PaymentValidationData["cash"]["coins"]
-  ) => {
-    const denominations = getCurrentDenominations();
-    const coinDenominations = getCurrentCoins();
-
-    const billTotal =
-      bills.hundreds * denominations[0].value +
-      bills.fifties * denominations[1].value +
-      bills.twenties * denominations[2].value +
-      bills.tens * denominations[3].value +
-      bills.fives * denominations[4].value +
-      bills.ones * denominations[5].value;
-
-    const coinTotal =
-      coins.quarters * coinDenominations[0].value +
-      coins.dimes * coinDenominations[1].value +
-      coins.nickels * coinDenominations[2].value +
-      coins.pennies * coinDenominations[3].value;
-
-    const totalCountedInCurrentCurrency = billTotal + coinTotal;
-    const totalCountedInUSD = convertToUSD(totalCountedInCurrentCurrency);
+    // Convert to USD if needed for internal calculations
+    const totalCountedInUSD = convertToUSD(amount);
     const difference = totalCountedInUSD - paymentData.cash.systemTotal;
 
     setPaymentData((prev) => ({
       ...prev,
       cash: {
         ...prev.cash,
-        bills,
-        coins,
         totalCounted: totalCountedInUSD,
         difference,
       },
@@ -286,9 +207,7 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
       paymentData.cash.systemTotal > 0 &&
       paymentData.cash.totalCounted === 0
     ) {
-      toast.error(
-        "Please count the physical cash by entering bills and coins."
-      );
+      toast.error("Please enter the actual cash amount received.");
       return;
     }
 
@@ -448,118 +367,64 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
             ({currency === "USD" ? "US Dollars" : "Cambodian Riel"})
           </span>
         </h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {/* Bills */}
-          <div>
-            <h5 className="font-medium mb-3">Bills</h5>
-            <div className="space-y-2 sm:space-y-3">
-              {getCurrentDenominations().map((denomination, index) => {
-                const billKey = Object.keys(paymentData.cash.bills)[
-                  index
-                ] as keyof PaymentValidationData["cash"]["bills"];
-                const billValue = paymentData.cash.bills[billKey];
 
-                return (
-                  <div
-                    key={denomination.name}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="w-16 sm:w-20 text-xs sm:text-sm font-medium">
-                      {denomination.label}
-                    </span>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={billValue}
-                      onChange={(e) =>
-                        updateBill(billKey, parseInt(e.target.value) || 0)
-                      }
-                      className="w-16 sm:w-20 text-center text-sm"
-                    />
-                    <span className="w-20 sm:w-24 text-right text-xs sm:text-sm">
-                      {formatCurrency(billValue * denomination.value)}
-                    </span>
-                  </div>
-                );
-              })}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Enter Cash Amount ({currency === "USD" ? "$" : "៛"})
+            </label>
+            <Input
+              type="number"
+              min="0"
+              step={currency === "USD" ? "0.01" : "100"}
+              value={cashInputAmount}
+              onChange={(e) =>
+                updateCashAmount(parseFloat(e.target.value) || 0)
+              }
+              placeholder={currency === "USD" ? "0.00" : "0"}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              System Total
+            </label>
+            <div className="p-2 bg-gray-100 rounded border font-semibold">
+              {formatCurrency(
+                convertToDisplayCurrency(paymentData.cash.systemTotal)
+              )}
             </div>
           </div>
-
-          {/* Coins */}
           <div>
-            <h5 className="font-medium mb-3">Coins</h5>
-            <div className="space-y-2 sm:space-y-3">
-              {getCurrentCoins().map((denomination, index) => {
-                const coinKey = Object.keys(paymentData.cash.coins)[
-                  index
-                ] as keyof PaymentValidationData["cash"]["coins"];
-                const coinValue = paymentData.cash.coins[coinKey];
-
-                return (
-                  <div
-                    key={denomination.name}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <span className="w-16 sm:w-20 text-xs sm:text-sm font-medium">
-                      {denomination.label}
-                    </span>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={coinValue}
-                      onChange={(e) =>
-                        updateCoin(coinKey, parseInt(e.target.value) || 0)
-                      }
-                      className="w-16 sm:w-20 text-center text-sm"
-                    />
-                    <span className="w-20 sm:w-24 text-right text-xs sm:text-sm">
-                      {formatCurrency(coinValue * denomination.value)}
-                    </span>
-                  </div>
-                );
-              })}
+            <label className="block text-sm font-medium mb-2">Difference</label>
+            <div
+              className={`p-2 rounded border font-semibold ${getDifferenceColor(
+                paymentData.cash.difference
+              )}`}
+            >
+              {formatCurrency(
+                convertToDisplayCurrency(paymentData.cash.difference)
+              )}
             </div>
           </div>
         </div>
 
-        {/* Cash Totals */}
+        {/* Cash Summary */}
         <div className="mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-xs sm:text-sm text-gray-600">System Total</p>
               <p className="text-base sm:text-lg font-bold">
                 {formatCurrency(
-                  convertToDisplayCurrency(paymentData.cash.systemTotal),
-                  "USD"
+                  convertToDisplayCurrency(paymentData.cash.systemTotal)
                 )}
               </p>
-              {currency === "KHR" && (
-                <p className="text-xs text-gray-500">
-                  (
-                  {formatCurrency(
-                    convertToDisplayCurrency(paymentData.cash.systemTotal)
-                  )}
-                  )
-                </p>
-              )}
             </div>
             <div>
               <p className="text-xs sm:text-sm text-gray-600">Counted Total</p>
               <p className="text-base sm:text-lg font-bold">
-                {formatCurrency(
-                  convertToDisplayCurrency(paymentData.cash.totalCounted),
-                  "USD"
-                )}
+                {formatCurrency(cashInputAmount, currency)}
               </p>
-              {currency === "KHR" && (
-                <p className="text-xs text-gray-500">
-                  (
-                  {formatCurrency(
-                    convertToDisplayCurrency(paymentData.cash.totalCounted)
-                  )}
-                  )
-                </p>
-              )}
             </div>
             <div>
               <p className="text-xs sm:text-sm text-gray-600">Difference</p>
@@ -568,17 +433,10 @@ const CashCount: React.FC<CashCountProps> = ({ onCashCountComplete }) => {
                   paymentData.cash.difference
                 )}`}
               >
-                {formatCurrency(paymentData.cash.difference, "USD")}
+                {formatCurrency(
+                  convertToDisplayCurrency(paymentData.cash.difference)
+                )}
               </p>
-              {currency === "KHR" && (
-                <p
-                  className={`text-sm ${getDifferenceColor(
-                    paymentData.cash.difference
-                  )}`}
-                >
-                  ({formatCurrency(paymentData.cash.difference * exchangeRate)})
-                </p>
-              )}
             </div>
           </div>
         </div>
