@@ -1,5 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ sizeId: string }> }
+) {
+  try {
+    const { sizeId } = await params;
+    if (!sizeId)
+      return NextResponse.json("Size Id is required", { status: 400 });
+    const size = await prisma.size.findUnique({
+      where: { id: sizeId },
+      include: { product: { include: {category: true} } },
+    });
+    return NextResponse.json(size);
+  }
+  catch (error) {
+    console.log("[SIZE_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ sizeId: string }> }

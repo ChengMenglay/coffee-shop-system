@@ -279,3 +279,21 @@ model DayClose {
   closedAt         DateTime @default(now())
   createdAt        DateTime @default(now())
 }
+
+model Billboard{
+  id       String   @id @default(cuid())
+  image     String
+  title     String
+  link      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  image     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

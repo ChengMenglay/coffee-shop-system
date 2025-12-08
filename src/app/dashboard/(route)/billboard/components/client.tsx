@@ -1,0 +1,44 @@
+"use client";
+
+import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/ui/data-table";
+import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { BillboardColumn, columns } from "./columns";
+import { RefreshCcw } from "lucide-react";
+
+type BillboardColumnProps = {
+  data: BillboardColumn[];
+};
+function BillboardClient({ data }: BillboardColumnProps) {
+  const router = useRouter();
+  const [filterdData, setFilterdData] = useState<BillboardColumn[]>(data);
+  useEffect(() => {
+    setFilterdData(data);
+  }, [data]);
+  return (
+    <>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2">
+        <Header
+          title="Billboard"
+          subtitle="Manage billboards for your store."
+          total={data.length}
+        />
+        <div className="flex items-center gap-2">
+          <Button variant={"outline"} onClick={() => setFilterdData(data)}>
+            <RefreshCcw />
+          </Button>
+          <Button onClick={() => router.push("/dashboard/billboard/new")}>
+            New
+          </Button>
+        </div>
+      </div>
+      <Separator className="my-6" />
+      <DataTable searchKey="title" columns={columns} data={filterdData} />
+    </>
+  );
+}
+
+export default BillboardClient;

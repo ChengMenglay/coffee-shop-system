@@ -2,6 +2,25 @@ import { Ice } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ iceId: string }> }
+) {
+  try {
+    const { iceId } = await params;
+    if (!iceId)
+      return NextResponse.json("Ice Id is required", { status: 400 });
+    const ice = await prisma.ice.findUnique({
+      where: { id: iceId },
+      include: { product: { include: { category: true } } },
+    });
+    return NextResponse.json(ice);
+  } catch (error) {
+    console.log("[ICE_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ iceId: string }> }

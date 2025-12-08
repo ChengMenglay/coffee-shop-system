@@ -234,6 +234,21 @@ const productItems = [
   },
 ];
 
+const broadcastItems = [
+  {
+    title: "Billboard",
+    url: "/dashboard/billboard",
+    icon: Megaphone,
+    requiredPermission: "view:billboard",
+  },
+  {
+    title: "Announcements",
+    url: "/dashboard/announcement",
+    icon: FileText,
+    requiredPermission: "view:announcement",
+  },
+];
+
 export async function AppSidebar() {
   const session = await auth();
   const users = session?.user;
@@ -391,6 +406,51 @@ export async function AppSidebar() {
                   <CollapsibleContent className="ml-4 mt-1">
                     <SidebarMenuSub>
                       {userManagementItems
+                        .filter(
+                          (item) =>
+                            !item.requiredPermission ||
+                            users?.permissions.includes(item.requiredPermission)
+                        )
+                        .map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              className="h-10 hover:bg-gray-50 rounded-md"
+                            >
+                              <a
+                                href={item.url}
+                                className="flex items-center gap-3"
+                              >
+                                <item.icon className="w-4 h-4 text-gray-500" />
+                                <span className="text-sm text-gray-600">
+                                  {item.title}
+                                </span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </Collapsible>
+              </SidebarMenuItem>
+
+              {/* Broadcast Dropdown */}
+              <SidebarMenuItem>
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className="h-12 flex justify-between items-center hover:bg-gray-100 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-gray-600" />
+                        <span className="font-medium text-gray-700">
+                          Broadcasts
+                        </span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-500 transition-transform duration-200" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="ml-4 mt-1">
+                    <SidebarMenuSub>
+                      {broadcastItems
                         .filter(
                           (item) =>
                             !item.requiredPermission ||

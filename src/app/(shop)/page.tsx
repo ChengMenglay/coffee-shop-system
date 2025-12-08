@@ -16,7 +16,7 @@ async function Home() {
     }),
     prisma.promotion.findMany({
       where: {
-        isActive: true,
+        isActive: true,   
         endDate: {
           gte: new Date(),
         },

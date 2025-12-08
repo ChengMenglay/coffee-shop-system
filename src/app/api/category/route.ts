@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export async function GET(){
+  try {
+    const categories = await prisma.category.findMany(); 
+    return NextResponse.json(categories);
+  } catch (error) {
+    console.log("[CATEGORY_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 export async function POST(req: Request) {
   try {
     const body = await req.json();

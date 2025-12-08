@@ -1,5 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+
+export async function GET() {
+  try {
+    const sizes = await prisma.size.findMany();
+    return NextResponse.json(sizes);
+  } catch (error) {
+    console.log("[SIZE_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

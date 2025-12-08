@@ -5,6 +5,27 @@ import { unlink } from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
 
+export async function GET(
+  _req: Request,{
+
+  params,
+}: {
+  params: Promise<{ productId: string }>;
+}) {
+  try {
+    const { productId } = await params;
+    if (!productId)
+      return NextResponse.json("Product Id is required", { status: 400 });
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { category: true },
+    });
+    return NextResponse.json(product);
+  } catch (error) {
+    console.log("[PRODUCT_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ productId: string }> }
