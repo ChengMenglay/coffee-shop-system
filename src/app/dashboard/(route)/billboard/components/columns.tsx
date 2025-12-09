@@ -34,7 +34,7 @@ export const columns: ColumnDef<BillboardColumn>[] = [
         alt={row.original.title}
         width={100}
         height={100}
-        src={`/uploads/${row.original.image}`}
+        src={`${row.original.image}`}
         className="rounded-md"
       />
     ),

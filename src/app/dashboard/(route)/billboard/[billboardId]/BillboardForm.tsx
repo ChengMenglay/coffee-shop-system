@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Billboard } from "@prisma/client";
 import { Checkbox } from "@/components/ui/checkbox";
-import ImageUpload from "@/components/ImageUpload";
+import ImageUpload from "@/components/image-upload";
 
 type BillboardFormProps = {
   initialData: Billboard | null;
@@ -154,6 +154,7 @@ function BillboardForm({ initialData }: BillboardFormProps) {
                   <FormLabel>Image</FormLabel>
                   <FormControl>
                     <ImageUpload
+                    disable={isLoading}
                       value={field.value ? field.value : ""}
                       onChange={(url: string) => field.onChange(url)}
                       onDelete={() => field.onChange("")}

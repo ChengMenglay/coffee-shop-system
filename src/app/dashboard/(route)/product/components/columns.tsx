@@ -37,7 +37,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
         alt={row.original.name}
         width={100}
         height={100}
-        src={`/uploads/${row.original.image}`}
+        src={`${row.original.image}`}
         className="rounded-md"
       />
     ),
@@ -79,6 +79,6 @@ export const columns: ColumnDef<ProductColumn>[] = [
   },
   {
     accessorKey: "Action",
-    cell: ({ row }) => <ActionCell row={row} />
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

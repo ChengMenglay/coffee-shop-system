@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Announcement } from "@prisma/client";
 import { Checkbox } from "@/components/ui/checkbox";
-import ImageUpload from "@/components/ImageUpload";
+import ImageUpload from "@/components/image-upload";
 import { Textarea } from "@/components/ui/textarea";
 
 type AnnouncementFormProps = {
@@ -163,6 +163,7 @@ function AnnouncementForm({ initialData }: AnnouncementFormProps) {
                   <FormLabel>Image</FormLabel>
                   <FormControl>
                     <ImageUpload
+                      disable={isLoading}
                       value={field.value ? field.value : ""}
                       onChange={(url: string) => field.onChange(url)}
                       onDelete={() => field.onChange("")}

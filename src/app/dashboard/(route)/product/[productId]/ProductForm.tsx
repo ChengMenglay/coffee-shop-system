@@ -33,7 +33,7 @@ import { Category } from "@prisma/client";
 import { ChevronLeft } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import ImageUpload from "@/components/ImageUpload";
+import ImageUpload from "@/components/image-upload";
 import { Product } from "types";
 
 type ProductFormProps = {
@@ -239,6 +239,7 @@ function ProductForm({ initialData, categories }: ProductFormProps) {
                 <FormLabel>Image</FormLabel>
                 <FormControl>
                   <ImageUpload
+                    disable={isLoading}
                     value={field.value ? field.value : ""}
                     onChange={(url: string) => field.onChange(url)}
                     onDelete={() => field.onChange("")}
