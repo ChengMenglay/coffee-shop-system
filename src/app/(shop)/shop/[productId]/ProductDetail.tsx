@@ -148,7 +148,7 @@ function ProductDetail({
     <div className="grid md:grid-cols-2 grid-cols-1 gap-4 p-4">
       <div className="lg:w-96 lg:h-96 md:w-80 md:h-80 w-full h-96 cursor-pointer relative mx-auto">
         <Image
-          src={("/uploads/" + product?.image) as string}
+          src={product?.image as string}
           alt={product?.name as string}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"

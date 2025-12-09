@@ -40,7 +40,7 @@ function CartItems() {
                   <div className="relative w-20 h-20 flex-shrink-0">
                     <Image
                       src={
-                        `/uploads/${item.image}` || "/placeholder-product.jpg"
+                        `${item.image}` || "/placeholder-product.jpg"
                       }
                       alt={item.name}
                       fill

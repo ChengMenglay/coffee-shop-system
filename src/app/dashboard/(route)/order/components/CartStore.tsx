@@ -321,7 +321,7 @@ export default function CartStore({
                     <div className="relative w-[60px] h-[60px] flex-shrink-0">
                       <Image
                         alt={item.name}
-                        src={"/uploads/" + item.image}
+                        src={item.image}
                         fill
                         className="object-contain rounded"
                         sizes="(max-width: 768px) 100vw, 50vw"

@@ -23,7 +23,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Image
           className="object-cover"
           alt={product?.name as string}
-          src={("/uploads/" + product?.image) as string}
+          src={(product?.image) as string}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
         />
