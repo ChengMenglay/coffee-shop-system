@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const billboards = await prisma.billboard.findMany();
+    const billboards = await prisma.billboard.findMany({orderBy: { createdAt: "desc" }});
     return NextResponse.json(billboards);
   } catch (error) {
     console.log("[BILLBOARD_GET]", error);

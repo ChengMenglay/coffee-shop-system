@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const ices = await prisma.ice.findMany();
+    const ices = await prisma.ice.findMany({orderBy: { createdAt: "desc" }});
     return NextResponse.json(ices);
   } catch (error) {
     console.log("[ICE_GET]", error);

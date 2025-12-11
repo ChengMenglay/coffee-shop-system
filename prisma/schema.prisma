@@ -291,6 +291,7 @@ model Billboard{
 
 model Announcement {
   id        String   @id @default(cuid())
+  type      String?
   title     String
   content   String
   image     String?

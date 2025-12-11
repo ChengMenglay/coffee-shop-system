@@ -11,6 +11,7 @@ async function AnnouncementPage() {
   });
   const formattedAnnouncement: AnnouncementColumn[] = announcements.map((item) => ({
     id: item.id,
+    type: item.type || "N/A",
     title: item.title,
     content: item.content || "",
     image: item.image || "",

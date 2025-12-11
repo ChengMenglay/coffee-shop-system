@@ -32,6 +32,7 @@ type AnnouncementFormProps = {
   initialData: Announcement | null;
 };
 const announcementSchema = z.object({
+  type: z.string().optional(),
   title: z.string().min(1, "Announcement title is required"),
   image: z.string().min(1, "Image is required"),
   content: z.string().optional(),
@@ -52,6 +53,8 @@ function AnnouncementForm({ initialData }: AnnouncementFormProps) {
     defaultValues: initialData
       ? {
           ...initialData,
+          type: initialData.type || "",
+          title: initialData.title || "",
           image: initialData.image || "",
           content: initialData.content || "",
         }
@@ -126,6 +129,23 @@ function AnnouncementForm({ initialData }: AnnouncementFormProps) {
                     <Textarea
                       disabled={isLoading}
                       placeholder="Announcement content..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder="Announcement type..."
                       {...field}
                     />
                   </FormControl>

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 
 export type AnnouncementColumn = {
   id: string;
+  type: string;
   title: string;
   content: string;
   image: string;
@@ -38,6 +39,10 @@ export const columns: ColumnDef<AnnouncementColumn>[] = [
         className="rounded-md"
       />
     ),
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
   },
   {
     accessorKey: "title",
