@@ -13,9 +13,9 @@ export async function GET(){
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name } = body;
+    const { name, image } = body;
     if (!name) return NextResponse.json("Name is required", { status: 400 });
-    const category = await prisma.category.create({ data: { name } });
+    const category = await prisma.category.create({ data: { name, image } });
     return NextResponse.json(category);
   } catch (error) {
     console.log("[CATEGORY_POST]", error);

@@ -23,12 +23,14 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Category } from "@prisma/client";
+import ImageUpload from "@/components/image-upload";
 
 type CategoryFormProps = {
   initialData: Category | null;
 };
 const categorySchema = z.object({
   name: z.string().min(1, "Category is required"),
+  image: z.string().optional(),
 });
 type CategorySchema = z.infer<typeof categorySchema>;
 function CategoryForm({ initialData }: CategoryFormProps) {
@@ -39,9 +41,10 @@ function CategoryForm({ initialData }: CategoryFormProps) {
   const form = useForm<CategorySchema>({
     resolver: zodResolver(categorySchema),
     defaultValues: initialData
-      ? { ...initialData }
+      ? { ...initialData, image: initialData.image || "" }
       : {
           name: "",
+          image: "",
         },
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -92,6 +95,24 @@ function CategoryForm({ initialData }: CategoryFormProps) {
                       disabled={isLoading}
                       placeholder="Category name..."
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+                        <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image</FormLabel>
+                  <FormControl>
+                    <ImageUpload
+                    disable={isLoading}
+                      value={field.value ? field.value : ""}
+                      onChange={(url: string) => field.onChange(url)}
+                      onDelete={() => field.onChange("")}
                     />
                   </FormControl>
                   <FormMessage />
