@@ -2,7 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 export async function GET() {
   try {
-    const sugars = await prisma.sugar.findMany();
+    const sugars = await prisma.sugar.findMany({
+      include: { product: { include: { category: true } } },
+      orderBy: { createdAt: "desc" },
+    });
     return NextResponse.json(sugars);
   } catch (error) {
     console.log("[SUGAR_GET]", error);

@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const ices = await prisma.ice.findMany({orderBy: { createdAt: "desc" }});
+    const ices = await prisma.ice.findMany({
+      include: { product: { include: { category: true } } },
+      orderBy: { createdAt: "desc" },
+    });
     return NextResponse.json(ices);
   } catch (error) {
     console.log("[ICE_GET]", error);
@@ -14,8 +17,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { name, productId } = body;
-    if (!name)
-      return NextResponse.json("name is required", { status: 400 });
+    if (!name) return NextResponse.json("name is required", { status: 400 });
     if (!productId)
       return NextResponse.json("productId is required", { status: 400 });
     const currentIce = await prisma.ice.findMany({ where: { productId } });

@@ -1,0 +1,3 @@
+ALTER TABLE "Sugar" ADD COLUMN "image" TEXT;
+ALTER TABLE "Ice" ADD COLUMN "image" TEXT;
+ALTER TABLE "ExtraShot" ADD COLUMN "image" TEXT;

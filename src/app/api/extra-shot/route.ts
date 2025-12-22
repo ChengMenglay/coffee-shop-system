@@ -1,5 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+export async function GET() {
+  try {
+    const extraShots = await prisma.extraShot.findMany({
+      include: { product: { include: { category: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(extraShots);
+  } catch (error) {
+    console.log("[EXTRA_SHOT_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 export async function POST(req: Request) {
   try {
     const body = await req.json();

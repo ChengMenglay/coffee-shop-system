@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,25 +11,25 @@ model User {
   id                         String              @id @default(cuid())
   name                       String
   password                   String
-  phone                      String?
   roleId                     String
-  role                       Role                @relation(fields: [roleId], references: [id])
   createdAt                  DateTime            @default(now())
-  orders                     Order[]
+  phone                      String?
   IngredientStocks           IngredientStock[]
-  purchases                  Purchase[]
-  pendingPurchases           PendingPurchase[]
+  notification               Notification[]
+  orders                     Order[]
   approvedPendingPurchases   PendingPurchase[]   @relation("ApprovedBy")
+  pendingPurchases           PendingPurchase[]
   approvedPendingStockUsages PendingStockUsage[] @relation("ApprovedStockUsage")
   pendingStockUsages         PendingStockUsage[]
-  notification               Notification[]
+  purchases                  Purchase[]
+  role                       Role                @relation(fields: [roleId], references: [id])
 }
 
 model Role {
   id          String       @id @default(cuid())
   name        String
-  permissions Permission[] @relation("RolePermissions")
   users       User[]
+  permissions Permission[] @relation("RolePermissions")
 }
 
 model Permission {
@@ -48,27 +42,27 @@ model Permission {
 model Category {
   id        String    @id @default(cuid())
   name      String
+  createdAt DateTime  @default(now())
   image     String?
   products  Product[]
-  createdAt DateTime  @default(now())
 }
 
 model Product {
   id          String      @id @default(cuid())
   name        String
   price       Decimal
-  discount    Int?
   image       String
   description String
   categoryId  String
   status      Boolean     @default(true)
-  category    Category    @relation(fields: [categoryId], references: [id])
   createdAt   DateTime    @default(now())
+  discount    Int?
+  ExtraShot   ExtraShot[]
+  ice         Ice[]
   orderItems  OrderItem[]
+  category    Category    @relation(fields: [categoryId], references: [id])
   size        Size[]
   sugar       Sugar[]
-  ice         Ice[]
-  ExtraShot   ExtraShot[]
   promotions  Promotion[] @relation("ProductPromotions")
 }
 
@@ -86,27 +80,21 @@ model Promotion {
   products     Product[]     @relation("ProductPromotions")
 }
 
-enum PromotionType {
-  BUY_X_GET_Y
-  FIXED_DISCOUNT
-  PERCENT_DISCOUNT
-}
-
 model Sugar {
   id         String      @id @default(cuid())
   name       String
-  productId  String
-  product    Product     @relation(fields: [productId], references: [id])
   createdAt  DateTime    @default(now())
+  productId  String
   orderItems OrderItem[]
+  product    Product     @relation(fields: [productId], references: [id])
 }
 
 model Ice {
   id         String      @id @default(cuid())
   name       String
+  createdAt  DateTime    @default(now())
   productId  String
   product    Product     @relation(fields: [productId], references: [id])
-  createdAt  DateTime    @default(now())
   orderItems OrderItem[]
 }
 
@@ -114,9 +102,9 @@ model ExtraShot {
   id            String      @id @default(cuid())
   name          String
   priceModifier Decimal
+  createdAt     DateTime    @default(now())
   productId     String
   product       Product     @relation(fields: [productId], references: [id])
-  createdAt     DateTime    @default(now())
   orderItems    OrderItem[]
 }
 
@@ -125,44 +113,44 @@ model Size {
   sizeName      String
   priceModifier Decimal
   productId     String
-  product       Product     @relation(fields: [productId], references: [id])
-  orderItems    OrderItem[]
   fullPrice     Decimal
   createdAt     DateTime    @default(now())
+  orderItems    OrderItem[]
+  product       Product     @relation(fields: [productId], references: [id])
 }
 
 model Order {
   id            String      @id @default(cuid())
-  displayId     Int
   userId        String
-  user          User        @relation(fields: [userId], references: [id])
   orderStatus   String      @default("Pending")
   paymentStatus Boolean     @default(false)
   paymentMethod String      @default("Cash")
-  discount      Decimal     @default(0)
-  total         Decimal
   createdAt     DateTime    @default(now())
+  total         Decimal
+  discount      Decimal     @default(0)
+  displayId     Int
+  user          User        @relation(fields: [userId], references: [id])
   orderItems    OrderItem[]
 }
 
 model OrderItem {
   id          String     @id @default(cuid())
   orderId     String
-  order       Order      @relation(fields: [orderId], references: [id])
   productId   String
-  product     Product    @relation(fields: [productId], references: [id])
   quantity    Int        @default(1)
   price       Decimal
-  sizeId      String?
-  size        Size?      @relation(fields: [sizeId], references: [id])
-  sugarId     String?
-  sugar       Sugar?     @relation(fields: [sugarId], references: [id])
-  iceId       String?
-  ice         Ice?       @relation(fields: [iceId], references: [id])
-  extraShotId String?
-  extraShot   ExtraShot? @relation(fields: [extraShotId], references: [id])
   note        String?
+  sizeId      String?
+  extraShotId String?
+  iceId       String?
+  sugarId     String?
   createdAt   DateTime   @default(now())
+  extraShot   ExtraShot? @relation(fields: [extraShotId], references: [id])
+  ice         Ice?       @relation(fields: [iceId], references: [id])
+  order       Order      @relation(fields: [orderId], references: [id])
+  product     Product    @relation(fields: [productId], references: [id])
+  size        Size?      @relation(fields: [sizeId], references: [id])
+  sugar       Sugar?     @relation(fields: [sugarId], references: [id])
 }
 
 model Ingredient {
@@ -172,72 +160,72 @@ model Ingredient {
   unit               String
   lowStockThreshold  Int
   createdAt          DateTime            @default(now())
-  suppliers          Supplier[]          @relation("SupplierIngredients")
   ingredientStocks   IngredientStock[]
-  Purchases          Purchase[]
   pendingPurchases   PendingPurchase[]
   pendingStockUsages PendingStockUsage[]
+  Purchases          Purchase[]
+  suppliers          Supplier[]          @relation("SupplierIngredients")
 }
 
 model IngredientStock {
   id           String     @id @default(cuid())
   ingredientId String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  quantity     Int
   status       String     @default("Use")
-  note         String?
   createdAt    DateTime   @default(now())
+  quantity     Int
+  note         String?
+  userId       String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
 }
 
 model PendingStockUsage {
   id              String     @id @default(cuid())
   ingredientId    String
-  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
   userId          String
-  user            User       @relation(fields: [userId], references: [id])
   quantity        Int
   note            String?
-  status          String     @default("Use")
-  approvalStatus  String     @default("Pending") // "Pending" | "Approved" | "Rejected"
+  approvalStatus  String     @default("Pending")
   approvedById    String?
-  approvedBy      User?      @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
   rejectionReason String?
   approvedAt      DateTime?
   createdAt       DateTime   @default(now())
+  status          String     @default("Use")
+  approvedBy      User?      @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+  user            User       @relation(fields: [userId], references: [id])
 }
 
 model Purchase {
   id           String     @id @default(cuid())
   ingredientId String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  userId       String
-  user         User       @relation(fields: [userId], references: [id])
-  supplierId   String
-  supplier     Supplier   @relation(fields: [supplierId], references: [id])
   quantity     Int
   price        Decimal
   createdAt    DateTime   @default(now())
+  supplierId   String
+  userId       String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  supplier     Supplier   @relation(fields: [supplierId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
 }
 
 model PendingPurchase {
   id              String     @id @default(cuid())
   ingredientId    String
-  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
   supplierId      String
-  supplier        Supplier   @relation(fields: [supplierId], references: [id])
   userId          String
-  user            User       @relation(fields: [userId], references: [id])
   quantity        Int
   price           Decimal
   note            String?
-  approvalStatus  String     @default("Pending") // "Pending" | "Approved" | "Rejected"
-  approvedById    String? // Optional, in case you want to track
-  approvedBy      User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  approvalStatus  String     @default("Pending")
+  approvedById    String?
   rejectionReason String?
   approvedAt      DateTime?
   createdAt       DateTime   @default(now())
+  approvedBy      User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+  supplier        Supplier   @relation(fields: [supplierId], references: [id])
+  user            User       @relation(fields: [userId], references: [id])
 }
 
 model Supplier {
@@ -245,57 +233,63 @@ model Supplier {
   name                String
   contact             String
   isActive            Boolean           @default(true)
-  purchases           Purchase[]
-  suppliedIngredients Ingredient[]      @relation("SupplierIngredients")
   createdAt           DateTime          @default(now())
   pendingPurchases    PendingPurchase[]
+  purchases           Purchase[]
+  suppliedIngredients Ingredient[]      @relation("SupplierIngredients")
 }
 
 model Notification {
   id        String   @id @default(cuid())
-  title     String
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   type      String
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  title     String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model DayClose {
-  id               String   @id @default(cuid())
-  date             DateTime @unique
-  totalSales       Decimal
-  totalOrders      Int
-  totalCustomers   Int
-  cashSales        Decimal  @default(0)
-  abaSales         Decimal  @default(0)
-  creditCardSales  Decimal  @default(0)
-  topProducts      String?
-  promotionsUsed   String?
-  lowStockItems    String?
-  hourlyBreakdown  String?
-  notes            String?
-  closedBy         String?
-  closedAt         DateTime @default(now())
-  createdAt        DateTime @default(now())
+  id              String   @id @default(cuid())
+  date            DateTime @unique
+  totalSales      Decimal
+  totalOrders     Int
+  totalCustomers  Int
+  cashSales       Decimal  @default(0)
+  abaSales        Decimal  @default(0)
+  creditCardSales Decimal  @default(0)
+  topProducts     String?
+  promotionsUsed  String?
+  lowStockItems   String?
+  hourlyBreakdown String?
+  notes           String?
+  closedBy        String?
+  closedAt        DateTime @default(now())
+  createdAt       DateTime @default(now())
 }
 
-model Billboard{
-  id       String   @id @default(cuid())
+model Billboard {
+  id        String   @id @default(cuid())
   image     String
-  title     String
   link      String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+  title     String
 }
 
 model Announcement {
   id        String   @id @default(cuid())
-  type      String?
   title     String
   content   String
   image     String?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+  type      String?
+}
+
+enum PromotionType {
+  BUY_X_GET_Y
+  FIXED_DISCOUNT
+  PERCENT_DISCOUNT
 }

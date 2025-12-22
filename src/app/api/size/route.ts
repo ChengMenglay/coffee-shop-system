@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const sizes = await prisma.size.findMany();
+    const sizes = await prisma.size.findMany({
+      include: { product: { include: { category: true } } },
+      orderBy: { createdAt: "desc" },
+    });
     return NextResponse.json(sizes);
   } catch (error) {
     console.log("[SIZE_GET]", error);
