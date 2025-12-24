@@ -22,6 +22,7 @@ model User {
   approvedPendingStockUsages PendingStockUsage[] @relation("ApprovedStockUsage")
   pendingStockUsages         PendingStockUsage[]
   purchases                  Purchase[]
+  favorites                  Favorite[]
   role                       Role                @relation(fields: [roleId], references: [id])
 }
 
@@ -63,6 +64,7 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   size        Size[]
   sugar       Sugar[]
+  favorites   Favorite[]
   promotions  Promotion[] @relation("ProductPromotions")
 }
 
@@ -85,6 +87,7 @@ model Sugar {
   name       String
   createdAt  DateTime    @default(now())
   productId  String
+  image      String?
   orderItems OrderItem[]
   product    Product     @relation(fields: [productId], references: [id])
 }
@@ -94,6 +97,7 @@ model Ice {
   name       String
   createdAt  DateTime    @default(now())
   productId  String
+  image      String?
   product    Product     @relation(fields: [productId], references: [id])
   orderItems OrderItem[]
 }
@@ -104,6 +108,7 @@ model ExtraShot {
   priceModifier Decimal
   createdAt     DateTime    @default(now())
   productId     String
+  image         String?
   product       Product     @relation(fields: [productId], references: [id])
   orderItems    OrderItem[]
 }
@@ -286,6 +291,17 @@ model Announcement {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   type      String?
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 enum PromotionType {
