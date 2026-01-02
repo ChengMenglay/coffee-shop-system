@@ -18,10 +18,6 @@ export async function POST(req: Request) {
       return NextResponse.json("Size Id of order is required!", {
         status: 400,
       });
-    if (!sugarId)
-      return NextResponse.json("Sugar id of order is required!", {
-        status: 400,
-      });
     const orderItem = await prisma.orderItem.create({
       data: {
         orderId,

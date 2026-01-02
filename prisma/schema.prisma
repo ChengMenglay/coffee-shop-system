@@ -23,6 +23,7 @@ model User {
   pendingStockUsages         PendingStockUsage[]
   purchases                  Purchase[]
   favorites                  Favorite[]
+  voucherUsages              VoucherUsage[]
   role                       Role                @relation(fields: [roleId], references: [id])
 }
 
@@ -134,6 +135,10 @@ model Order {
   total         Decimal
   discount      Decimal     @default(0)
   displayId     Int
+  discountVoucher Decimal     @default(0)
+  voucherId     String?
+  voucherCode   String?
+  voucher       Voucher?    @relation(fields: [voucherId], references: [id])
   user          User        @relation(fields: [userId], references: [id])
   orderItems    OrderItem[]
 }
@@ -302,6 +307,50 @@ model Favorite {
   product   Product  @relation(fields: [productId], references: [id])
 
   @@unique([userId, productId])
+}
+
+model Voucher {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  description   String?
+
+  discountType  VoucherDiscountType
+  discountValue Decimal
+
+  minOrderTotal Decimal?
+  maxDiscount   Decimal?
+
+  startDate     DateTime
+  endDate       DateTime
+
+  usageLimit    Int?
+  usedCount     Int       @default(0)
+
+  perUserLimit Int?
+  isActive      Boolean   @default(true)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  voucherUsages VoucherUsage[]
+  orders        Order[]
+}
+
+model VoucherUsage {
+  id        String   @id @default(cuid())
+  voucherId String
+  userId    String
+  usedAt    DateTime @default(now())
+
+  voucher   Voucher  @relation(fields: [voucherId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+@@index([voucherId])
+  @@index([userId])
+}
+
+
+enum VoucherDiscountType {
+  PERCENT
+  FIXED
 }
 
 enum PromotionType {

@@ -11,6 +11,7 @@ export async function POST(req: Request) {
       paymentStatus,
       total,
       discount,
+      voucherCode,
     } = body;
 
     // ✅ Validation
@@ -22,10 +23,8 @@ export async function POST(req: Request) {
       return NextResponse.json("Payment method is required!", { status: 400 });
     if (paymentStatus === undefined)
       return NextResponse.json("Payment status is required!", { status: 400 });
-    if (!total)
-      return NextResponse.json("Total price of order is required!", {
-        status: 400,
-      });
+    if (!total || total <= 0)
+      return NextResponse.json("Total price is required!", { status: 400 });
 
     // 🔄 Find last order and calculate next displayId (1-100 loop)
     const lastOrder = await prisma.order.findFirst({
@@ -33,23 +32,100 @@ export async function POST(req: Request) {
       select: { displayId: true },
     });
 
-    // ✅ Safe calculation of nextDisplayId using optional chaining
     const nextDisplayId = ((lastOrder?.displayId ?? 0) % 100) + 1;
 
-    // ✅ Create new order
-    const newOrder = await prisma.order.create({
-      data: {
-        userId,
-        displayId: nextDisplayId,
-        orderStatus,
-        paymentMethod,
-        paymentStatus,
-        discount,
-        total,
-      },
+    let discountVoucher = 0;
+    let voucherId: string | null = null;
+
+    //Voucher validation
+    if (voucherCode) {
+      const voucher = await prisma.voucher.findUnique({
+        where: { code: voucherCode },
+        include: { voucherUsages: { where: { userId } } },
+      });
+
+      if (!voucher || !voucher.isActive) {
+        return NextResponse.json("Invalid voucher", { status: 400 });
+      }
+      const now = new Date();
+      if (now < voucher.startDate || now > voucher.endDate) {
+        return NextResponse.json("Voucher expired", { status: 400 });
+      }
+      if (voucher.minOrderTotal && total < voucher.minOrderTotal) {
+        return NextResponse.json(`Minimum order is ${voucher.minOrderTotal}`, {
+          status: 400,
+        });
+      }
+      if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
+        return NextResponse.json("Voucher usage limit reached", {
+          status: 400,
+        });
+      }
+
+      if (
+        voucher.perUserLimit &&
+        voucher.voucherUsages.length >= voucher.perUserLimit
+      ) {
+        return NextResponse.json("You already used this voucher", {
+          status: 400,
+        });
+      }
+
+      //Calculate discount
+      if (voucher.discountType === "PERCENT") {
+        discountVoucher = (Number(total) * Number(voucher.discountValue)) / 100;
+        if (voucher.maxDiscount) {
+          discountVoucher = Math.min(
+            discountVoucher,
+            Number(voucher.maxDiscount)
+          );
+        }
+      } else {
+        discountVoucher = Number(voucher.discountValue);
+      }
+      voucherId = voucher.id;
+    }
+
+    const finalTotal = Number(total) - discountVoucher;
+
+    if (finalTotal < 0)
+      return NextResponse.json("Invalid final total", { status: 400 });
+
+    // 🔐 TRANSACTION (IMPORTANT)
+    const order = await prisma.$transaction(async (tx) => {
+      const newOrder = await tx.order.create({
+        data: {
+          userId,
+          displayId: nextDisplayId,
+          orderStatus,
+          paymentMethod,
+          paymentStatus,
+          discount,
+          total: finalTotal,
+          discountVoucher,
+          voucherId,
+          voucherCode,
+        },
+      });
+
+      if (voucherId) {
+        await tx.voucherUsage.create({
+          data: {
+            voucherId,
+            userId,
+          },
+        });
+
+        await tx.voucher.update({
+          where: { id: voucherId },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+
+      return newOrder;
     });
 
-    return NextResponse.json(newOrder);
+    return NextResponse.json(order);
   } catch (error) {
     console.error("[ORDER_POST]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

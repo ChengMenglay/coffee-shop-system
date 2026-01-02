@@ -203,6 +203,12 @@ const productItems = [
     requiredPermission: "view:promotion",
   },
   {
+    title: "Voucher",
+    url: "/dashboard/voucher",
+    icon: Tag,
+    requiredPermission: "view:voucher",
+  },
+  {
     title: "Category",
     url: "/dashboard/category",
     icon: Tags,

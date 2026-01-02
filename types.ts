@@ -1,4 +1,4 @@
-import { PromotionType } from "@prisma/client";
+import { PromotionType, VoucherDiscountType } from "@prisma/client";
 
 export type Notification = {
   id: string;
@@ -58,6 +58,24 @@ export type Promotion = {
   startDate: Date;
   endDate: Date;
   isActive: boolean;
+};
+
+export type Voucher = {
+  id: string;
+  code: string;
+  description: string | null;
+  discountType: VoucherDiscountType;
+  discountValue: number;
+  minOrderTotal: number | null;
+  maxDiscount: number | null;
+  startDate: Date;
+  endDate: Date;
+  usageLimit: number | null;
+  usedCount: number;
+  perUserLimit: number | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type Order = {

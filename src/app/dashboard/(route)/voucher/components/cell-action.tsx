@@ -8,8 +8,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
-import React, { useState } from "react";
-import { PromotionColumn } from "./columns";
+import{ useState } from "react";
+import { VoucherColumn } from "./columns";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
@@ -25,7 +25,7 @@ import {
 import axios from "axios";
 
 type CellActionProps = {
-  data: PromotionColumn;
+  data: VoucherColumn;
   canEdit: boolean;
   canDelete: boolean;
 };
@@ -38,13 +38,13 @@ export default function CellAction({
   const [isOpen, setIsOpen] = useState(false);
   const onCopy = (id: string) => {
     navigator.clipboard.writeText(id);
-    toast.success("Promotion id copied");
+    toast.success("Voucher id copied");
   };
   const onDelete = async () => {
     try {
-      await axios.delete(`/api/promotion/${data.id}`);
-      toast.success("Promotion deleted");
-      router.push(`/dashboard/promotion`);
+      await axios.delete(`/api/voucher/${data.id}`);
+      toast.success("Voucher deleted");
+      router.push(`/dashboard/voucher`);
       setIsOpen(false);
       router.refresh();
     } catch (error) {
@@ -93,7 +93,7 @@ export default function CellAction({
           </DropdownMenuItem>
           {canEdit && (
             <DropdownMenuItem
-              onClick={() => router.push(`/dashboard/promotion/${data.id}`)}
+              onClick={() => router.push(`/dashboard/voucher/${data.id}`)}
             >
               <Edit className="w-4 h-4" />
               Update
