@@ -343,7 +343,8 @@ model VoucherUsage {
 
   voucher   Voucher  @relation(fields: [voucherId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-@@index([voucherId])
+
+  @@index([voucherId])
   @@index([userId])
 }
 
