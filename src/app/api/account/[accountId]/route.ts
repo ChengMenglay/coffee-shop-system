@@ -8,17 +8,19 @@ export async function PATCH(
 ) {
   try {
     const body = await req.json();
-    const { name, phone, roleId, password } = body;
+    const { name,email, phone,birthday,photoURL, roleId, password } = body;
     const { accountId } = await params;
     if (!accountId)
       return new NextResponse("Account Id is required", { status: 400 });
-    if (!name) return NextResponse.json("Name is required", { status: 400 });
-    if (!phone) return NextResponse.json("Phone is required", { status: 400 });
+
     if (!roleId)
       return NextResponse.json("Role Id is required", { status: 400 });
-    const updateData: { name: string; phone: string; roleId: string; password?: string } = {
+    const updateData: { name: string; email: string;  phone: string; birthday: string; photoURL: string; roleId: string; password?: string } = {
       name,
+      email,
       phone,
+      birthday,
+      photoURL,
       roleId,
     };
 
