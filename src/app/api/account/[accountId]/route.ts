@@ -12,7 +12,7 @@ export async function PATCH(
     const { accountId } = await params;
     if (!accountId)
       return new NextResponse("Account Id is required", { status: 400 });
-
+    
     if (!roleId)
       return NextResponse.json("Role Id is required", { status: 400 });
     const updateData: { name: string; email: string;  phone: string; birthday: string; photoURL: string; roleId: string; password?: string } = {

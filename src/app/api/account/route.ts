@@ -9,17 +9,7 @@ export async function POST(req: Request) {
 
     // Validation
     if (!name) {
-      return NextResponse.json(
-        { error: "Name is required" },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
     // Check if email already exists (if provided)
@@ -36,9 +26,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create user with default role
     const user = await prisma.user.create({
       data: {
@@ -47,7 +34,7 @@ export async function POST(req: Request) {
         phone: phone || null,
         birthday: birthday ? new Date(birthday) : null,
         gender: gender || null,
-        password: hashedPassword,
+        password: password ? await bcrypt.hash(password, 10) : "",
         photoURL: photoURL || null,
         roleId: "cmjzk3lhs000ijr046z864d4w", // Default role ID
       },
