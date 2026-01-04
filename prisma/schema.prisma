@@ -10,10 +10,14 @@ datasource db {
 model User {
   id                         String              @id @default(cuid())
   name                       String
+  email                      String?              @unique
+  birthday                   DateTime?
+  gender                     String?
   password                   String
   roleId                     String
   createdAt                  DateTime            @default(now())
   phone                      String?
+  photoURL                  String?
   IngredientStocks           IngredientStock[]
   notification               Notification[]
   orders                     Order[]
@@ -25,6 +29,8 @@ model User {
   favorites                  Favorite[]
   voucherUsages              VoucherUsage[]
   role                       Role                @relation(fields: [roleId], references: [id])
+  Feedback                  Feedback[]
+  feedbackUpdated           Feedback[]          @relation("FeedbackUpdatedBy")
 }
 
 model Role {
@@ -141,6 +147,7 @@ model Order {
   voucher       Voucher?    @relation(fields: [voucherId], references: [id])
   user          User        @relation(fields: [userId], references: [id])
   orderItems    OrderItem[]
+  Feedback      Feedback[]
 }
 
 model OrderItem {
@@ -346,6 +353,27 @@ model VoucherUsage {
 
   @@index([voucherId])
   @@index([userId])
+}
+
+model Feedback {
+  id          String           @id @default(cuid())
+  userId      String
+  orderId     String?          // Optional (some feedback not order-related)
+  category    String
+  description String           @db.VarChar(150)
+  images      String[]         // Store image URLs (Cloudinary, S3, etc.)
+  status      String           @default("PENDING")
+  
+  updatedById   String?     
+  createdAt   DateTime         @default(now())
+
+  user        User             @relation(fields: [userId], references: [id])
+  order       Order?           @relation(fields: [orderId], references: [id])
+  updatedBy   User?          @relation("FeedbackUpdatedBy", fields: [updatedById], references: [id])     
+
+
+  @@index([userId])
+  @@index([orderId])
 }
 
 

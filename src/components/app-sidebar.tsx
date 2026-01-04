@@ -253,6 +253,12 @@ const broadcastItems = [
     icon: FileText,
     requiredPermission: "view:announcement",
   },
+  {
+    title: "Feedback",
+    url: "/dashboard/feedback",
+    icon: Archive,
+    requiredPermission: "view:feedback",
+  },
 ];
 
 export async function AppSidebar() {
