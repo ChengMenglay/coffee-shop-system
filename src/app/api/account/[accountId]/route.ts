@@ -15,8 +15,6 @@ export async function PATCH(
     if (!accountId)
       return new NextResponse("Account Id is required", { status: 400 });
 
-    if (!roleId)
-      return NextResponse.json("Role Id is required", { status: 400 });
     const updateData: {
       name: string;
       email: string;
