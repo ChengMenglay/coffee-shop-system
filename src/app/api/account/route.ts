@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         name,
         email: email || null,
         phone: phone || null,
-        birthday: birthday ? new Date(birthday) : null,
+        birthday: birthday || null,
         gender: gender || null,
         password: password ? await bcrypt.hash(password, 10) : "",
         photoURL: photoURL || null,
