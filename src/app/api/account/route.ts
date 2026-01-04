@@ -74,35 +74,36 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const users = await prisma.user.findMany({
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return new NextResponse("Email is required", { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
       select: {
         id: true,
         name: true,
         email: true,
         phone: true,
         birthday: true,
-        gender: true,
         photoURL: true,
         roleId: true,
         createdAt: true,
-        role: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
-      orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(users);
+    if (!user) {
+      return new NextResponse("User not found", { status: 404 });
+    }
+
+    return NextResponse.json(user);
   } catch (error) {
     console.log("[ACCOUNT_GET]", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
