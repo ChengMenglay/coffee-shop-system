@@ -8,9 +8,9 @@ export async function POST(req: Request) {
     const { name, email, phone, birthday, gender, password, photoURL } = body;
 
     // Validation
-    if (!name || !password) {
+    if (!name) {
       return NextResponse.json(
-        { error: "Name and password are required" },
+        { error: "Name is required" },
         { status: 400 }
       );
     }
