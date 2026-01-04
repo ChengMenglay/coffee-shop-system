@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, phone, birthday, gender, password, photoURL } = body;
+    const { id, name, email, phone, birthday, gender, password, photoURL } =
+      body;
 
     // Validation
     if (!name) {
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
     // Create user with default role
     const user = await prisma.user.create({
       data: {
+        id,
         name,
         email: email || null,
         phone: phone || null,
