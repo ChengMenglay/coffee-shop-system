@@ -11,7 +11,7 @@ model User {
   id                         String              @id @default(cuid())
   name                       String
   email                      String?              @unique
-  birthday                   DateTime?
+  birthday                   String?
   gender                     String?
   password                   String
   roleId                     String

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         gender: gender || null,
         password: password ? await bcrypt.hash(password, 10) : "",
         photoURL: photoURL || null,
-        roleId: "cmjzk3lhs000ijr046z864d4w", // Default role ID
+        roleId: "cmjzk3lhs000ijr046z864d4w",
       },
       select: {
         id: true,
