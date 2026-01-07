@@ -87,11 +87,6 @@ export async function POST(req: Request) {
       voucherId = voucher.id;
     }
 
-    const finalTotal = Number(total) - discountVoucher;
-
-    if (finalTotal < 0)
-      return NextResponse.json("Invalid final total", { status: 400 });
-
     // 🔐 TRANSACTION (IMPORTANT)
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
@@ -103,7 +98,7 @@ export async function POST(req: Request) {
           paymentStatus,
           discount,
           oderFrom,
-          total: finalTotal,
+          total,
           discountVoucher,
           voucherId,
           voucherCode,
