@@ -135,6 +135,7 @@ model Order {
   id            String      @id @default(cuid())
   userId        String
   orderStatus   String      @default("Pending")
+  oderFrom     String      @default("System")
   paymentStatus Boolean     @default(false)
   paymentMethod String      @default("Cash")
   createdAt     DateTime    @default(now())

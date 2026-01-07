@@ -16,7 +16,10 @@ async function VoucherPage() {
     id: item.id,
     code: item.code,
     discountType: item.discountType,
-    discountValue: formatterUSD.format(Number(item.discountValue)),
+    discountValue:
+      item.discountType === "FIXED"
+        ? formatterUSD.format(Number(item.discountValue))
+        : item.discountValue + "%",
     perUserLimit: item.perUserLimit ?? 0,
     usageLimit: item.usageLimit ?? 0,
     startDate: item?.startDate,

@@ -15,6 +15,7 @@ export type PendingOrder = {
   orderStatus: string;
   paymentStatus: boolean;
   discount: number;
+  oderFrom: string;
   createdAt: string;
   user: {
     name: string;
@@ -80,6 +81,7 @@ async function OrderManagementPage() {
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,
+      oderFrom: order.oderFrom,
       total: formatterUSD.format(Number(order.total)),
       createdAt: format(order.createdAt, "dd MMMM yyyy"),
     }));
@@ -93,6 +95,7 @@ async function OrderManagementPage() {
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       discount: order.discount.toNumber(),
+      oderFrom: order.oderFrom,
       createdAt: formatDistanceToNowStrict(new Date(order.createdAt), {
         addSuffix: true,
       }),

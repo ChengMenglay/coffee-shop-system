@@ -12,6 +12,7 @@ export type OrderManagementColumn = {
   orderStatus: string;
   paymentStatus: boolean;
   paymentMethod: string;
+  oderFrom: string;
   total: string;
   createdAt: string;
 };
@@ -20,14 +21,14 @@ const ActionCell = ({ row }: { row: { original: OrderManagementColumn } }) => {
   const { canPerformAction } = usePermissions();
 
   return (
-      <CellAction
-        editOrderStatusCompleted={row.original.orderStatus === "Completed"}
-        editOrderStatusCancelled={row.original.orderStatus === "Cancelled"}
-        editPaymentPaid={!row.original.paymentStatus}
-        editPaymentUnPaid={row.original.paymentStatus}
-        data={row.original}
-        canDelete={canPerformAction(["delete:order_management"])}
-      />
+    <CellAction
+      editOrderStatusCompleted={row.original.orderStatus === "Completed"}
+      editOrderStatusCancelled={row.original.orderStatus === "Cancelled"}
+      editPaymentPaid={!row.original.paymentStatus}
+      editPaymentUnPaid={row.original.paymentStatus}
+      data={row.original}
+      canDelete={canPerformAction(["delete:order_management"])}
+    />
   );
 };
 
@@ -94,6 +95,6 @@ export const columns: ColumnDef<OrderManagementColumn>[] = [
   {
     accessorKey: "action",
     header: "Action",
-    cell: ({ row }) => <ActionCell row={row} />
+    cell: ({ row }) => <ActionCell row={row} />,
   },
 ];

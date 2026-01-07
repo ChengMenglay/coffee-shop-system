@@ -10,6 +10,7 @@ export async function POST(req: Request) {
       paymentMethod,
       paymentStatus,
       total,
+      oderFrom,
       discount,
       voucherCode,
     } = body;
@@ -101,6 +102,7 @@ export async function POST(req: Request) {
           paymentMethod,
           paymentStatus,
           discount,
+          oderFrom,
           total: finalTotal,
           discountVoucher,
           voucherId,
@@ -128,6 +130,19 @@ export async function POST(req: Request) {
     return NextResponse.json(order);
   } catch (error) {
     console.error("[ORDER_POST]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { user: true, voucher: true, orderItems: true },
+    });
+    return NextResponse.json(orders);
+  } catch (error) {
+    console.error("[ORDER_GET_ALL]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

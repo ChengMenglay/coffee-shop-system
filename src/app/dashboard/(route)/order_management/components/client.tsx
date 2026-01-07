@@ -48,7 +48,7 @@ function OrderManagementClient({
   draftCount,
   pendingOrderData,
 }: OrderManagementClientTypeProps) {
-  const [selectedTab, setSelectedTab] = useState("new_order");
+  const [selectedTab, setSelectedTab] = useState("system");
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>();
   const [isDayClosed, setIsDayClosed] = useState<boolean>(false);
   const router = useRouter();
@@ -74,6 +74,12 @@ function OrderManagementClient({
   const cancelledData = filterdData.filter(
     (order) => order.orderStatus === "Cancelled"
   );
+  const systemOrdersCount = filterPendingData.filter(
+    (order) => order.oderFrom === "System" && order.orderStatus === "Pending"
+  ).length;
+  const mobileOrdersCount = filterPendingData.filter(
+    (order) => order.oderFrom === "Mobile" && order.orderStatus === "Pending"
+  ).length;
   // Check if day is already closed
   useEffect(() => {
     const checkDayStatus = async () => {
@@ -258,11 +264,19 @@ function OrderManagementClient({
           className="my-4"
         >
           <TabsList>
-            <TabsTrigger value="new_order">
-              New Order
-              {pendingCount > 0 && (
-                <Badge className="text-xs rounded-full bg-red-500 text-white">
-                  {pendingCount}
+            <TabsTrigger value="system">
+              System Orders
+              {systemOrdersCount > 0 && (
+                <Badge className="text-xs rounded-full bg-blue-500 text-white ml-1">
+                  {systemOrdersCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="mobile">
+              Mobile Orders
+              {mobileOrdersCount > 0 && (
+                <Badge className="text-xs rounded-full bg-purple-500 text-white ml-1">
+                  {mobileOrdersCount}
                 </Badge>
               )}
             </TabsTrigger>
@@ -315,20 +329,53 @@ function OrderManagementClient({
             />
           )}
         </div>
-      ) : selectedTab === "new_order" ? (
+      ) : selectedTab === "system" ? (
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-          {pendingData.length > 0 ? (
-            pendingData.map((order) => (
-              <NewOrder
-                key={order.id}
-                data={order}
-                countItem={order.orderItems.length}
-              />
-            ))
+          {filterPendingData.filter(
+            (order) =>
+              order.oderFrom === "System" && order.orderStatus === "Pending"
+          ).length > 0 ? (
+            filterPendingData
+              .filter(
+                (order) =>
+                  order.oderFrom === "System" && order.orderStatus === "Pending"
+              )
+              .map((order) => (
+                <NewOrder
+                  key={order.id}
+                  data={order}
+                  countItem={order.orderItems.length}
+                />
+              ))
           ) : (
             <NoResult
-              title="No pending orders"
-              description="There are no pending orders. New orders will appear here when submitted."
+              title="No system orders"
+              description="There are no pending orders from the system. Orders placed through the system will appear here."
+            />
+          )}
+        </div>
+      ) : selectedTab === "mobile" ? (
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
+          {filterPendingData.filter(
+            (order) =>
+              order.oderFrom === "Mobile" && order.orderStatus === "Pending"
+          ).length > 0 ? (
+            filterPendingData
+              .filter(
+                (order) =>
+                  order.oderFrom === "Mobile" && order.orderStatus === "Pending"
+              )
+              .map((order) => (
+                <NewOrder
+                  key={order.id}
+                  data={order}
+                  countItem={order.orderItems.length}
+                />
+              ))
+          ) : (
+            <NoResult
+              title="No mobile orders"
+              description="There are no pending orders from mobile. Orders placed through the mobile app will appear here."
             />
           )}
         </div>

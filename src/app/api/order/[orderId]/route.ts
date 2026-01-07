@@ -1,5 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ orderId: string }> }
+) {
+  try {
+    const { orderId } = await params;
+    if (!orderId)
+      return NextResponse.json("Order Id is required!", { status: 400 });
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include:{ orderItems: true, voucher: true, user: true }
+    });
+    return NextResponse.json(order);
+  } catch (error) {
+    console.error("[ORDER_GET]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
 
 export async function PATCH(
   req: Request,
