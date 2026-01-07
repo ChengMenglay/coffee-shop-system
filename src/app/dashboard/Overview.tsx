@@ -144,6 +144,7 @@ function Overview({
       .map((orderItem) => orderItem.product.name)
       .join(", "),
     userId: order.userId,
+    oderFrom: order.oderFrom,
     orderStatus: order.orderStatus,
     paymentStatus: order.paymentStatus,
     paymentMethod: order.paymentMethod,

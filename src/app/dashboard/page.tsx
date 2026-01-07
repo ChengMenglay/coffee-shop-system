@@ -94,6 +94,7 @@ async function DashboardPage() {
       displayId: order.displayId,
       total: order.total.toNumber(),
       paymentMethod: order.paymentMethod,
+      oderFrom: order.oderFrom,
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       discount: order.discount.toNumber(),
