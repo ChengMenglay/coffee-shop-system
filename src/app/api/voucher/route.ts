@@ -2,14 +2,54 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 // GET all vouchers
-export async function GET(_req: Request) {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
     const vouchers = await prisma.voucher.findMany({
       orderBy: { createdAt: "desc" },
+      where: {
+        isActive: true,
+        startDate: { lte: new Date() },
+        endDate: { gte: new Date() },
+      },
+      include: {
+        voucherUsages: userId
+          ? {
+              where: { userId },
+            }
+          : false,
+      },
     });
-    return NextResponse.json(vouchers);
+
+    // Filter vouchers that haven't reached their usage limit
+    const availableVouchers = vouchers.filter((voucher) => {
+      // Check global usage limit
+      if (
+        voucher.usageLimit !== null &&
+        voucher.usedCount >= voucher.usageLimit
+      ) {
+        return false;
+      }
+
+      // Check per-user usage limit if userId is provided
+      if (userId && voucher.perUserLimit !== null) {
+        const userUsageCount = voucher.voucherUsages?.length || 0;
+        if (userUsageCount >= voucher.perUserLimit) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return NextResponse.json(availableVouchers);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch vouchers" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch vouchers" },
+      { status: 500 }
+    );
   }
 }
 
@@ -33,7 +73,10 @@ export async function POST(req: Request) {
 
     // Basic validation
     if (!code || !discountType || !discountValue || !startDate || !endDate) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     const newVoucher = await prisma.voucher.create({
@@ -56,8 +99,14 @@ export async function POST(req: Request) {
   } catch (error: any) {
     if (error.code === "P2002") {
       // Prisma unique constraint failed
-      return NextResponse.json({ error: "Voucher code already exists" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Voucher code already exists" },
+        { status: 400 }
+      );
     }
-    return NextResponse.json({ error: "Failed to create voucher" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create voucher" },
+      { status: 500 }
+    );
   }
 }

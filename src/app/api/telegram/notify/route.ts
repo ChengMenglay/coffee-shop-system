@@ -123,9 +123,12 @@ async function handleNewOrderNotification(orderId: string) {
       total: order.total.toNumber(),
       paymentMethod: order.paymentMethod,
       orderStatus: order.orderStatus,
+      pickupTime: order.pickupTime ? order.pickupTime : null,
       oderFrom: order.oderFrom,
       paymentStatus: order.paymentStatus,
       discount: order.discount.toNumber(),
+      discountVoucher: order.discountVoucher.toNumber(),
+      voucherCode: order.voucherCode,
       createdAt: order.createdAt.toISOString(),
       user: {
         name: order.user.name,

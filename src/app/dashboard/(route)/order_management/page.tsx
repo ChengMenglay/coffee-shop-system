@@ -15,7 +15,10 @@ export type PendingOrder = {
   orderStatus: string;
   paymentStatus: boolean;
   discount: number;
+  discountVoucher: number;
+  voucherCode?: string | null;
   oderFrom: string;
+  pickupTime?: string | null;
   createdAt: string;
   user: {
     name: string;
@@ -95,7 +98,10 @@ async function OrderManagementPage() {
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       discount: order.discount.toNumber(),
+      discountVoucher: order.discountVoucher.toNumber(),
+      voucherCode: order.voucherCode || null,
       oderFrom: order.oderFrom,
+      pickupTime: order.pickupTime || null,
       createdAt: formatDistanceToNowStrict(new Date(order.createdAt), {
         addSuffix: true,
       }),

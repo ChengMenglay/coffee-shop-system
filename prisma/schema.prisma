@@ -138,6 +138,7 @@ model Order {
   oderFrom     String      @default("System")
   paymentStatus Boolean     @default(false)
   paymentMethod String      @default("Cash")
+  pickupTime    String?     @default("Now")
   createdAt     DateTime    @default(now())
   total         Decimal
   discount      Decimal     @default(0)
@@ -145,8 +146,8 @@ model Order {
   discountVoucher Decimal     @default(0)
   voucherId     String?
   voucherCode   String?
-  voucher       Voucher?    @relation(fields: [voucherId], references: [id])
-  user          User        @relation(fields: [userId], references: [id])
+  voucher       Voucher?    @relation(fields: [voucherId], references: [id], onDelete: SetNull)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderItems    OrderItem[]
   Feedback      Feedback[]
 }
@@ -193,8 +194,8 @@ model IngredientStock {
   quantity     Int
   note         String?
   userId       String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  user         User       @relation(fields: [userId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PendingStockUsage {
@@ -209,9 +210,9 @@ model PendingStockUsage {
   approvedAt      DateTime?
   createdAt       DateTime   @default(now())
   status          String     @default("Use")
-  approvedBy      User?      @relation("ApprovedStockUsage", fields: [approvedById], references: [id])
-  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
-  user            User       @relation(fields: [userId], references: [id])
+  approvedBy      User?      @relation("ApprovedStockUsage", fields: [approvedById], references: [id], onDelete: SetNull)
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Purchase {
@@ -222,9 +223,9 @@ model Purchase {
   createdAt    DateTime   @default(now())
   supplierId   String
   userId       String
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
-  supplier     Supplier   @relation(fields: [supplierId], references: [id])
-  user         User       @relation(fields: [userId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  supplier     Supplier   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PendingPurchase {
@@ -240,10 +241,10 @@ model PendingPurchase {
   rejectionReason String?
   approvedAt      DateTime?
   createdAt       DateTime   @default(now())
-  approvedBy      User?      @relation("ApprovedBy", fields: [approvedById], references: [id])
-  ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
-  supplier        Supplier   @relation(fields: [supplierId], references: [id])
-  user            User       @relation(fields: [userId], references: [id])
+  approvedBy      User?      @relation("ApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+  ingredient      Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  supplier        Supplier   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Supplier {
@@ -265,7 +266,7 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   title     String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model DayClose {
@@ -311,8 +312,8 @@ model Favorite {
   userId    String
   productId String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
 }
@@ -349,8 +350,8 @@ model VoucherUsage {
   userId    String
   usedAt    DateTime @default(now())
 
-  voucher   Voucher  @relation(fields: [voucherId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  voucher   Voucher  @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([voucherId])
   @@index([userId])
@@ -368,9 +369,9 @@ model Feedback {
   updatedById   String?     
   createdAt   DateTime         @default(now())
 
-  user        User             @relation(fields: [userId], references: [id])
-  order       Order?           @relation(fields: [orderId], references: [id])
-  updatedBy   User?          @relation("FeedbackUpdatedBy", fields: [updatedById], references: [id])     
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order       Order?           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  updatedBy   User?          @relation("FeedbackUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)     
 
 
   @@index([userId])

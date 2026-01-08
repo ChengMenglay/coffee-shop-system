@@ -26,7 +26,8 @@ type NewOrderTypeProps = {
 
 function NewOrder({ data, countItem }: NewOrderTypeProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCancelLoading, setIsCancelLoading] = useState(false);
+  const [isCompleteLoading, setIsCompleteLoading] = useState(false);
 
   // Calculate item base price (before product discount)
   const calculateItemBasePrice = (item: PendingOrder["orderItems"][0]) => {
@@ -79,7 +80,7 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
 
   const handleOrderComplete = async () => {
     try {
-      setIsLoading(true);
+      setIsCompleteLoading(true);
       const order = await axios.patch(`/api/order/${data.id}`, {
         ...data,
         orderStatus: "Completed",
@@ -90,12 +91,13 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       console.log(error);
       toast.error("Internal Server Error");
     } finally {
-      setIsLoading(false);
+      setIsCompleteLoading(false);
     }
   };
 
   const handleOrderCancell = async () => {
     try {
+      setIsCancelLoading(true);
       const order = await axios.patch(`/api/order/${data.id}`, {
         ...data,
         orderStatus: "Cancelled",
@@ -105,6 +107,8 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
     } catch (error) {
       console.log(error);
       toast.error("Internal Server Error");
+    } finally {
+      setIsCancelLoading(false);
     }
   };
 
@@ -126,6 +130,12 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
                 <Calendar className="w-3 h-3" />
                 {data.createdAt}
               </div>
+              {data.pickupTime && (
+                <div className="flex items-center gap-1 text-xs text-amber-300 mt-0.5">
+                  <Clock className="w-3 h-3" />
+                  Pickup: {data.pickupTime}
+                </div>
+              )}
             </div>
           </div>
           <div className="text-right">
@@ -188,7 +198,7 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
           <span className="text-gray-600">
             <strong>{data.user.name}</strong> ({data.user.role.name})
           </span>
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {totalProductDiscounts > 0 && (
               <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded">
                 {formatterUSD.format(totalProductDiscounts)} product savings
@@ -197,6 +207,12 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
             {data.discount > 0 && (
               <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">
                 {formatterUSD.format(data.discount)} order discount
+              </span>
+            )}
+            {data.voucherCode && data.discountVoucher > 0 && (
+              <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
+                🎟️ {data.voucherCode} (-
+                {formatterUSD.format(data.discountVoucher)})
               </span>
             )}
           </div>
@@ -283,7 +299,9 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       </div>
 
       {/* Order Summary */}
-      {(totalProductDiscounts > 0 || data.discount > 0) && (
+      {(totalProductDiscounts > 0 ||
+        data.discount > 0 ||
+        (data.voucherCode && data.discountVoucher > 0)) && (
         <div className="px-3 py-2 bg-gray-50 border-b text-xs space-y-1">
           <div className="flex justify-between">
             <span>Subtotal:</span>
@@ -293,6 +311,12 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
             <div className="flex justify-between text-green-600">
               <span>Order Discount:</span>
               <span>-{formatterUSD.format(data.discount)}</span>
+            </div>
+          )}
+          {data.voucherCode && data.discountVoucher > 0 && (
+            <div className="flex justify-between text-blue-600">
+              <span>Voucher ({data.voucherCode}):</span>
+              <span>-{formatterUSD.format(data.discountVoucher)}</span>
             </div>
           )}
           <div className="flex justify-between font-bold border-t pt-1">
@@ -305,23 +329,26 @@ function NewOrder({ data, countItem }: NewOrderTypeProps) {
       {/* Compact Action Buttons */}
       <div className="p-3 bg-gray-50 flex gap-2">
         <Button
-          disabled={isLoading}
+          disabled={isCancelLoading}
           onClick={handleOrderCancell}
           size="sm"
           className="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs"
         >
-          Cancel
+          {isCancelLoading && (
+            <CgSpinnerTwoAlt className="w-3 h-3 mr-1 animate-spin" />
+          )}
+          {isCancelLoading ? "Processing..." : "Cancel"}
         </Button>
         <Button
-          disabled={isLoading}
+          disabled={isCompleteLoading}
           onClick={handleOrderComplete}
           size="sm"
           className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
         >
-          {isLoading && (
+          {isCompleteLoading && (
             <CgSpinnerTwoAlt className="w-3 h-3 mr-1 animate-spin" />
           )}
-          {isLoading ? "Processing..." : "Complete"}
+          {isCompleteLoading ? "Processing..." : "Complete"}
         </Button>
       </div>
     </Card>

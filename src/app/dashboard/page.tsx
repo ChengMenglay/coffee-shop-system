@@ -98,6 +98,9 @@ async function DashboardPage() {
       orderStatus: order.orderStatus,
       paymentStatus: order.paymentStatus,
       discount: order.discount.toNumber(),
+      discountVoucher: order.discountVoucher.toNumber(),
+      voucherCode: order.voucherCode,
+      pickupTime: order.pickupTime,
       createdAt: order.createdAt.toLocaleString(),
       user: {
         name: order.user.name,

@@ -12,6 +12,7 @@ export async function POST(req: Request) {
       total,
       oderFrom,
       discount,
+      pickupTime,
       voucherCode,
     } = body;
 
@@ -101,6 +102,7 @@ export async function POST(req: Request) {
           total,
           discountVoucher,
           voucherId,
+          pickupTime,
           voucherCode,
         },
       });
@@ -131,7 +133,10 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const searchParams = new URL(req.url).searchParams;
+    const userId = searchParams.get("userId");
     const orders = await prisma.order.findMany({
+      where: { userId: userId || undefined },
       orderBy: { createdAt: "desc" },
       include: { user: true, voucher: true, orderItems: true },
     });
