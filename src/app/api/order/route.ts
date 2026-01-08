@@ -11,6 +11,7 @@ export async function POST(req: Request) {
       paymentStatus,
       total,
       oderFrom,
+      discountVoucher,
       discount,
       pickupTime,
       voucherCode,
@@ -36,7 +37,6 @@ export async function POST(req: Request) {
 
     const nextDisplayId = ((lastOrder?.displayId ?? 0) % 100) + 1;
 
-    let discountVoucher = 0;
     let voucherId: string | null = null;
 
     //Voucher validation
@@ -94,20 +94,6 @@ export async function POST(req: Request) {
           );
         }
       }
-
-      //Calculate voucher discount on subtotal (after regular discount)
-      if (voucher.discountType === "PERCENT") {
-        discountVoucher = (subtotal * Number(voucher.discountValue)) / 100;
-        if (voucher.maxDiscount) {
-          discountVoucher = Math.min(
-            discountVoucher,
-            Number(voucher.maxDiscount)
-          );
-        }
-      } else {
-        discountVoucher = Number(voucher.discountValue);
-      }
-      voucherId = voucher.id;
     }
 
     // 🔐 TRANSACTION (IMPORTANT)
