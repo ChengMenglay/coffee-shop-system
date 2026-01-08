@@ -61,7 +61,11 @@ export async function POST(req: Request) {
       if (now < voucher.startDate || now > voucher.endDate) {
         return NextResponse.json("Voucher expired", { status: 400 });
       }
-      if (voucher.minOrderTotal && total < voucher.minOrderTotal) {
+
+      // Calculate subtotal after regular discount
+      const subtotal = Number(total) - (discount ? Number(discount) : 0);
+
+      if (voucher.minOrderTotal && subtotal < Number(voucher.minOrderTotal)) {
         return NextResponse.json(`Minimum order is ${voucher.minOrderTotal}`, {
           status: 400,
         });
@@ -72,18 +76,28 @@ export async function POST(req: Request) {
         });
       }
 
-      if (
-        voucher.perUserLimit &&
-        voucher.voucherUsages.length >= voucher.perUserLimit
-      ) {
-        return NextResponse.json("You already used this voucher", {
-          status: 400,
+      // Check per-user usage by counting actual orders with this voucher
+      if (voucher.perUserLimit) {
+        const userOrdersWithVoucher = await prisma.order.count({
+          where: {
+            userId,
+            voucherId: voucher.id,
+          },
         });
+
+        if (userOrdersWithVoucher >= voucher.perUserLimit) {
+          return NextResponse.json(
+            "You already used this voucher the maximum number of times",
+            {
+              status: 400,
+            }
+          );
+        }
       }
 
-      //Calculate discount
+      //Calculate voucher discount on subtotal (after regular discount)
       if (voucher.discountType === "PERCENT") {
-        discountVoucher = (Number(total) * Number(voucher.discountValue)) / 100;
+        discountVoucher = (subtotal * Number(voucher.discountValue)) / 100;
         if (voucher.maxDiscount) {
           discountVoucher = Math.min(
             discountVoucher,
