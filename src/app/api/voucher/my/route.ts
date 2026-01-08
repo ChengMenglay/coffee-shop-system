@@ -9,13 +9,45 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing userId" }, { status: 400 });
   }
 
-  const vouchers = await prisma.voucherUsage.findMany({
-    where: { userId },
+  const voucherUsages = await prisma.voucherUsage.findMany({
+    where: {
+      userId,
+      voucher: {
+        isActive: true,
+        startDate: { lte: new Date() },
+        endDate: { gte: new Date() },
+      },
+    },
     include: {
       voucher: true,
     },
     orderBy: { usedAt: "desc" },
   });
 
-  return NextResponse.json(vouchers);
+  // Filter out vouchers that have reached their usage limits
+  const availableVoucherUsages = voucherUsages.filter((usage) => {
+    const voucher = usage.voucher;
+
+    // Check global usage limit
+    if (
+      voucher.usageLimit !== null &&
+      voucher.usedCount >= voucher.usageLimit
+    ) {
+      return false;
+    }
+
+    // Check per-user usage limit
+    if (voucher.perUserLimit !== null) {
+      const userUsageCount = voucherUsages.filter(
+        (u) => u.voucherId === voucher.id
+      ).length;
+      if (userUsageCount >= voucher.perUserLimit) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  return NextResponse.json(availableVoucherUsages);
 }

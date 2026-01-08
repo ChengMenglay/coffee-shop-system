@@ -67,19 +67,11 @@ export async function POST(req: Request) {
         }
       }
 
-      // Create voucher usage (will fail if duplicate due to unique constraint)
+      // Create voucher claim (save to user's account)
       await tx.voucherUsage.create({
         data: {
           voucherId: voucher.id,
           userId,
-        },
-      });
-
-      // Increment usage count
-      await tx.voucher.update({
-        where: { id: voucher.id },
-        data: {
-          usedCount: { increment: 1 },
         },
       });
     });

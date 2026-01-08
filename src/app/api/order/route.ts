@@ -49,6 +49,14 @@ export async function POST(req: Request) {
       if (!voucher || !voucher.isActive) {
         return NextResponse.json("Invalid voucher", { status: 400 });
       }
+
+      // Check if user has claimed this voucher
+      if (voucher.voucherUsages.length === 0) {
+        return NextResponse.json("You must claim this voucher first", {
+          status: 400,
+        });
+      }
+
       const now = new Date();
       if (now < voucher.startDate || now > voucher.endDate) {
         return NextResponse.json("Voucher expired", { status: 400 });
@@ -108,13 +116,7 @@ export async function POST(req: Request) {
       });
 
       if (voucherId) {
-        await tx.voucherUsage.create({
-          data: {
-            voucherId,
-            userId,
-          },
-        });
-
+        // Only increment usage count (user already claimed the voucher)
         await tx.voucher.update({
           where: { id: voucherId },
           data: { usedCount: { increment: 1 } },
